@@ -1,0 +1,22 @@
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@import "tailwindcss";
+
+@theme {
+	--color-ubuntu-orange: #e95420;
+	--color-ubuntu-purple: #77216f;
+	--color-ubuntu-dark-purple: #5e2750;
+	--color-ubuntu-dark: #2d2d2d;
+	--color-ubuntu-light: #f7f7f7;
+	--color-ubuntu-warm-gray: #aea79f;
+	--color-ubuntu-cool-gray: #333333;
+	--color-ubuntu-text-gray: #111111;
+
+	--color-ubuntu-success: #0e8420;
+	--color-ubuntu-warning: #f99b11;
+	--color-ubuntu-error: #c7162b;
+
+	--font-ubuntu: "Ubuntu", system-ui, sans-serif;
+}

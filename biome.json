@@ -7,6 +7,7 @@
 		"enabled": true,
 		"rules": {
 			"recommended": false,
+
 			"complexity": { "noUselessTypeConstraint": "error" },
 			"correctness": { "noUnusedVariables": "error" },
 			"performance": {
@@ -48,6 +49,12 @@
 			"!build/**",
 			"!next-env.d.ts"
 		]
+	},
+
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
 	},
 	"javascript": { "formatter": { "quoteStyle": "double" }, "globals": [] },
 	"overrides": [
