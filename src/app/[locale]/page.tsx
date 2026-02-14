@@ -17,8 +17,6 @@ export default function IndexPage({
 	// const t = useTranslations("HomePage");
 
 	return (
-		<main className="w-full h-screen bg-ubuntu-dark overflow-hidden select-none">
-			<div className="bg-ubuntu-dark text-black p-6">Ubuntu Style Card</div>
-		</main>
+		<main className="w-full h-screen bg-ubuntu-purple overflow-hidden select-none"></main>
 	);
 }

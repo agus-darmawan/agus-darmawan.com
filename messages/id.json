@@ -1,5 +1,18 @@
 {
 	"HomePage": {
-		"title": "Hello dunia!"
+		"title": "Halo dunia!"
+	},
+	"TopBar": {
+		"activities": "Aktivitas",
+		"darkMode": "Mode Gelap",
+		"lightMode": "Mode Terang",
+		"language": "Bahasa",
+		"nowPlaying": "Sedang Diputar",
+		"network": "Jaringan",
+		"battery": "Baterai",
+		"charging": "Mengisi Daya",
+		"offline": "Offline",
+		"openApps": "Aplikasi Terbuka",
+		"noOpenApps": "Tidak ada aplikasi terbuka"
 	}
 }
