@@ -1,4 +1,5 @@
 const requiredEnv = (key: string): string => {
+	console.log(`Loading environment variable: ${key}`);
 	const value = process.env[key];
 	if (!value) {
 		throw new Error(`Missing required environment variable: ${key}`);

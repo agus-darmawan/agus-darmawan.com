@@ -1,10 +1,5 @@
 import { NextResponse } from "next/server";
-
-type ApiResponse<T> = {
-	success: boolean;
-	data: T | null;
-	error?: string;
-};
+import { ApiResponse } from "@/types/api";
 
 export async function GET() {
 	const response: ApiResponse<{ ok: boolean }> = {

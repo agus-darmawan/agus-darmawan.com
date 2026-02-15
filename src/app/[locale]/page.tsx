@@ -2,6 +2,7 @@
 // import { useTranslations } from "next-intl";
 // import { setRequestLocale } from "next-intl/server";
 // import { use } from "react";
+import TopBar from "@/components/top-bar/TopBar";
 
 export default function IndexPage({
 	params,
@@ -17,6 +18,8 @@ export default function IndexPage({
 	// const t = useTranslations("HomePage");
 
 	return (
-		<main className="w-full h-screen bg-ubuntu-purple overflow-hidden select-none"></main>
+		<main className="w-full h-screen bg-ubuntu-purple overflow-hidden select-none">
+			<TopBar />
+		</main>
 	);
 }

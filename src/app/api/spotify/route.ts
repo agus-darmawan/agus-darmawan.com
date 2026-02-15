@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
 import { getNowPlaying } from "@/lib/spotify";
-
-type ApiResponse<T> = {
-	success: boolean;
-	data: T | null;
-	error?: string;
-};
+import { ApiResponse } from "@/types/api";
 
 export async function GET() {
 	try {

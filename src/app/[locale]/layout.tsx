@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "@/styles/globals.css";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { Providers } from "@/components/providers/Providers";
 import { routing } from "@/i18n/routing";
 
 type Props = {
@@ -35,6 +36,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 	if (!hasLocale(routing.locales, locale)) {
 		notFound();
 	}
+
 	return (
 		<html lang={locale} suppressHydrationWarning>
 			<head>
@@ -46,7 +48,9 @@ export default async function LocaleLayout({ children, params }: Props) {
 				/>
 			</head>
 			<body className="antialiased">
-				<NextIntlClientProvider>{children}</NextIntlClientProvider>
+				<NextIntlClientProvider>
+					<Providers>{children}</Providers>
+				</NextIntlClientProvider>
 			</body>
 		</html>
 	);
