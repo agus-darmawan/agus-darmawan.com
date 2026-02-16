@@ -20,3 +20,79 @@
 
 	--font-ubuntu: "Ubuntu", system-ui, sans-serif;
 }
+
+/* ────────────────────────────────────────────────
+   Design tokens — light / dark
+──────────────────────────────────────────────── */
+:root {
+	--surface: #ffffff;
+	--surface-secondary: #f5f5f5;
+	--border: rgba(0, 0, 0, 0.1);
+	--text-primary: #111111;
+	--text-secondary: #555555;
+	--text-muted: #888888;
+	--window-bg: #ffffff;
+	--window-header: #e0e0e0;
+	--window-header-active: #d0d0d0;
+	--scrollbar-thumb: rgba(0, 0, 0, 0.2);
+}
+
+.dark {
+	--surface: #1e1e1e;
+	--surface-secondary: #2d2d2d;
+	--border: rgba(255, 255, 255, 0.1);
+	--text-primary: #f0f0f0;
+	--text-secondary: #aaaaaa;
+	--text-muted: #666666;
+	--window-bg: #1e1e1e;
+	--window-header: #3d3d3d;
+	--window-header-active: #2d2d2d;
+	--scrollbar-thumb: rgba(255, 255, 255, 0.15);
+}
+
+/* ────────────────────────────────────────────────
+   Base
+──────────────────────────────────────────────── */
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	height: 100%;
+}
+
+body {
+	font-family: var(--font-ubuntu);
+	background-color: var(--surface);
+	color: var(--text-primary);
+}
+
+/* ────────────────────────────────────────────────
+   Scrollbar
+──────────────────────────────────────────────── */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+::-webkit-scrollbar-thumb {
+	background: var(--scrollbar-thumb);
+	border-radius: 3px;
+}
+
+/* ────────────────────────────────────────────────
+   Window shadows (referenced in WindowFrame)
+──────────────────────────────────────────────── */
+.shadow-ubuntu {
+	box-shadow:
+		0 4px 24px rgba(0, 0, 0, 0.45),
+		0 1px 4px rgba(0, 0, 0, 0.3);
+}
+.shadow-ubuntu-lg {
+	box-shadow:
+		0 8px 40px rgba(0, 0, 0, 0.6),
+		0 2px 8px rgba(0, 0, 0, 0.4);
+}

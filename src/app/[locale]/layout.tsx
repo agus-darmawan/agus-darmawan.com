@@ -11,9 +11,8 @@ type Props = {
 };
 
 export const metadata: Metadata = {
-	title: "Ubuntu Portfolio - Your Name",
-	description:
-		"Interactive Ubuntu 22.04 themed portfolio showcasing my work and experience",
+	title: "Ubuntu Portfolio",
+	description: "Interactive Ubuntu 22.04 themed portfolio",
 	keywords: [
 		"portfolio",
 		"ubuntu",
@@ -25,7 +24,7 @@ export const metadata: Metadata = {
 	authors: [{ name: "I Wayan Agus Darmawan" }],
 	creator: "agus-darmawan",
 	openGraph: {
-		title: "Dar Portfolio - Agus Darmawan",
+		title: "Ubuntu Portfolio - Agus Darmawan",
 		description: "Interactive Ubuntu 22.04 themed portfolio",
 		type: "website",
 	},
@@ -33,6 +32,7 @@ export const metadata: Metadata = {
 
 export default async function LocaleLayout({ children, params }: Props) {
 	const { locale } = await params;
+
 	if (!hasLocale(routing.locales, locale)) {
 		notFound();
 	}

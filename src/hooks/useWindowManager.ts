@@ -1,35 +1,37 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { WindowState } from "@/types/app";
+import type { WindowState } from "@/types/app";
+
+const APP_TITLES: Record<string, string> = {
+	about: "About Me",
+	resume: "Resume",
+	experience: "Experience",
+	projects: "Projects",
+	terminal: "Terminal",
+	contact: "Contact",
+};
+
+const BASE_Z_INDEX = 100;
+const WINDOW_STAGGER = 40;
+const WINDOW_OFFSET_START = 120;
+const WINDOW_OFFSET_Y_START = 80;
 
 type WindowPayload = Record<string, unknown> | undefined;
 
-export const useWindowManager = () => {
+export function useWindowManager() {
 	const [windows, setWindows] = useState<WindowState[]>([]);
 	const [activeWindow, setActiveWindow] = useState<string | null>(null);
-
-	const zIndexRef = useRef(100);
-
 	const [dragging, setDragging] = useState<string | null>(null);
-	const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-	const appTitles: Record<string, string> = {
-		about: "About Me",
-		resume: "Resume",
-		experience: "Experience",
-		projects: "Projects",
-	};
+	const zIndexCounter = useRef(BASE_Z_INDEX);
+	const dragOffset = useRef({ x: 0, y: 0 });
 
-	// Stable z-index generator (Biome-safe)
 	const nextZ = useCallback(() => {
-		zIndexRef.current += 1;
-		return zIndexRef.current;
+		zIndexCounter.current += 1;
+		return zIndexCounter.current;
 	}, []);
 
-	// -----------------------------
-	// OPEN
-	// -----------------------------
 	const openWindow = useCallback(
 		(appId: string, data?: WindowPayload) => {
 			setWindows((prev) => {
@@ -38,7 +40,6 @@ export const useWindowManager = () => {
 				if (existing) {
 					const z = nextZ();
 					setActiveWindow(existing.id);
-
 					return prev.map((w) =>
 						w.id === existing.id
 							? { ...w, minimized: false, data, zIndex: z }
@@ -47,19 +48,20 @@ export const useWindowManager = () => {
 				}
 
 				const id = `${appId}-${Date.now()}`;
+				const z = nextZ();
 
 				const newWindow: WindowState = {
 					id,
 					appId,
-					title: appTitles[appId] || appId,
+					title: APP_TITLES[appId] ?? appId,
 					data,
 					minimized: false,
 					maximized: false,
 					position: {
-						x: 120 + prev.length * 40,
-						y: 80 + prev.length * 40,
+						x: WINDOW_OFFSET_START + prev.length * WINDOW_STAGGER,
+						y: WINDOW_OFFSET_Y_START + prev.length * WINDOW_STAGGER,
 					},
-					zIndex: nextZ(),
+					zIndex: z,
 				};
 
 				setActiveWindow(id);
@@ -69,35 +71,23 @@ export const useWindowManager = () => {
 		[nextZ],
 	);
 
-	// -----------------------------
-	// CLOSE
-	// -----------------------------
 	const closeWindow = useCallback((id: string) => {
 		setWindows((prev) => prev.filter((w) => w.id !== id));
 		setActiveWindow((prev) => (prev === id ? null : prev));
 	}, []);
 
-	// -----------------------------
-	// MINIMIZE
-	// -----------------------------
 	const minimizeWindow = useCallback((id: string) => {
 		setWindows((prev) =>
 			prev.map((w) => (w.id === id ? { ...w, minimized: true } : w)),
 		);
 	}, []);
 
-	// -----------------------------
-	// MAXIMIZE
-	// -----------------------------
 	const toggleMaximize = useCallback((id: string) => {
 		setWindows((prev) =>
 			prev.map((w) => (w.id === id ? { ...w, maximized: !w.maximized } : w)),
 		);
 	}, []);
 
-	// -----------------------------
-	// FOCUS
-	// -----------------------------
 	const bringToFront = useCallback(
 		(id: string) => {
 			const z = nextZ();
@@ -109,71 +99,67 @@ export const useWindowManager = () => {
 		[nextZ],
 	);
 
-	// -----------------------------
-	// DOCK CLICK
-	// -----------------------------
 	const handleDockClick = useCallback(
 		(appId: string) => {
 			setWindows((prev) => {
 				const win = prev.find((w) => w.appId === appId);
 
 				if (!win) {
-					openWindow(appId);
+					setTimeout(() => openWindow(appId), 0);
 					return prev;
 				}
 
 				if (win.minimized) {
 					const z = nextZ();
 					setActiveWindow(win.id);
-
 					return prev.map((w) =>
 						w.id === win.id ? { ...w, minimized: false, zIndex: z } : w,
 					);
 				}
 
-				return prev.map((w) =>
-					w.id === win.id ? { ...w, minimized: true } : w,
-				);
+				if (activeWindow === win.id) {
+					return prev.map((w) =>
+						w.id === win.id ? { ...w, minimized: true } : w,
+					);
+				}
+
+				bringToFront(win.id);
+				return prev;
 			});
 		},
-		[nextZ, openWindow],
+		[nextZ, openWindow, bringToFront, activeWindow],
 	);
 
-	// -----------------------------
-	// DRAG START
-	// -----------------------------
 	const handleMouseDown = useCallback(
 		(e: React.MouseEvent, id: string) => {
 			const win = windows.find((w) => w.id === id);
 			if (!win || win.maximized) return;
 
-			if ((e.target as HTMLElement).closest(".window-titlebar")) {
-				bringToFront(id);
-				setDragging(id);
-				setDragOffset({
-					x: e.clientX - win.position.x,
-					y: e.clientY - win.position.y,
-				});
-			}
+			const target = e.target as HTMLElement;
+			if (!target.closest(".window-titlebar")) return;
+
+			bringToFront(id);
+			setDragging(id);
+			dragOffset.current = {
+				x: e.clientX - win.position.x,
+				y: e.clientY - win.position.y,
+			};
 		},
 		[windows, bringToFront],
 	);
 
-	// -----------------------------
-	// DRAG MOVE
-	// -----------------------------
 	useEffect(() => {
 		if (!dragging) return;
 
-		const move = (e: MouseEvent) => {
+		const onMouseMove = (e: MouseEvent) => {
 			setWindows((prev) =>
 				prev.map((w) =>
 					w.id === dragging
 						? {
 								...w,
 								position: {
-									x: e.clientX - dragOffset.x,
-									y: e.clientY - dragOffset.y,
+									x: e.clientX - dragOffset.current.x,
+									y: e.clientY - dragOffset.current.y,
 								},
 							}
 						: w,
@@ -181,16 +167,16 @@ export const useWindowManager = () => {
 			);
 		};
 
-		const up = () => setDragging(null);
+		const onMouseUp = () => setDragging(null);
 
-		window.addEventListener("mousemove", move);
-		window.addEventListener("mouseup", up);
+		window.addEventListener("mousemove", onMouseMove);
+		window.addEventListener("mouseup", onMouseUp);
 
 		return () => {
-			window.removeEventListener("mousemove", move);
-			window.removeEventListener("mouseup", up);
+			window.removeEventListener("mousemove", onMouseMove);
+			window.removeEventListener("mouseup", onMouseUp);
 		};
-	}, [dragging, dragOffset]);
+	}, [dragging]);
 
 	return {
 		windows,
@@ -205,4 +191,4 @@ export const useWindowManager = () => {
 		bringToFront,
 		setActiveWindow,
 	};
-};
+}

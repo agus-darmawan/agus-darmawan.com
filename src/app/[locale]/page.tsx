@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+
 import { Dock } from "@/components/dock/Dock";
 import TopBar from "@/components/top-bar/TopBar";
 import AboutWindow from "@/components/windows/content/AboutWindow";
@@ -8,47 +8,28 @@ import ProjectsWindow from "@/components/windows/content/ProjectsWindow";
 import ResumeWindow from "@/components/windows/content/ResumeWindow";
 import { WindowFrame } from "@/components/windows/frame/WindowFrame";
 import { useWindowManager } from "@/hooks/useWindowManager";
-// import { useTranslations } from "next-intl";
-// import { setRequestLocale } from "next-intl/server";
-// import { use } from "react";
-import { WindowState } from "@/types/app";
+import type { WindowState } from "@/types/app";
 
-export default function IndexPage({
-	params,
-}: {
-	params: Promise<{ locale: string }>;
-}) {
-	// const { locale } = use(params);
+function WindowContent({ win }: { win: WindowState }) {
+	switch (win.appId) {
+		case "about":
+			return <AboutWindow />;
+		case "resume":
+			return <ResumeWindow />;
+		case "experience":
+			return <ExperienceWindow />;
+		case "projects":
+			return <ProjectsWindow />;
+		default:
+			return (
+				<div className="h-full flex items-center justify-center text-(--text-muted)]">
+					Not found
+				</div>
+			);
+	}
+}
 
-	// setRequestLocale(locale);
-
-	// Once the request locale is set, you
-	// can call hooks from `next-intl`
-	// const t = useTranslations("HomePage");
-
-	const handleIconClick = (windowId: string) => {
-		setActiveWindow(windowId);
-	};
-
-	const renderWindowContent = (win: WindowState) => {
-		switch (win.appId) {
-			case "about":
-				return <AboutWindow />;
-			case "resume":
-				return <ResumeWindow />;
-			case "experience":
-				return <ExperienceWindow />;
-			case "projects":
-				return <ProjectsWindow />;
-			default:
-				return (
-					<div className="h-full flex items-center justify-center">
-						Not found
-					</div>
-				);
-		}
-	};
-
+export default function IndexPage() {
 	const {
 		windows,
 		activeWindow,
@@ -65,37 +46,31 @@ export default function IndexPage({
 	return (
 		<main className="w-full h-screen bg-ubuntu-purple overflow-hidden select-none">
 			<TopBar />
-			<div className="w-full h-screen bg-[#77216F] overflow-hidden select-none">
-				<div className="relative h-[calc(100vh-4.5rem)]">
-					{windows.map((win) => (
-						<WindowFrame
-							key={win.id}
-							window={win}
-							isActive={activeWindow === win.id}
-							isDragging={dragging === win.id}
-							onMouseDown={(e) => handleMouseDown(e, win.id)}
-							onClick={() => {
-								setActiveWindow(win.id);
-								bringToFront(win.id);
-							}}
-							onClose={() => closeWindow(win.id)}
-							onMinimize={() => minimizeWindow(win.id)}
-							onMaximize={() => toggleMaximize(win.id)}
-						>
-							{renderWindowContent(win)}
-						</WindowFrame>
-					))}
-				</div>
-				<Dock
-					windows={windows}
-					activeWindow={activeWindow}
-					onIconClick={handleDockClick}
-				/>
+
+			<div className="relative h-[calc(100vh-6rem)] mt-8">
+				{windows.map((win) => (
+					<WindowFrame
+						key={win.id}
+						window={win}
+						isActive={activeWindow === win.id}
+						isDragging={dragging === win.id}
+						onMouseDown={(e) => handleMouseDown(e, win.id)}
+						onClick={() => {
+							setActiveWindow(win.id);
+							bringToFront(win.id);
+						}}
+						onClose={() => closeWindow(win.id)}
+						onMinimize={() => minimizeWindow(win.id)}
+						onMaximize={() => toggleMaximize(win.id)}
+					>
+						<WindowContent win={win} />
+					</WindowFrame>
+				))}
 			</div>
 			<Dock
 				windows={windows}
 				activeWindow={activeWindow}
-				onIconClick={handleIconClick}
+				onIconClick={handleDockClick}
 			/>
 		</main>
 	);

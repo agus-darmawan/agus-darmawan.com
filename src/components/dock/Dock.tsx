@@ -1,4 +1,5 @@
 "use client";
+
 import {
 	Briefcase,
 	FileText,
@@ -7,16 +8,10 @@ import {
 	Terminal,
 	User,
 } from "lucide-react";
-import { AppConfig, WindowState } from "@/types/app";
+import type { AppConfig, WindowState } from "@/types/app";
 import { DockIcon } from "./DockIcon";
 
-interface DockProps {
-	windows: WindowState[];
-	activeWindow: string | null;
-	onIconClick: (appId: string) => void;
-}
-
-const apps: AppConfig[] = [
+const APPS: AppConfig[] = [
 	{ id: "about", name: "About Me", icon: User, color: "bg-orange-500" },
 	{ id: "terminal", name: "Terminal", icon: Terminal, color: "bg-[#300a24]" },
 	{ id: "resume", name: "Resume", icon: FileText, color: "bg-red-500" },
@@ -30,14 +25,21 @@ const apps: AppConfig[] = [
 	{ id: "contact", name: "Contact", icon: Mail, color: "bg-yellow-600" },
 ];
 
+interface DockProps {
+	windows: WindowState[];
+	activeWindow: string | null;
+	onIconClick: (appId: string) => void;
+}
+
 export function Dock({ windows, activeWindow, onIconClick }: DockProps) {
 	return (
 		<div className="fixed bottom-0 left-0 right-0 h-16 flex items-end justify-center pointer-events-none z-50">
 			<div className="bg-ubuntu-dark/95 backdrop-blur-md rounded-t-xl px-2 py-2 flex gap-1 shadow-2xl border-t border-white/10 pointer-events-auto">
-				{apps.map((app) => {
-					const window = windows.find((w) => w.id === app.id);
-					const isOpen = !!window;
-					const isActive = activeWindow === app.id;
+				{APPS.map((app) => {
+					const win = windows.find((w) => w.appId === app.id);
+					const isOpen = !!win && !win.minimized;
+					const isActive = !!win && activeWindow === win.id;
+
 					return (
 						<DockIcon
 							key={app.id}

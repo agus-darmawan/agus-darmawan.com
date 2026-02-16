@@ -1,8 +1,7 @@
-// components/ui/WindowFrame.tsx
 "use client";
 
-import React, { ReactNode } from "react";
-import { WindowState } from "@/types/app";
+import React, { type ReactNode } from "react";
+import type { WindowState } from "@/types/app";
 import { WindowHeader } from "./WindowHeader";
 
 interface WindowFrameProps {
@@ -30,7 +29,7 @@ export function WindowFrame({
 }: WindowFrameProps) {
 	if (win.minimized) return null;
 
-	const style = win.maximized
+	const positionStyle = win.maximized
 		? { top: 0, left: 0, right: 0, bottom: 0, width: "100%", height: "100%" }
 		: {
 				top: win.position.y,
@@ -41,10 +40,12 @@ export function WindowFrame({
 
 	return (
 		<div
-			className={`absolute rounded-lg overflow-hidden shadow-2xl flex flex-col transition-shadow duration-200 ${
-				isDragging ? "cursor-grabbing" : ""
-			} ${isActive ? "shadow-ubuntu-lg" : "shadow-ubuntu"}`}
-			style={{ ...style, zIndex: win.zIndex }}
+			className={[
+				"absolute rounded-lg overflow-hidden flex flex-col transition-shadow duration-200",
+				isDragging ? "cursor-grabbing" : "",
+				isActive ? "shadow-ubuntu-lg" : "shadow-ubuntu",
+			].join(" ")}
+			style={{ ...positionStyle, zIndex: win.zIndex }}
 			onClick={onClick}
 			onMouseDown={onMouseDown}
 		>
@@ -57,7 +58,9 @@ export function WindowFrame({
 				onMaximize={onMaximize}
 			/>
 
-			<div className="flex-1 overflow-hidden bg-white">{children}</div>
+			<div className="flex-1 overflow-hidden bg-(--window-bg)] text-(--text-primary)]">
+				{children}
+			</div>
 		</div>
 	);
 }

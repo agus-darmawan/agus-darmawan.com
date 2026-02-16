@@ -10,17 +10,13 @@ interface ProvidersProps {
 }
 
 export function Providers({ children }: ProvidersProps) {
-	// useState ensures a new QueryClient is created per request (no shared state between users)
 	const [queryClient] = useState(
 		() =>
 			new QueryClient({
 				defaultOptions: {
 					queries: {
-						// Don't refetch on window focus by default globally — let each query opt in
 						refetchOnWindowFocus: false,
-						// Cache for 30s before considering stale
 						staleTime: 30_000,
-						// Retry once on failure
 						retry: 1,
 					},
 				},
@@ -32,6 +28,7 @@ export function Providers({ children }: ProvidersProps) {
 			<ThemeProvider
 				attribute="class"
 				defaultTheme="dark"
+				enableSystem={false}
 				disableTransitionOnChange
 			>
 				{children}

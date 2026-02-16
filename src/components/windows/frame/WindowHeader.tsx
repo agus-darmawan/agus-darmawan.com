@@ -1,5 +1,5 @@
-// components/ui/WindowHeader.tsx
 "use client";
+
 import { Maximize2, Minimize2, X } from "lucide-react";
 
 interface WindowHeaderProps {
@@ -21,11 +21,11 @@ export function WindowHeader({
 }: WindowHeaderProps) {
 	return (
 		<div
-			className={`window-header h-9 ${
-				isActive ? "bg-[#3d3d3d]" : "bg-[#5d5d5d]"
-			} flex items-center justify-between px-3 ${
-				!isMaximized ? "cursor-grab active:cursor-grabbing" : ""
-			} select-none`}
+			className={[
+				"window-titlebar h-9 flex items-center justify-between px-3 select-none",
+				isActive ? "bg-(--window-header-active)" : "bg-(--window-header)",
+				!isMaximized ? "cursor-grab active:cursor-grabbing" : "",
+			].join(" ")}
 		>
 			<div className="flex items-center gap-2">
 				<div className="flex gap-2">
@@ -74,8 +74,9 @@ export function WindowHeader({
 						/>
 					</button>
 				</div>
-
-				<span className="text-white text-sm font-medium ml-2">{title}</span>
+				<span className="text-sm font-medium ml-2 text-(--text-primary)]">
+					{title}
+				</span>
 			</div>
 		</div>
 	);
