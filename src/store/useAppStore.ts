@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { OpenApp } from "@/types/app-status";
+import type { OpenApp } from "@/types/app";
 
 interface AppStoreState {
 	openApps: OpenApp[];
