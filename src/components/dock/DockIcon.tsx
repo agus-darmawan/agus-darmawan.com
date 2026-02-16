@@ -1,4 +1,3 @@
-// components/ui/DockIcon.tsx
 "use client";
 
 import { LucideIcon } from "lucide-react";
