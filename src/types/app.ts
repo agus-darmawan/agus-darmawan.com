@@ -16,13 +16,18 @@ export interface AppConfig {
 	category?: string;
 }
 
+export type WindowPayload = Record<string, unknown> | undefined;
+
 export interface WindowState {
 	id: string;
 	appId: string;
 	title: string;
-	data?: TemplateStringsArray;
 	minimized: boolean;
 	maximized: boolean;
-	position: { x: number; y: number };
+	position: {
+		x: number;
+		y: number;
+	};
 	zIndex: number;
+	data?: WindowPayload;
 }
