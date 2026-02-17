@@ -11,6 +11,10 @@ interface WindowHeaderProps {
 	onMaximize: () => void;
 }
 
+/**
+ * WindowHeader — macOS-style traffic-light title bar.
+ * Draggable via .window-titlebar selector in useWindowManager.
+ */
 export function WindowHeader({
 	title,
 	isActive,
@@ -22,62 +26,91 @@ export function WindowHeader({
 	return (
 		<div
 			className={[
-				"window-titlebar h-9 flex items-center justify-between px-3 select-none",
-				isActive ? "bg-(--window-header-active)" : "bg-(--window-header)",
+				"window-titlebar h-9 flex items-center justify-between px-3 select-none shrink-0",
 				!isMaximized ? "cursor-grab active:cursor-grabbing" : "",
-			].join(" ")}
+			]
+				.filter(Boolean)
+				.join(" ")}
+			style={{
+				background: isActive
+					? "var(--window-header-active)"
+					: "var(--window-header)",
+				borderBottom: "1px solid var(--border)",
+			}}
 		>
+			{/* Traffic lights + title */}
 			<div className="flex items-center gap-2">
 				<div className="flex gap-2">
-					<button
-						type="button"
-						onClick={(e) => {
-							e.stopPropagation();
-							onClose();
-						}}
-						className="w-4 h-4 bg-[#f46067] hover:bg-[#f68086] rounded-full flex items-center justify-center group transition-colors"
-						title="Close"
-					>
-						<X
-							size={10}
-							className="text-[#2d0922] opacity-0 group-hover:opacity-100 transition-opacity"
-						/>
-					</button>
-
-					<button
-						type="button"
-						onClick={(e) => {
-							e.stopPropagation();
-							onMinimize();
-						}}
-						className="w-4 h-4 bg-[#f6a847] hover:bg-[#f8b867] rounded-full flex items-center justify-center group transition-colors"
-						title="Minimize"
-					>
-						<Minimize2
-							size={8}
-							className="text-[#2d0922] opacity-0 group-hover:opacity-100 transition-opacity"
-						/>
-					</button>
-
-					<button
-						type="button"
-						onClick={(e) => {
-							e.stopPropagation();
-							onMaximize();
-						}}
-						className="w-4 h-4 bg-[#64c550] hover:bg-[#84d570] rounded-full flex items-center justify-center group transition-colors"
-						title={isMaximized ? "Restore" : "Maximize"}
-					>
-						<Maximize2
-							size={8}
-							className="text-[#2d0922] opacity-0 group-hover:opacity-100 transition-opacity"
-						/>
-					</button>
+					<TrafficButton
+						color="#f46067"
+						hoverColor="#f68086"
+						label="Close"
+						onClick={onClose}
+						icon={<X size={10} />}
+					/>
+					<TrafficButton
+						color="#f6a847"
+						hoverColor="#f8b867"
+						label="Minimize"
+						onClick={onMinimize}
+						icon={<Minimize2 size={8} />}
+					/>
+					<TrafficButton
+						color="#64c550"
+						hoverColor="#84d570"
+						label={isMaximized ? "Restore" : "Maximize"}
+						onClick={onMaximize}
+						icon={<Maximize2 size={8} />}
+					/>
 				</div>
-				<span className="text-sm font-medium ml-2 text-(--text-primary)]">
+
+				<span
+					className="text-sm font-medium ml-2 truncate max-w-48"
+					style={{ color: "var(--text-primary)" }}
+				>
 					{title}
 				</span>
 			</div>
 		</div>
+	);
+}
+
+interface TrafficButtonProps {
+	color: string;
+	hoverColor: string;
+	label: string;
+	onClick: (e: React.MouseEvent) => void;
+	icon: React.ReactNode;
+}
+
+function TrafficButton({
+	color,
+	hoverColor,
+	label,
+	onClick,
+	icon,
+}: TrafficButtonProps) {
+	return (
+		<button
+			type="button"
+			title={label}
+			aria-label={label}
+			onClick={(e) => {
+				e.stopPropagation();
+				onClick(e);
+			}}
+			className="w-4 h-4 rounded-full flex items-center justify-center group transition-colors"
+			style={{ background: color }}
+			onMouseEnter={(e) => {
+				(e.currentTarget as HTMLElement).style.background = hoverColor;
+			}}
+			onMouseLeave={(e) => {
+				(e.currentTarget as HTMLElement).style.background = color;
+			}}
+		>
+			<span className="text-[#2d0922] opacity-0 group-hover:opacity-100 transition-opacity">
+				{icon}
+			</span>
+		</button>
 	);
 }

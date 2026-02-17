@@ -1,9 +1,9 @@
 "use client";
 
-import { Languages, MoonIcon, SunIcon } from "lucide-react";
+import { Languages, Moon, Sun } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { usePing } from "@/hooks/top-bar/usePing";
 import { useSpotify } from "@/hooks/top-bar/useSpotify";
 import { useBattery } from "@/hooks/useBattery";
@@ -33,25 +33,39 @@ export function SettingsMenu() {
 
 	useClickOutside({ ref: menuRef, onOutside: () => setOpen(false) });
 
-	const toggleTheme = () => setTheme(isDark ? "light" : "dark");
+	const toggleTheme = useCallback(() => {
+		setTheme(isDark ? "light" : "dark");
+	}, [isDark, setTheme]);
 
-	const toggleLanguage = () => {
+	// Keep panel open when switching language — router.push re-renders but
+	// the component state is preserved because we're NOT closing on nav.
+	const toggleLanguage = useCallback(() => {
 		router.push(pathname, { locale: locale === "en" ? "id" : "en" });
-	};
+		// intentionally do NOT call setOpen(false) here
+	}, [locale, pathname, router]);
 
 	return (
 		<div ref={menuRef} className="relative">
 			<MenuTrigger open={open} onToggle={() => setOpen((v) => !v)} />
 
 			{open && (
-				<div className="absolute right-0 top-full mt-1 w-80 max-w-[calc(100vw-2rem)] bg-gray-900/95 dark:bg-gray-950/95 backdrop-blur-xl rounded-xl shadow-2xl border border-white/10 py-2 z-50 text-white">
+				<div
+					className="absolute right-0 top-full mt-1 w-80 max-w-[calc(100vw-1rem)] rounded-xl shadow-2xl border py-2 z-50 animate-fade-in"
+					style={{
+						background: "var(--panel-bg)",
+						borderColor: "var(--panel-border)",
+						color: "var(--panel-text)",
+						backdropFilter: "blur(20px)",
+						WebkitBackdropFilter: "blur(20px)",
+					}}
+				>
 					{/* Theme toggle */}
 					<MenuItem onClick={toggleTheme}>
 						<div className="flex items-center gap-3">
 							{isDark ? (
-								<MoonIcon className="w-4 h-4" />
+								<Moon className="w-4 h-4 text-blue-300" />
 							) : (
-								<SunIcon className="w-4 h-4" />
+								<Sun className="w-4 h-4 text-yellow-300" />
 							)}
 							<span className="text-sm">
 								{isDark ? t("darkMode") : t("lightMode")}
@@ -62,16 +76,31 @@ export function SettingsMenu() {
 
 					<Divider />
 
+					{/* Language toggle */}
 					<MenuItem onClick={toggleLanguage}>
 						<div className="flex items-center gap-3">
 							<Languages className="w-4 h-4" />
 							<span className="text-sm">{t("language")}</span>
 						</div>
-						<span className="text-sm font-medium text-gray-400 uppercase">
-							{locale}
-						</span>
+						<div className="flex items-center gap-1.5">
+							<span
+								className={`text-xs px-1.5 py-0.5 rounded font-medium transition-colors ${
+									locale === "en" ? "bg-ubuntu-orange text-white" : "opacity-40"
+								}`}
+							>
+								EN
+							</span>
+							<span
+								className={`text-xs px-1.5 py-0.5 rounded font-medium transition-colors ${
+									locale === "id" ? "bg-ubuntu-orange text-white" : "opacity-40"
+								}`}
+							>
+								ID
+							</span>
+						</div>
 					</MenuItem>
 
+					{/* Spotify now playing */}
 					{track && (
 						<>
 							<Divider />

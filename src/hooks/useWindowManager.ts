@@ -3,7 +3,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { WindowState } from "@/types/app";
 
-const APP_TITLES: Record<string, string> = {
+const BASE_Z_INDEX = 100;
+const WINDOW_STAGGER = 36;
+const WINDOW_OFFSET_X = 100;
+const WINDOW_OFFSET_Y = 64;
+
+type WindowPayload = Record<string, unknown> | undefined;
+type TranslateFn = (key: string) => string;
+
+const FALLBACK_TITLES: Record<string, string> = {
 	about: "About Me",
 	resume: "Resume",
 	experience: "Experience",
@@ -12,25 +20,29 @@ const APP_TITLES: Record<string, string> = {
 	contact: "Contact",
 };
 
-const BASE_Z_INDEX = 100;
-const WINDOW_STAGGER = 40;
-const WINDOW_OFFSET_START = 120;
-const WINDOW_OFFSET_Y_START = 80;
-
-type WindowPayload = Record<string, unknown> | undefined;
-
-export function useWindowManager() {
+export function useWindowManager(t?: TranslateFn) {
 	const [windows, setWindows] = useState<WindowState[]>([]);
 	const [activeWindow, setActiveWindow] = useState<string | null>(null);
 	const [dragging, setDragging] = useState<string | null>(null);
 
-	const zIndexCounter = useRef(BASE_Z_INDEX);
+	const zCounter = useRef(BASE_Z_INDEX);
 	const dragOffset = useRef({ x: 0, y: 0 });
 
 	const nextZ = useCallback(() => {
-		zIndexCounter.current += 1;
-		return zIndexCounter.current;
+		zCounter.current += 1;
+		return zCounter.current;
 	}, []);
+
+	const getTitle = useCallback(
+		(appId: string) => {
+			try {
+				return t ? t(appId) : (FALLBACK_TITLES[appId] ?? appId);
+			} catch {
+				return FALLBACK_TITLES[appId] ?? appId;
+			}
+		},
+		[t],
+	);
 
 	const openWindow = useCallback(
 		(appId: string, data?: WindowPayload) => {
@@ -49,17 +61,18 @@ export function useWindowManager() {
 
 				const id = `${appId}-${Date.now()}`;
 				const z = nextZ();
+				const count = prev.length;
 
 				const newWindow: WindowState = {
 					id,
 					appId,
-					title: APP_TITLES[appId] ?? appId,
+					title: getTitle(appId),
 					data,
 					minimized: false,
 					maximized: false,
 					position: {
-						x: WINDOW_OFFSET_START + prev.length * WINDOW_STAGGER,
-						y: WINDOW_OFFSET_Y_START + prev.length * WINDOW_STAGGER,
+						x: WINDOW_OFFSET_X + count * WINDOW_STAGGER,
+						y: WINDOW_OFFSET_Y + count * WINDOW_STAGGER,
 					},
 					zIndex: z,
 				};
@@ -68,7 +81,7 @@ export function useWindowManager() {
 				return [...prev, newWindow];
 			});
 		},
-		[nextZ],
+		[nextZ, getTitle],
 	);
 
 	const closeWindow = useCallback((id: string) => {
@@ -80,6 +93,7 @@ export function useWindowManager() {
 		setWindows((prev) =>
 			prev.map((w) => (w.id === id ? { ...w, minimized: true } : w)),
 		);
+		setActiveWindow((prev) => (prev === id ? null : prev));
 	}, []);
 
 	const toggleMaximize = useCallback((id: string) => {
@@ -105,6 +119,7 @@ export function useWindowManager() {
 				const win = prev.find((w) => w.appId === appId);
 
 				if (!win) {
+					// Defer to avoid setState-during-render
 					setTimeout(() => openWindow(appId), 0);
 					return prev;
 				}
@@ -117,6 +132,7 @@ export function useWindowManager() {
 					);
 				}
 
+				// If already active → minimize; else bring to front
 				if (activeWindow === win.id) {
 					return prev.map((w) =>
 						w.id === win.id ? { ...w, minimized: true } : w,
@@ -148,18 +164,19 @@ export function useWindowManager() {
 		[windows, bringToFront],
 	);
 
+	// Mouse move / up for dragging
 	useEffect(() => {
 		if (!dragging) return;
 
-		const onMouseMove = (e: MouseEvent) => {
+		const onMove = (e: MouseEvent) => {
 			setWindows((prev) =>
 				prev.map((w) =>
 					w.id === dragging
 						? {
 								...w,
 								position: {
-									x: e.clientX - dragOffset.current.x,
-									y: e.clientY - dragOffset.current.y,
+									x: Math.max(0, e.clientX - dragOffset.current.x),
+									y: Math.max(0, e.clientY - dragOffset.current.y),
 								},
 							}
 						: w,
@@ -167,14 +184,13 @@ export function useWindowManager() {
 			);
 		};
 
-		const onMouseUp = () => setDragging(null);
+		const onUp = () => setDragging(null);
 
-		window.addEventListener("mousemove", onMouseMove);
-		window.addEventListener("mouseup", onMouseUp);
-
+		window.addEventListener("mousemove", onMove);
+		window.addEventListener("mouseup", onUp);
 		return () => {
-			window.removeEventListener("mousemove", onMouseMove);
-			window.removeEventListener("mouseup", onMouseUp);
+			window.removeEventListener("mousemove", onMove);
+			window.removeEventListener("mouseup", onUp);
 		};
 	}, [dragging]);
 

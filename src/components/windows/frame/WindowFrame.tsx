@@ -16,6 +16,10 @@ interface WindowFrameProps {
 	onMaximize: () => void;
 }
 
+/**
+ * WindowFrame — draggable, resizable window shell with macOS-style
+ * traffic-light controls. Supports maximized/minimized states.
+ */
 export function WindowFrame({
 	window: win,
 	isActive,
@@ -29,23 +33,29 @@ export function WindowFrame({
 }: WindowFrameProps) {
 	if (win.minimized) return null;
 
-	const positionStyle = win.maximized
+	const positionStyle: React.CSSProperties = win.maximized
 		? { top: 0, left: 0, right: 0, bottom: 0, width: "100%", height: "100%" }
 		: {
 				top: win.position.y,
 				left: win.position.x,
-				width: "900px",
-				height: "650px",
+				// Responsive: full width on small screens, fixed on desktop
+				width: "clamp(320px, 90vw, 900px)",
+				height: "clamp(400px, 80vh, 650px)",
 			};
 
 	return (
 		<div
 			className={[
 				"absolute rounded-lg overflow-hidden flex flex-col transition-shadow duration-200",
-				isDragging ? "cursor-grabbing" : "",
+				isDragging ? "cursor-grabbing select-none" : "",
 				isActive ? "shadow-ubuntu-lg" : "shadow-ubuntu",
-			].join(" ")}
-			style={{ ...positionStyle, zIndex: win.zIndex }}
+			]
+				.filter(Boolean)
+				.join(" ")}
+			style={{
+				...positionStyle,
+				zIndex: win.zIndex,
+			}}
 			onClick={onClick}
 			onMouseDown={onMouseDown}
 		>
@@ -58,7 +68,13 @@ export function WindowFrame({
 				onMaximize={onMaximize}
 			/>
 
-			<div className="flex-1 overflow-hidden bg-(--window-bg)] text-(--text-primary)]">
+			<div
+				className="flex-1 overflow-auto"
+				style={{
+					background: "var(--window-bg)",
+					color: "var(--text-primary)",
+				}}
+			>
 				{children}
 			</div>
 		</div>
