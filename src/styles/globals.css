@@ -1,8 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
-
-@import "tailwindcss";
 
 @theme {
 	--color-ubuntu-orange: #e95420;
@@ -31,9 +29,29 @@
 	--text-primary: #111111;
 	--text-secondary: #555555;
 	--text-muted: #888888;
-	--window-bg: #ffffff;
-	--window-header: #e0e0e0;
-	--window-header-active: #d0d0d0;
+
+	/* Window */
+	--window-bg: #f8f8f8;
+	--window-header: #e8e8e8;
+	--window-header-active: #d8d8d8;
+
+	/* TopBar */
+	--topbar-bg: rgba(30, 20, 28, 0.92);
+	--topbar-text: rgba(255, 255, 255, 0.92);
+	--topbar-hover: rgba(255, 255, 255, 0.1);
+	--topbar-border: rgba(255, 255, 255, 0.08);
+
+	/* Panel / dropdown */
+	--panel-bg: rgba(28, 22, 26, 0.97);
+	--panel-border: rgba(255, 255, 255, 0.1);
+	--panel-hover: rgba(255, 255, 255, 0.08);
+	--panel-text: rgba(255, 255, 255, 0.9);
+	--panel-text-muted: rgba(255, 255, 255, 0.45);
+
+	/* Dock */
+	--dock-bg: rgba(20, 15, 18, 0.92);
+	--dock-border: rgba(255, 255, 255, 0.08);
+
 	--scrollbar-thumb: rgba(0, 0, 0, 0.2);
 }
 
@@ -44,16 +62,25 @@
 	--text-primary: #f0f0f0;
 	--text-secondary: #aaaaaa;
 	--text-muted: #666666;
+
+	/* Window */
 	--window-bg: #1e1e1e;
 	--window-header: #3d3d3d;
 	--window-header-active: #2d2d2d;
+
+	/* TopBar & Panel — same in both modes (always dark) */
+	--topbar-bg: rgba(18, 12, 16, 0.95);
+	--panel-bg: rgba(22, 16, 20, 0.98);
+
 	--scrollbar-thumb: rgba(255, 255, 255, 0.15);
 }
 
 /* ────────────────────────────────────────────────
    Base
 ──────────────────────────────────────────────── */
-* {
+*,
+*::before,
+*::after {
 	box-sizing: border-box;
 }
 
@@ -66,6 +93,8 @@ body {
 	font-family: var(--font-ubuntu);
 	background-color: var(--surface);
 	color: var(--text-primary);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 /* ────────────────────────────────────────────────
@@ -84,7 +113,7 @@ body {
 }
 
 /* ────────────────────────────────────────────────
-   Window shadows (referenced in WindowFrame)
+   Window shadows
 ──────────────────────────────────────────────── */
 .shadow-ubuntu {
 	box-shadow:
@@ -95,4 +124,49 @@ body {
 	box-shadow:
 		0 8px 40px rgba(0, 0, 0, 0.6),
 		0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ────────────────────────────────────────────────
+   Animations
+──────────────────────────────────────────────── */
+@keyframes fade-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px) scale(0.98);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+@keyframes slide-up {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.animate-fade-in {
+	animation: fade-in 0.15s ease-out forwards;
+}
+
+.animate-slide-up {
+	animation: slide-up 0.2s ease-out forwards;
+}
+
+/* ────────────────────────────────────────────────
+   Dock app grid
+──────────────────────────────────────────────── */
+.dock-grid-item {
+	transition:
+		transform 0.15s ease,
+		box-shadow 0.15s ease;
+}
+.dock-grid-item:hover {
+	transform: scale(1.06);
 }
