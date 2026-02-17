@@ -14,5 +14,39 @@
 		"offline": "Offline",
 		"openApps": "Open Apps",
 		"noOpenApps": "No open apps"
+	},
+	"Dock": {
+		"about": "About Me",
+		"terminal": "Terminal",
+		"resume": "Resume",
+		"experience": "Experience",
+		"projects": "Projects",
+		"contact": "Contact",
+		"search": "Search applications…",
+		"noResults": "No applications found"
+	},
+	"Windows": {
+		"about": "About Me",
+		"terminal": "Terminal",
+		"resume": "Resume",
+		"experience": "Experience",
+		"projects": "Projects",
+		"contact": "Contact"
+	},
+	"AboutWindow": {
+		"title": "About Me",
+		"description": "A passionate full-stack developer"
+	},
+	"ExperienceWindow": {
+		"title": "Experience"
+	},
+	"ProjectsWindow": {
+		"title": "Projects"
+	},
+	"ResumeWindow": {
+		"title": "Resume"
+	},
+	"TerminalWindow": {
+		"title": "Terminal"
 	}
 }

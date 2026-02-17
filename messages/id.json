@@ -14,5 +14,39 @@
 		"offline": "Offline",
 		"openApps": "Aplikasi Terbuka",
 		"noOpenApps": "Tidak ada aplikasi terbuka"
+	},
+	"Dock": {
+		"about": "Tentang Saya",
+		"terminal": "Terminal",
+		"resume": "Resume",
+		"experience": "Pengalaman",
+		"projects": "Proyek",
+		"contact": "Kontak",
+		"search": "Cari aplikasi…",
+		"noResults": "Tidak ada aplikasi ditemukan"
+	},
+	"Windows": {
+		"about": "Tentang Saya",
+		"terminal": "Terminal",
+		"resume": "Resume",
+		"experience": "Pengalaman",
+		"projects": "Proyek",
+		"contact": "Kontak"
+	},
+	"AboutWindow": {
+		"title": "Tentang Saya",
+		"description": "Seorang full-stack developer yang bersemangat"
+	},
+	"ExperienceWindow": {
+		"title": "Pengalaman"
+	},
+	"ProjectsWindow": {
+		"title": "Proyek"
+	},
+	"ResumeWindow": {
+		"title": "Resume"
+	},
+	"TerminalWindow": {
+		"title": "Terminal"
 	}
 }
