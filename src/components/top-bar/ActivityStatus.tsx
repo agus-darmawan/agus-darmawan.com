@@ -23,7 +23,7 @@ export function ActivityStatus() {
 
 			{hasApps && lastApp && (
 				<span
-					className="hidden md:inline text-xs max-w-[6rem] truncate"
+					className="hidden md:inline text-xs max-w-24 truncate"
 					style={{ color: "var(--panel-text-muted)" }}
 				>
 					{lastApp.icon && (
