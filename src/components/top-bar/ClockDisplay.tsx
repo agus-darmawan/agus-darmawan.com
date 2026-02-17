@@ -4,8 +4,8 @@ import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 
 /**
- * ClockDisplay — shows current date and time, updated every second.
- * Formats date and time according to user's locale (en-US or id-ID).
+ * ClockDisplay — live clock updated every second, formatted per locale.
+ * Mounted client-side to avoid SSR hydration mismatch.
  */
 export function ClockDisplay() {
 	const locale = useLocale();
@@ -15,15 +15,11 @@ export function ClockDisplay() {
 
 	useEffect(() => {
 		setTime(new Date());
-
-		const id = setInterval(() => {
-			setTime(new Date());
-		}, 1000);
-
+		const id = setInterval(() => setTime(new Date()), 1_000);
 		return () => clearInterval(id);
 	}, []);
 
-	if (!time) return null; // fix hydration mismatch
+	if (!time) return null;
 
 	const date = time.toLocaleDateString(bcp, {
 		weekday: "short",
@@ -40,9 +36,10 @@ export function ClockDisplay() {
 	return (
 		<time
 			dateTime={time.toISOString()}
-			className="text-sm font-medium tabular-nums"
+			className="text-sm font-medium tabular-nums select-none"
+			style={{ color: "var(--topbar-text)" }}
 		>
-			{date} {clock}
+			{date}&ensp;{clock}
 		</time>
 	);
 }

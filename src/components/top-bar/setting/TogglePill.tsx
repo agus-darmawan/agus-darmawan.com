@@ -1,16 +1,16 @@
-/*
- * A simple toggle pill component that can be used in the settings menu.
+/**
+ * TogglePill — visual on/off indicator (not interactive on its own).
  */
-
 export function TogglePill({ active }: { active: boolean }) {
 	return (
 		<div
-			className={`w-10 h-5 rounded-full transition-colors ${
-				active ? "bg-blue-500" : "bg-gray-600"
+			className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${
+				active ? "bg-ubuntu-orange" : "bg-white/20"
 			}`}
+			role="presentation"
 		>
 			<div
-				className={`w-4 h-4 bg-white rounded-full shadow mt-0.5 transition-transform ${
+				className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${
 					active ? "translate-x-5" : "translate-x-0.5"
 				}`}
 			/>

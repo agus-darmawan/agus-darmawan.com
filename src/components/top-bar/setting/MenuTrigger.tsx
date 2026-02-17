@@ -1,7 +1,7 @@
 import { ChevronDown } from "lucide-react";
 
 /**
- * MenuTrigger — button that toggles the settings menu, showing a
+ * MenuTrigger — chevron button that opens/closes the settings panel.
  */
 export function MenuTrigger({
 	open,
@@ -12,14 +12,22 @@ export function MenuTrigger({
 }) {
 	return (
 		<button
-			onClick={onToggle}
 			type="button"
+			onClick={onToggle}
 			aria-haspopup="true"
 			aria-label="Open settings menu"
-			className="p-1 rounded-md hover:bg-white/10 transition-colors"
+			className="p-1.5 rounded-md transition-colors"
+			style={{ color: "var(--topbar-text)" }}
+			onMouseEnter={(e) => {
+				(e.currentTarget as HTMLElement).style.background =
+					"var(--topbar-hover)";
+			}}
+			onMouseLeave={(e) => {
+				(e.currentTarget as HTMLElement).style.background = "transparent";
+			}}
 		>
 			<ChevronDown
-				className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`}
+				className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
 			/>
 		</button>
 	);

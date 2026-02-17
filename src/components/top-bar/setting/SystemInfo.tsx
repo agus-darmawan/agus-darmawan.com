@@ -6,9 +6,8 @@ interface SystemInfoProps {
 }
 
 /**
- * Displays system information such as network ping and battery status.
+ * SystemInfo — read-only rows showing network latency and battery status.
  */
-
 export function SystemInfo({
 	ping,
 	batteryLevel,
@@ -16,17 +15,25 @@ export function SystemInfo({
 	t,
 }: SystemInfoProps) {
 	return (
-		<div className="px-4 py-2 space-y-1 text-xs text-gray-400">
-			<div className="flex justify-between">
+		<div
+			className="px-4 py-2 space-y-1.5 text-xs"
+			style={{ color: "var(--panel-text-muted)" }}
+		>
+			<div className="flex justify-between items-center">
 				<span>{t("network")}</span>
-				<span>{ping != null ? `${ping}ms` : t("offline")}</span>
+				<span className="tabular-nums font-medium">
+					{ping != null ? `${ping} ms` : t("offline")}
+				</span>
 			</div>
 
 			{batteryLevel !== null && (
-				<div className="flex justify-between">
+				<div className="flex justify-between items-center">
 					<span>{t("battery")}</span>
-					<span>
-						{batteryLevel}%{charging ? ` (${t("charging")})` : ""}
+					<span className="tabular-nums font-medium">
+						{batteryLevel}%
+						{charging && (
+							<span className="ml-1 text-green-400">({t("charging")})</span>
+						)}
 					</span>
 				</div>
 			)}

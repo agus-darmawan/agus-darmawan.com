@@ -1,6 +1,12 @@
 /**
- * A simple divider component for separating sections in the settings menu.
+ * Divider — thin separator line for settings panel sections.
  */
 export function Divider() {
-	return <div className="h-px bg-white/10 my-1" aria-hidden />;
+	return (
+		<div
+			className="h-px my-1"
+			style={{ background: "var(--panel-border)" }}
+			aria-hidden
+		/>
+	);
 }

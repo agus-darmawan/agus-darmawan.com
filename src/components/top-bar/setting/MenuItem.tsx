@@ -1,5 +1,5 @@
 /**
- * MenuItem component represents an individual item in a settings menu. It is a button that triggers a specified action when clicked.
+ * MenuItem — a button row inside the settings / panel dropdown.
  */
 export function MenuItem({
 	children,
@@ -10,9 +10,19 @@ export function MenuItem({
 }) {
 	return (
 		<button
-			onClick={onClick}
 			type="button"
-			className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/10 transition-colors"
+			onClick={onClick}
+			className="w-full flex items-center justify-between px-4 py-2.5 transition-colors"
+			style={{
+				color: "var(--panel-text)",
+			}}
+			onMouseEnter={(e) => {
+				(e.currentTarget as HTMLElement).style.background =
+					"var(--panel-hover)";
+			}}
+			onMouseLeave={(e) => {
+				(e.currentTarget as HTMLElement).style.background = "transparent";
+			}}
 		>
 			{children}
 		</button>
