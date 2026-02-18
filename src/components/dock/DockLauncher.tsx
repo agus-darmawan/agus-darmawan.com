@@ -1,6 +1,6 @@
 "use client";
 
-import { Grid3x3 } from "lucide-react";
+import { Grip } from "lucide-react";
 
 interface DockLauncherProps {
 	isOpen: boolean;
@@ -23,8 +23,8 @@ export function DockLauncher({ isOpen, onClick }: DockLauncherProps) {
 					: "bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/15"
 			}`}
 		>
-			<Grid3x3
-				size={22}
+			<Grip
+				size={30}
 				className={`transition-transform duration-200 ${
 					isOpen ? "text-white rotate-45 scale-90" : ""
 				}`}

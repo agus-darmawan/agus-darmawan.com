@@ -3,17 +3,17 @@ import type { OpenApp } from "@/types/app";
 
 interface AppStoreState {
 	openApps: OpenApp[];
-	/** Register an open app. If the same id already exists it gets refreshed to the top. */
+	activeWindowId: string | null;
 	addApp: (app: Omit<OpenApp, "openedAt">) => void;
-	/** Unregister a closed app. */
 	removeApp: (appId: string) => void;
 	clearApps: () => void;
-	/** Returns the app with the latest openedAt timestamp. */
-	getLastOpenedApp: () => OpenApp | null;
+	setActiveApp: (id: string | null) => void;
+	getActiveApp: () => OpenApp | null;
 }
 
 export const useAppStore = create<AppStoreState>((set, get) => ({
 	openApps: [],
+	activeWindowId: null,
 
 	addApp: (app) =>
 		set((state) => ({
@@ -26,14 +26,22 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
 	removeApp: (appId) =>
 		set((state) => ({
 			openApps: state.openApps.filter((a) => a.id !== appId),
+			activeWindowId:
+				state.activeWindowId === appId ? null : state.activeWindowId,
 		})),
 
-	clearApps: () => set({ openApps: [] }),
+	clearApps: () => set({ openApps: [], activeWindowId: null }),
 
-	getLastOpenedApp: () => {
-		const apps = get().openApps;
-		if (apps.length === 0) return null;
-		return apps.reduce((latest, app) =>
+	setActiveApp: (id) => set({ activeWindowId: id }),
+
+	getActiveApp: () => {
+		const { openApps, activeWindowId } = get();
+		if (openApps.length === 0) return null;
+		if (activeWindowId) {
+			const found = openApps.find((a) => a.id === activeWindowId);
+			if (found) return found;
+		}
+		return openApps.reduce((latest, app) =>
 			app.openedAt > latest.openedAt ? app : latest,
 		);
 	},

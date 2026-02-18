@@ -28,6 +28,18 @@ export function useWindowManager(t?: TranslateFn) {
 	const zCounter = useRef(BASE_Z_INDEX);
 	const dragOffset = useRef({ x: 0, y: 0 });
 
+	// These refs always hold the latest values — no stale closures ever
+	const windowsRef = useRef<WindowState[]>([]);
+	const activeWindowRef = useRef<string | null>(null);
+
+	// Keep refs in sync
+	useEffect(() => {
+		windowsRef.current = windows;
+	}, [windows]);
+	useEffect(() => {
+		activeWindowRef.current = activeWindow;
+	}, [activeWindow]);
+
 	const nextZ = useCallback(() => {
 		zCounter.current += 1;
 		return zCounter.current;
@@ -46,40 +58,44 @@ export function useWindowManager(t?: TranslateFn) {
 
 	const openWindow = useCallback(
 		(appId: string, data?: WindowPayload) => {
-			setWindows((prev) => {
-				const existing = prev.find((w) => w.appId === appId);
+			// Read from ref — always fresh, no stale closure
+			const existing = windowsRef.current.find((w) => w.appId === appId);
 
-				if (existing) {
-					const z = nextZ();
-					setActiveWindow(existing.id);
-					return prev.map((w) =>
+			if (existing) {
+				const z = nextZ();
+				setWindows((prev) =>
+					prev.map((w) =>
 						w.id === existing.id
 							? { ...w, minimized: false, data, zIndex: z }
 							: w,
-					);
-				}
+					),
+				);
+				setActiveWindow(existing.id);
+				return;
+			}
 
-				const id = `${appId}-${Date.now()}`;
-				const z = nextZ();
-				const count = prev.length;
+			const id = `${appId}-${Date.now()}`;
+			const z = nextZ();
+			const visibleCount = windowsRef.current.filter(
+				(w) => !w.minimized,
+			).length;
 
-				const newWindow: WindowState = {
-					id,
-					appId,
-					title: getTitle(appId),
-					data,
-					minimized: false,
-					maximized: false,
-					position: {
-						x: WINDOW_OFFSET_X + count * WINDOW_STAGGER,
-						y: WINDOW_OFFSET_Y + count * WINDOW_STAGGER,
-					},
-					zIndex: z,
-				};
+			const newWin: WindowState = {
+				id,
+				appId,
+				title: getTitle(appId),
+				data,
+				minimized: false,
+				maximized: false,
+				position: {
+					x: WINDOW_OFFSET_X + visibleCount * WINDOW_STAGGER,
+					y: WINDOW_OFFSET_Y + visibleCount * WINDOW_STAGGER,
+				},
+				zIndex: z,
+			};
 
-				setActiveWindow(id);
-				return [...prev, newWindow];
-			});
+			setWindows((prev) => [...prev, newWin]);
+			setActiveWindow(id);
 		},
 		[nextZ, getTitle],
 	);
@@ -118,42 +134,55 @@ export function useWindowManager(t?: TranslateFn) {
 		setActiveWindow(null);
 	}, []);
 
+	// THE KEY FIX: Read from refs, NOT from state/closure
+	// This function is called from dock icons AND app grid
 	const handleDockClick = useCallback(
 		(appId: string) => {
-			setWindows((prev) => {
-				const win = prev.find((w) => w.appId === appId);
+			const currentWindows = windowsRef.current; // always latest
+			const currentActive = activeWindowRef.current; // always latest
 
-				if (!win) {
-					// Defer to avoid setState-during-render
-					setTimeout(() => openWindow(appId), 0);
-					return prev;
-				}
+			const win = currentWindows.find((w) => w.appId === appId);
 
-				if (win.minimized) {
-					const z = nextZ();
-					setActiveWindow(win.id);
-					return prev.map((w) =>
+			// No window exists yet → open fresh
+			if (!win) {
+				openWindow(appId);
+				return;
+			}
+
+			// Window is minimized → restore it
+			if (win.minimized) {
+				const z = nextZ();
+				setWindows((prev) =>
+					prev.map((w) =>
 						w.id === win.id ? { ...w, minimized: false, zIndex: z } : w,
-					);
-				}
+					),
+				);
+				setActiveWindow(win.id);
+				return;
+			}
 
-				// If already active → minimize; else bring to front
-				if (activeWindow === win.id) {
-					return prev.map((w) =>
-						w.id === win.id ? { ...w, minimized: true } : w,
-					);
-				}
+			// Window is visible AND currently focused → minimize it
+			if (currentActive === win.id) {
+				setWindows((prev) =>
+					prev.map((w) => (w.id === win.id ? { ...w, minimized: true } : w)),
+				);
+				setActiveWindow(null);
+				return;
+			}
 
-				bringToFront(win.id);
-				return prev;
-			});
+			// Window is visible but not focused → bring to front
+			const z = nextZ();
+			setWindows((prev) =>
+				prev.map((w) => (w.id === win.id ? { ...w, zIndex: z } : w)),
+			);
+			setActiveWindow(win.id);
 		},
-		[nextZ, openWindow, bringToFront, activeWindow],
-	);
+		[nextZ, openWindow],
+	); // NO activeWindow in deps — we use the ref
 
 	const handleMouseDown = useCallback(
 		(e: React.MouseEvent, id: string) => {
-			const win = windows.find((w) => w.id === id);
+			const win = windowsRef.current.find((w) => w.id === id);
 			if (!win || win.maximized) return;
 
 			const target = e.target as HTMLElement;
@@ -166,10 +195,9 @@ export function useWindowManager(t?: TranslateFn) {
 				y: e.clientY - win.position.y,
 			};
 		},
-		[windows, bringToFront],
+		[bringToFront],
 	);
 
-	// Mouse move / up for dragging
 	useEffect(() => {
 		if (!dragging) return;
 
@@ -190,7 +218,6 @@ export function useWindowManager(t?: TranslateFn) {
 		};
 
 		const onUp = () => setDragging(null);
-
 		window.addEventListener("mousemove", onMove);
 		window.addEventListener("mouseup", onUp);
 		return () => {

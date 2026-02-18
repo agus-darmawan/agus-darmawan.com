@@ -4,9 +4,11 @@ import {
 	Briefcase,
 	FileText,
 	Folder,
+	Grid3x3,
 	Mail,
 	Terminal,
 	User,
+	X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
@@ -14,7 +16,6 @@ import { useClickOutside } from "@/hooks/useClickOutside";
 import type { AppConfig, WindowState } from "@/types/app";
 import { AppGrid } from "./AppGrid";
 import { DockIcon } from "./DockIcon";
-import { DockLauncher } from "./DockLauncher";
 
 export const APPS: AppConfig[] = [
 	{ id: "about", name: "about", icon: User, color: "bg-orange-500" },
@@ -43,30 +44,24 @@ export function Dock({ windows, activeWindow, onIconClick }: DockProps) {
 
 	useClickOutside({ ref: dockRef, onOutside: () => setGridOpen(false) });
 
+	// Single handler used by BOTH dock icons and app grid buttons
 	const handleAppClick = (appId: string) => {
-		setGridOpen(false); // Close grid FIRST
+		setGridOpen(false);
 		onIconClick(appId);
 	};
 
-	const handleLauncherClick = () => {
-		setGridOpen((v) => {
-			const willOpen = !v;
-			// If opening grid, signal to parent to minimize all windows
-			if (willOpen) {
-				// Emit custom event for parent to handle
-				window.dispatchEvent(new CustomEvent("minimizeAllWindows"));
-			}
-			return willOpen;
-		});
+	const toggleGrid = () => {
+		if (!gridOpen) {
+			// Opening grid: minimize all windows first
+			window.dispatchEvent(new CustomEvent("minimizeAllWindows"));
+		}
+		setGridOpen((v) => !v);
 	};
 
-	// On mobile, only show first 4 apps in dock
 	const MOBILE_LIMIT = 4;
-	const visibleApps = APPS.slice(0, MOBILE_LIMIT);
 
 	return (
 		<>
-			{/* App grid overlay */}
 			{gridOpen && (
 				<AppGrid
 					apps={APPS}
@@ -77,62 +72,85 @@ export function Dock({ windows, activeWindow, onIconClick }: DockProps) {
 				/>
 			)}
 
-			{/* Dock bar */}
 			<div
 				className="fixed bottom-0 left-0 right-0 h-16 flex items-end justify-center pointer-events-none z-40"
 				ref={dockRef}
 			>
 				<div
-					className="flex items-center gap-1 px-3 py-2 rounded-t-xl shadow-2xl pointer-events-auto border-t border-x"
+					className="flex items-center gap-1 px-3 py-2 rounded-t-xl pointer-events-auto"
 					style={{
-						background: "var(--dock-bg)",
-						borderColor: "var(--dock-border)",
-						backdropFilter: "blur(16px)",
-						WebkitBackdropFilter: "blur(16px)",
+						background: "#111111",
+						borderTop: "1px solid rgba(255,255,255,0.1)",
+						borderLeft: "1px solid rgba(255,255,255,0.1)",
+						borderRight: "1px solid rgba(255,255,255,0.1)",
+						boxShadow: "0 -4px 24px rgba(0,0,0,0.6)",
 					}}
 				>
-					{/* Ubuntu dash/launcher icon */}
-					<DockLauncher isOpen={gridOpen} onClick={handleLauncherClick} />
+					{/* Grid launcher button */}
+					<button
+						type="button"
+						onClick={toggleGrid}
+						aria-label="Show all applications"
+						className="relative w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-150 group"
+						style={{
+							background: gridOpen ? "#e95420" : "rgba(255,255,255,0.08)",
+						}}
+						onMouseEnter={(e) => {
+							if (!gridOpen)
+								(e.currentTarget as HTMLElement).style.background =
+									"rgba(255,255,255,0.15)";
+						}}
+						onMouseLeave={(e) => {
+							if (!gridOpen)
+								(e.currentTarget as HTMLElement).style.background =
+									"rgba(255,255,255,0.08)";
+						}}
+					>
+						{gridOpen ? (
+							<X size={18} className="text-white" />
+						) : (
+							<Grid3x3 size={20} className="text-white/75" />
+						)}
+						<span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded text-xs whitespace-nowrap bg-black text-white border border-white/10 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+							{gridOpen ? "Close" : "Show Apps"}
+						</span>
+					</button>
 
-					{/* Separator */}
 					<div
 						className="w-px h-8 mx-1 rounded-full"
-						style={{ background: "var(--dock-border)" }}
+						style={{ background: "rgba(255,255,255,0.1)" }}
 						aria-hidden
 					/>
 
-					{/* App icons - limited on mobile, full on desktop */}
+					{/* App icons */}
 					<div className="flex items-center gap-1">
-						{/* Mobile: first 4 apps */}
-						{visibleApps.map((app) => {
+						{APPS.slice(0, MOBILE_LIMIT).map((app) => {
 							const win = windows.find((w) => w.appId === app.id);
-							const isOpen = !!win && !win.minimized;
+							// isRunning: window EXISTS (not closed), dot shows even when minimized
+							const isRunning = !!win;
+							// isActive: window is focused right now
 							const isActive = !!win && activeWindow === win.id;
-
 							return (
 								<DockIcon
 									key={app.id}
 									app={app}
 									label={t(app.name)}
-									isOpen={isOpen}
+									isRunning={isRunning}
 									isActive={isActive}
 									onClick={() => handleAppClick(app.id)}
 								/>
 							);
 						})}
-
-						{/* Desktop: all remaining apps (hidden on mobile) */}
 						{APPS.slice(MOBILE_LIMIT).map((app) => {
 							const win = windows.find((w) => w.appId === app.id);
-							const isOpen = !!win && !win.minimized;
+							const isRunning = !!win;
 							const isActive = !!win && activeWindow === win.id;
-
 							return (
 								<DockIcon
 									key={app.id}
 									app={app}
 									label={t(app.name)}
-									isOpen={isOpen}
+									isRunning={isRunning}
 									isActive={isActive}
 									onClick={() => handleAppClick(app.id)}
 									className="hidden sm:flex"

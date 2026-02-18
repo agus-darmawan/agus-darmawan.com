@@ -12,10 +12,6 @@ interface AppGridProps {
 	t: (key: string) => string;
 }
 
-/**
- * AppGrid — Ubuntu GNOME-style "Activities Overview" launcher.
- * Full-screen overlay with search bar and app grid.
- */
 export function AppGrid({
 	apps,
 	windows,
@@ -26,13 +22,11 @@ export function AppGrid({
 	const [query, setQuery] = useState("");
 	const searchRef = useRef<HTMLInputElement>(null);
 
-	// Auto-focus search on mount
 	useEffect(() => {
 		const id = requestAnimationFrame(() => searchRef.current?.focus());
 		return () => cancelAnimationFrame(id);
 	}, []);
 
-	// Close on Escape
 	useEffect(() => {
 		const handler = (e: KeyboardEvent) => {
 			if (e.key === "Escape") onClose();
@@ -47,18 +41,17 @@ export function AppGrid({
 
 	return (
 		<div
-			className="fixed inset-0 z-30 flex flex-col items-center pt-16 pb-20 animate-fade-in"
+			className="fixed inset-0 z-30 flex flex-col items-center pt-16 pb-24 animate-fade-in"
 			style={{
-				background: "rgba(10, 5, 8, 0.88)",
-				backdropFilter: "blur(24px)",
-				WebkitBackdropFilter: "blur(24px)",
+				background: "rgba(8, 4, 6, 0.92)",
+				backdropFilter: "blur(20px)",
+				WebkitBackdropFilter: "blur(20px)",
 			}}
-			// Click on backdrop = close
 			onClick={(e) => {
 				if (e.target === e.currentTarget) onClose();
 			}}
 		>
-			{/* Search bar */}
+			{/* Search */}
 			<div className="relative w-full max-w-md mx-4 mb-10 mt-4">
 				<Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
 				<input
@@ -67,27 +60,18 @@ export function AppGrid({
 					placeholder={t("search")}
 					value={query}
 					onChange={(e) => setQuery(e.target.value)}
-					className="w-full pl-10 pr-10 py-2.5 rounded-xl text-sm outline-none transition-all"
+					className="w-full pl-10 pr-10 py-2.5 rounded-xl text-sm outline-none"
 					style={{
-						background: "rgba(255,255,255,0.1)",
+						background: "rgba(255,255,255,0.08)",
 						border: "1px solid rgba(255,255,255,0.15)",
-						color: "var(--panel-text)",
-					}}
-					onFocus={(e) => {
-						e.currentTarget.style.background = "rgba(255,255,255,0.15)";
-						e.currentTarget.style.borderColor = "rgba(233,84,32,0.6)";
-					}}
-					onBlur={(e) => {
-						e.currentTarget.style.background = "rgba(255,255,255,0.1)";
-						e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
+						color: "rgba(255,255,255,0.9)",
 					}}
 				/>
 				{query && (
 					<button
 						type="button"
 						onClick={() => setQuery("")}
-						className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
-						aria-label="Clear search"
+						className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70"
 					>
 						<X size={14} />
 					</button>
@@ -107,10 +91,7 @@ export function AppGrid({
 								key={app.id}
 								type="button"
 								onClick={() => onAppClick(app.id)}
-								className="dock-grid-item flex flex-col items-center gap-2 p-3 rounded-xl group"
-								style={{
-									transition: "background 0.15s ease",
-								}}
+								className="flex flex-col items-center gap-2 p-3 rounded-xl transition-colors"
 								onMouseEnter={(e) => {
 									(e.currentTarget as HTMLElement).style.background =
 										"rgba(255,255,255,0.08)";
@@ -120,22 +101,16 @@ export function AppGrid({
 										"transparent";
 								}}
 							>
-								{/* Icon */}
 								<div
 									className={`relative w-14 h-14 ${color} rounded-2xl flex items-center justify-center shadow-lg`}
 								>
 									<Icon size={28} className="text-white" />
-									{/* Running dot */}
+									{/* Dot shows if app is running (even minimized) */}
 									{isRunning && (
-										<span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white rounded-full" />
+										<span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white rounded-full" />
 									)}
 								</div>
-
-								{/* Label */}
-								<span
-									className="text-xs text-center leading-tight"
-									style={{ color: "rgba(255,255,255,0.85)" }}
-								>
+								<span className="text-xs text-center leading-tight text-white/80">
 									{t(app.name)}
 								</span>
 							</button>
@@ -143,12 +118,7 @@ export function AppGrid({
 					})}
 				</div>
 			) : (
-				<div
-					className="text-sm mt-8"
-					style={{ color: "rgba(255,255,255,0.4)" }}
-				>
-					{t("noResults")}
-				</div>
+				<p className="text-sm mt-8 text-white/40">{t("noResults")}</p>
 			)}
 		</div>
 	);
