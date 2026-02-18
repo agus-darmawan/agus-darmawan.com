@@ -8,6 +8,7 @@ interface DockIconProps {
 	isOpen: boolean;
 	isActive: boolean;
 	onClick: () => void;
+	className?: string;
 }
 
 /**
@@ -19,6 +20,7 @@ export function DockIcon({
 	isOpen,
 	isActive,
 	onClick,
+	className = "",
 }: DockIconProps) {
 	const { icon: Icon, color } = app;
 
@@ -32,6 +34,7 @@ export function DockIcon({
 				text-white hover:scale-110 active:scale-95 transition-all duration-200
 				shadow-lg group
 				${isActive ? "ring-2 ring-white/40 ring-offset-1 ring-offset-transparent" : ""}
+				${className}
 			`}
 		>
 			<Icon size={24} strokeWidth={isActive ? 2.5 : 2} />

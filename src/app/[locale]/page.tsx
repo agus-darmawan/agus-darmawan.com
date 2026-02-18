@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 import { Dock } from "@/components/dock/Dock";
 import TopBar from "@/components/top-bar/TopBar";
 import AboutWindow from "@/components/windows/content/AboutWindow";
@@ -10,6 +11,7 @@ import ResumeWindow from "@/components/windows/content/ResumeWindow";
 import TerminalWindow from "@/components/windows/content/TerminalWindow";
 import { WindowFrame } from "@/components/windows/frame/WindowFrame";
 import { useWindowManager } from "@/hooks/useWindowManager";
+import { useAppStore } from "@/store/useAppStore";
 import type { WindowState } from "@/types/app";
 
 function WindowContent({ win }: { win: WindowState }) {
@@ -38,6 +40,8 @@ function WindowContent({ win }: { win: WindowState }) {
 
 export default function IndexPage() {
 	const t = useTranslations("Windows");
+	const addApp = useAppStore((s) => s.addApp);
+	const removeApp = useAppStore((s) => s.removeApp);
 
 	const {
 		windows,
@@ -50,7 +54,31 @@ export default function IndexPage() {
 		handleMouseDown,
 		setActiveWindow,
 		bringToFront,
+		minimizeAllWindows,
 	} = useWindowManager(t);
+
+	// Listen for "minimize all" events from Dock
+	useEffect(() => {
+		const handler = () => minimizeAllWindows();
+		window.addEventListener("minimizeAllWindows", handler);
+		return () => window.removeEventListener("minimizeAllWindows", handler);
+	}, [minimizeAllWindows]);
+
+	// Sync windows to AppStore for TopBar ActivityStatus
+	useEffect(() => {
+		windows.forEach((win) => {
+			if (!win.minimized) {
+				addApp({
+					id: win.id,
+					name: win.title,
+					icon: getAppIcon(win.appId),
+					type: "app",
+				});
+			} else {
+				removeApp(win.id);
+			}
+		});
+	}, [windows, addApp, removeApp]);
 
 	return (
 		<main className="w-full h-screen bg-ubuntu-purple overflow-hidden select-none">
@@ -69,8 +97,14 @@ export default function IndexPage() {
 							setActiveWindow(win.id);
 							bringToFront(win.id);
 						}}
-						onClose={() => closeWindow(win.id)}
-						onMinimize={() => minimizeWindow(win.id)}
+						onClose={() => {
+							closeWindow(win.id);
+							removeApp(win.id);
+						}}
+						onMinimize={() => {
+							minimizeWindow(win.id);
+							removeApp(win.id);
+						}}
 						onMaximize={() => toggleMaximize(win.id)}
 					>
 						<WindowContent win={win} />
@@ -85,4 +119,16 @@ export default function IndexPage() {
 			/>
 		</main>
 	);
+}
+
+function getAppIcon(appId: string): string {
+	const icons: Record<string, string> = {
+		about: "👤",
+		terminal: "💻",
+		resume: "📄",
+		experience: "💼",
+		projects: "📁",
+		contact: "✉️",
+	};
+	return icons[appId] ?? "📦";
 }

@@ -43,6 +43,27 @@ export function Dock({ windows, activeWindow, onIconClick }: DockProps) {
 
 	useClickOutside({ ref: dockRef, onOutside: () => setGridOpen(false) });
 
+	const handleAppClick = (appId: string) => {
+		setGridOpen(false); // Close grid FIRST
+		onIconClick(appId);
+	};
+
+	const handleLauncherClick = () => {
+		setGridOpen((v) => {
+			const willOpen = !v;
+			// If opening grid, signal to parent to minimize all windows
+			if (willOpen) {
+				// Emit custom event for parent to handle
+				window.dispatchEvent(new CustomEvent("minimizeAllWindows"));
+			}
+			return willOpen;
+		});
+	};
+
+	// On mobile, only show first 4 apps in dock
+	const MOBILE_LIMIT = 4;
+	const visibleApps = APPS.slice(0, MOBILE_LIMIT);
+
 	return (
 		<>
 			{/* App grid overlay */}
@@ -50,10 +71,7 @@ export function Dock({ windows, activeWindow, onIconClick }: DockProps) {
 				<AppGrid
 					apps={APPS}
 					windows={windows}
-					onAppClick={(id) => {
-						onIconClick(id);
-						setGridOpen(false);
-					}}
+					onAppClick={handleAppClick}
 					onClose={() => setGridOpen(false)}
 					t={t}
 				/>
@@ -74,34 +92,54 @@ export function Dock({ windows, activeWindow, onIconClick }: DockProps) {
 					}}
 				>
 					{/* Ubuntu dash/launcher icon */}
-					<DockLauncher
-						isOpen={gridOpen}
-						onClick={() => setGridOpen((v) => !v)}
-					/>
+					<DockLauncher isOpen={gridOpen} onClick={handleLauncherClick} />
 
 					{/* Separator */}
 					<div
 						className="w-px h-8 mx-1 rounded-full"
 						style={{ background: "var(--dock-border)" }}
+						aria-hidden
 					/>
 
-					{/* App icons */}
-					{APPS.map((app) => {
-						const win = windows.find((w) => w.appId === app.id);
-						const isOpen = !!win && !win.minimized;
-						const isActive = !!win && activeWindow === win.id;
+					{/* App icons - limited on mobile, full on desktop */}
+					<div className="flex items-center gap-1">
+						{/* Mobile: first 4 apps */}
+						{visibleApps.map((app) => {
+							const win = windows.find((w) => w.appId === app.id);
+							const isOpen = !!win && !win.minimized;
+							const isActive = !!win && activeWindow === win.id;
 
-						return (
-							<DockIcon
-								key={app.id}
-								app={app}
-								label={t(app.name)}
-								isOpen={isOpen}
-								isActive={isActive}
-								onClick={() => onIconClick(app.id)}
-							/>
-						);
-					})}
+							return (
+								<DockIcon
+									key={app.id}
+									app={app}
+									label={t(app.name)}
+									isOpen={isOpen}
+									isActive={isActive}
+									onClick={() => handleAppClick(app.id)}
+								/>
+							);
+						})}
+
+						{/* Desktop: all remaining apps (hidden on mobile) */}
+						{APPS.slice(MOBILE_LIMIT).map((app) => {
+							const win = windows.find((w) => w.appId === app.id);
+							const isOpen = !!win && !win.minimized;
+							const isActive = !!win && activeWindow === win.id;
+
+							return (
+								<DockIcon
+									key={app.id}
+									app={app}
+									label={t(app.name)}
+									isOpen={isOpen}
+									isActive={isActive}
+									onClick={() => handleAppClick(app.id)}
+									className="hidden sm:flex"
+								/>
+							);
+						})}
+					</div>
 				</div>
 			</div>
 		</>

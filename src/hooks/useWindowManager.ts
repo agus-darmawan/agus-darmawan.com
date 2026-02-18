@@ -113,6 +113,11 @@ export function useWindowManager(t?: TranslateFn) {
 		[nextZ],
 	);
 
+	const minimizeAllWindows = useCallback(() => {
+		setWindows((prev) => prev.map((w) => ({ ...w, minimized: true })));
+		setActiveWindow(null);
+	}, []);
+
 	const handleDockClick = useCallback(
 		(appId: string) => {
 			setWindows((prev) => {
@@ -201,6 +206,7 @@ export function useWindowManager(t?: TranslateFn) {
 		openWindow,
 		closeWindow,
 		minimizeWindow,
+		minimizeAllWindows,
 		toggleMaximize,
 		handleDockClick,
 		handleMouseDown,

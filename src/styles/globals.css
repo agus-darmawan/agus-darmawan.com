@@ -35,22 +35,23 @@
 	--window-header: #e8e8e8;
 	--window-header-active: #d8d8d8;
 
-	/* TopBar */
+	/* TopBar - always dark like real Ubuntu */
 	--topbar-bg: rgba(30, 20, 28, 0.92);
 	--topbar-text: rgba(255, 255, 255, 0.92);
 	--topbar-hover: rgba(255, 255, 255, 0.1);
 	--topbar-border: rgba(255, 255, 255, 0.08);
 
-	/* Panel / dropdown */
+	/* Panel / dropdown - always dark */
 	--panel-bg: rgba(28, 22, 26, 0.97);
 	--panel-border: rgba(255, 255, 255, 0.1);
 	--panel-hover: rgba(255, 255, 255, 0.08);
 	--panel-text: rgba(255, 255, 255, 0.9);
 	--panel-text-muted: rgba(255, 255, 255, 0.45);
 
-	/* Dock */
-	--dock-bg: rgba(20, 15, 18, 0.92);
-	--dock-border: rgba(255, 255, 255, 0.08);
+	/* Dock - light theme */
+	--dock-bg: rgba(240, 240, 240, 0.92);
+	--dock-border: rgba(0, 0, 0, 0.12);
+	--dock-text: rgba(0, 0, 0, 0.75);
 
 	--scrollbar-thumb: rgba(0, 0, 0, 0.2);
 }
@@ -68,9 +69,14 @@
 	--window-header: #3d3d3d;
 	--window-header-active: #2d2d2d;
 
-	/* TopBar & Panel — same in both modes (always dark) */
+	/* TopBar & Panel — always dark in both modes */
 	--topbar-bg: rgba(18, 12, 16, 0.95);
 	--panel-bg: rgba(22, 16, 20, 0.98);
+
+	/* Dock - dark theme */
+	--dock-bg: rgba(20, 15, 18, 0.95);
+	--dock-border: rgba(255, 255, 255, 0.08);
+	--dock-text: rgba(255, 255, 255, 0.85);
 
 	--scrollbar-thumb: rgba(255, 255, 255, 0.15);
 }

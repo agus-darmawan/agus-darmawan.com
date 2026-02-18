@@ -16,17 +16,19 @@ export function DockLauncher({ isOpen, onClick }: DockLauncherProps) {
 		<button
 			type="button"
 			onClick={onClick}
+			aria-label="Show all applications"
 			className={`relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group ${
 				isOpen
 					? "bg-ubuntu-orange shadow-lg shadow-ubuntu-orange/30"
-					: "bg-white/10 hover:bg-white/20"
+					: "bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/15"
 			}`}
 		>
 			<Grid3x3
 				size={22}
 				className={`transition-transform duration-200 ${
-					isOpen ? "text-white rotate-45 scale-90" : "text-white/80"
+					isOpen ? "text-white rotate-45 scale-90" : ""
 				}`}
+				style={{ color: isOpen ? "white" : "var(--dock-text)" }}
 			/>
 
 			{/* Tooltip */}
