@@ -1,6 +1,6 @@
 "use client";
 
-import { Grip } from "lucide-react";
+import { Grip, X } from "lucide-react";
 
 interface DockLauncherProps {
 	isOpen: boolean;
@@ -8,7 +8,7 @@ interface DockLauncherProps {
 }
 
 /**
- * DockLauncher — the Ubuntu-style "show all apps" button (hamburger/grid).
+ * DockLauncher — the Ubuntu-style "show all apps" button.
  * Sits at the left end of the dock.
  */
 export function DockLauncher({ isOpen, onClick }: DockLauncherProps) {
@@ -17,40 +17,31 @@ export function DockLauncher({ isOpen, onClick }: DockLauncherProps) {
 			type="button"
 			onClick={onClick}
 			aria-label="Show all applications"
-			className={`relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group ${
-				isOpen
-					? "bg-ubuntu-orange shadow-lg shadow-ubuntu-orange/30"
-					: "bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/15"
-			}`}
+			className="relative w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-150 group"
+			style={{
+				background: isOpen ? "#e95420" : "rgba(255,255,255,0.08)",
+			}}
+			onMouseEnter={(e) => {
+				if (!isOpen)
+					(e.currentTarget as HTMLElement).style.background =
+						"rgba(255,255,255,0.15)";
+			}}
+			onMouseLeave={(e) => {
+				if (!isOpen)
+					(e.currentTarget as HTMLElement).style.background =
+						"rgba(255,255,255,0.08)";
+			}}
 		>
-			<Grip
-				size={30}
-				className={`transition-transform duration-200 ${
-					isOpen ? "text-white rotate-45 scale-90" : ""
-				}`}
-				style={{ color: isOpen ? "white" : "var(--dock-text)" }}
-			/>
+			{isOpen ? (
+				<X size={18} className="text-white" />
+			) : (
+				<Grip size={30} className="text-white/75" />
+			)}
 
 			{/* Tooltip */}
-			<div
-				className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 rounded-md text-xs whitespace-nowrap
-				opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 shadow-xl"
-				style={{
-					background: "var(--panel-bg)",
-					color: "var(--panel-text)",
-					border: "1px solid var(--panel-border)",
-				}}
-			>
+			<span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded text-xs whitespace-nowrap bg-black text-white border border-white/10 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
 				{isOpen ? "Close" : "Show Apps"}
-				<div
-					className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0"
-					style={{
-						borderLeft: "4px solid transparent",
-						borderRight: "4px solid transparent",
-						borderTop: "4px solid var(--panel-bg)",
-					}}
-				/>
-			</div>
+			</span>
 		</button>
 	);
 }
