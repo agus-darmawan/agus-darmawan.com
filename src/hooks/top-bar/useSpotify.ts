@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import type { ApiResponse } from "@/types/api";
 import type { SpotifyTrack } from "@/types/spotify";
+import { useRefreshProgress } from "../useRefreshProgress";
 
 const REFETCH_INTERVAL = 10_000;
 
@@ -10,9 +11,9 @@ async function fetchNowPlaying(): Promise<SpotifyTrack | null> {
 	return res.data?.success ? (res.data.data ?? null) : null;
 }
 
-interface UseSpotifyResult {
+export interface UseSpotifyResult {
 	track: SpotifyTrack | null;
-	/** 0 = just fetched → 1 = about to fetch again */
+	/** Smooth 0→1 arc progress toward next refetch */
 	refreshProgress: number;
 	isLoading: boolean;
 	isFetching: boolean;
@@ -25,13 +26,12 @@ export function useSpotify(): UseSpotifyResult {
 		refetchInterval: REFETCH_INTERVAL,
 		refetchIntervalInBackground: false,
 		refetchOnWindowFocus: true,
-		// Keep the previous track visible while re-fetching (no flash of empty)
+		// Keep previous track visible while re-fetching — no flash of empty
 		placeholderData: (prev) => prev,
 		retry: false,
 	});
 
-	const elapsed = dataUpdatedAt ? Date.now() - dataUpdatedAt : 0;
-	const refreshProgress = Math.min(elapsed / REFETCH_INTERVAL, 1);
+	const refreshProgress = useRefreshProgress(dataUpdatedAt, REFETCH_INTERVAL);
 
 	return {
 		track: data ?? null,

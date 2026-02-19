@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import type { ApiResponse } from "@/types/api";
+import { useRefreshProgress } from "../useRefreshProgress";
 
 const REFETCH_INTERVAL = 10_000;
 
@@ -10,9 +11,9 @@ async function fetchPing(): Promise<number> {
 	return Math.round(performance.now() - start);
 }
 
-interface UsePingResult {
+export interface UsePingResult {
 	ping: number | null;
-	/** 0 = just fetched → 1 = about to fetch again */
+	/** Smooth 0→1 arc progress toward next refetch */
 	refreshProgress: number;
 	isLoading: boolean;
 }
@@ -27,8 +28,7 @@ export function usePing(): UsePingResult {
 		retry: false,
 	});
 
-	const elapsed = dataUpdatedAt ? Date.now() - dataUpdatedAt : 0;
-	const refreshProgress = Math.min(elapsed / REFETCH_INTERVAL, 1);
+	const refreshProgress = useRefreshProgress(dataUpdatedAt, REFETCH_INTERVAL);
 
 	return {
 		ping: data ?? null,
