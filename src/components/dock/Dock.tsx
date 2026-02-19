@@ -1,34 +1,13 @@
 "use client";
 
-import {
-	Briefcase,
-	FileText,
-	Folder,
-	Mail,
-	Terminal,
-	User,
-} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
+import { APPS, DOCK_MOBILE_LIMIT } from "@/config/apps";
 import { useClickOutside } from "@/hooks/useClickOutside";
-import type { AppConfig, WindowState } from "@/types/app";
+import type { WindowState } from "@/types/app";
 import { AppGrid } from "./AppGrid";
 import { DockIcon } from "./DockIcon";
 import { DockLauncher } from "./DockLauncher";
-
-export const APPS: AppConfig[] = [
-	{ id: "about", name: "about", icon: User, color: "bg-orange-500" },
-	{ id: "terminal", name: "terminal", icon: Terminal, color: "bg-[#300a24]" },
-	{ id: "resume", name: "resume", icon: FileText, color: "bg-red-500" },
-	{
-		id: "experience",
-		name: "experience",
-		icon: Briefcase,
-		color: "bg-blue-600",
-	},
-	{ id: "projects", name: "projects", icon: Folder, color: "bg-teal-500" },
-	{ id: "contact", name: "contact", icon: Mail, color: "bg-yellow-600" },
-];
 
 interface DockProps {
 	windows: WindowState[];
@@ -54,8 +33,6 @@ export function Dock({ windows, activeWindow, onIconClick }: DockProps) {
 		}
 		setGridOpen((v) => !v);
 	};
-
-	const MOBILE_LIMIT = 4;
 
 	return (
 		<div ref={dockRef}>
@@ -89,32 +66,28 @@ export function Dock({ windows, activeWindow, onIconClick }: DockProps) {
 					/>
 
 					<div className="flex items-center gap-1">
-						{APPS.slice(0, MOBILE_LIMIT).map((app) => {
+						{APPS.slice(0, DOCK_MOBILE_LIMIT).map((app) => {
 							const win = windows.find((w) => w.appId === app.id);
-							const isRunning = !!win;
-							const isActive = !!win && activeWindow === win.id;
 							return (
 								<DockIcon
 									key={app.id}
 									app={app}
 									label={t(app.name)}
-									isRunning={isRunning}
-									isActive={isActive}
+									isRunning={!!win}
+									isActive={!!win && activeWindow === win.id}
 									onClick={() => handleAppClick(app.id)}
 								/>
 							);
 						})}
-						{APPS.slice(MOBILE_LIMIT).map((app) => {
+						{APPS.slice(DOCK_MOBILE_LIMIT).map((app) => {
 							const win = windows.find((w) => w.appId === app.id);
-							const isRunning = !!win;
-							const isActive = !!win && activeWindow === win.id;
 							return (
 								<DockIcon
 									key={app.id}
 									app={app}
 									label={t(app.name)}
-									isRunning={isRunning}
-									isActive={isActive}
+									isRunning={!!win}
+									isActive={!!win && activeWindow === win.id}
 									onClick={() => handleAppClick(app.id)}
 									className="hidden sm:flex"
 								/>

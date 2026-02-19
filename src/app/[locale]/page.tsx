@@ -10,7 +10,8 @@ import ProjectsWindow from "@/components/windows/content/ProjectsWindow";
 import ResumeWindow from "@/components/windows/content/ResumeWindow";
 import TerminalWindow from "@/components/windows/content/TerminalWindow";
 import { WindowFrame } from "@/components/windows/frame/WindowFrame";
-import { useWindowManager } from "@/hooks/useWindowManager";
+import { APPS } from "@/config/apps";
+import { useWindowManager } from "@/hooks/window";
 import { useAppStore } from "@/store/useAppStore";
 import type { WindowState } from "@/types/app";
 
@@ -39,7 +40,9 @@ function WindowContent({ win }: { win: WindowState }) {
 }
 
 function getAppIcon(appId: string): string {
-	const icons: Record<string, string> = {
+	const app = APPS.find((a) => a.id === appId);
+	// Derive emoji from app config color as a simple fallback mapping
+	const iconMap: Record<string, string> = {
 		about: "👤",
 		terminal: "💻",
 		resume: "📄",
@@ -47,7 +50,7 @@ function getAppIcon(appId: string): string {
 		projects: "📁",
 		contact: "✉️",
 	};
-	return icons[appId] ?? "📦";
+	return app ? (iconMap[app.id] ?? "📦") : "📦";
 }
 
 export default function IndexPage() {
@@ -76,8 +79,7 @@ export default function IndexPage() {
 		return () => window.removeEventListener("minimizeAllWindows", handler);
 	}, [minimizeAllWindows]);
 
-	// Sync ALL windows (including minimized) to AppStore so TopBar shows them
-	// Only remove when window is fully CLOSED (not minimized)
+	// Sync open windows (including minimized) to AppStore for TopBar
 	useEffect(() => {
 		windows.forEach((win) => {
 			addApp({
@@ -89,7 +91,7 @@ export default function IndexPage() {
 		});
 	}, [windows, addApp]);
 
-	// Sync active window to store for ActivityStatus
+	// Sync focused window to store for ActivityStatus
 	useEffect(() => {
 		setActiveApp(activeWindow);
 	}, [activeWindow, setActiveApp]);
