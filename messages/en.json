@@ -35,18 +35,39 @@
 	},
 	"AboutWindow": {
 		"title": "About Me",
-		"description": "A passionate full-stack developer"
+		"name": "I Wayan Agus Darmawan",
+		"role": "Full-Stack Developer",
+		"location": "Denpasar, Bali, Indonesia",
+		"experience": "3+ years experience",
+		"bio": "Passionate full-stack developer who loves building elegant, performant web applications. Experienced with modern TypeScript, React ecosystem, Go backends, and cloud infrastructure. Currently based in Bali, working remotely with global teams.",
+		"skills": "Technical Skills",
+		"connect": "Connect"
 	},
 	"ExperienceWindow": {
-		"title": "Experience"
+		"title": "Work Experience",
+		"companies": "companies",
+		"roles": "roles",
+		"years": "years",
+		"present": "Present",
+		"promoted": "Promoted",
+		"responsibilities": "Key Responsibilities",
+		"techStack": "Tech Stack"
 	},
 	"ProjectsWindow": {
-		"title": "Projects"
+		"title": "Projects",
+		"allProjects": "All",
+		"featured": "Featured",
+		"viewCode": "Code",
+		"viewDemo": "Demo",
+		"readMore": "Read More"
 	},
 	"ResumeWindow": {
 		"title": "Resume"
 	},
 	"TerminalWindow": {
 		"title": "Terminal"
+	},
+	"ContactWindow": {
+		"title": "Contact"
 	}
 }
