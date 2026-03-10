@@ -11,7 +11,7 @@ type Props = {
 };
 
 export const metadata: Metadata = {
-	title: "Ubuntu Portfolio",
+	title: "Darmawan Portfolio",
 	description: "Interactive Ubuntu 22.04 themed portfolio",
 	keywords: [
 		"portfolio",

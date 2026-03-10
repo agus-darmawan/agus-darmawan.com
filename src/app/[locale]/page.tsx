@@ -39,20 +39,6 @@ function WindowContent({ win }: { win: WindowState }) {
 	}
 }
 
-function getAppIcon(appId: string): string {
-	const app = APPS.find((a) => a.id === appId);
-	// Derive emoji from app config color as a simple fallback mapping
-	const iconMap: Record<string, string> = {
-		about: "👤",
-		terminal: "💻",
-		resume: "📄",
-		experience: "💼",
-		projects: "📁",
-		contact: "✉️",
-	};
-	return app ? (iconMap[app.id] ?? "📦") : "📦";
-}
-
 export default function IndexPage() {
 	const t = useTranslations("Windows");
 	const addApp = useAppStore((s) => s.addApp);
@@ -85,7 +71,6 @@ export default function IndexPage() {
 			addApp({
 				id: win.id,
 				name: win.title,
-				icon: getAppIcon(win.appId),
 				type: "app",
 			});
 		});
