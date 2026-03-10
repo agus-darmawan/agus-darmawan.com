@@ -23,4 +23,4 @@ export const APPS: AppConfig[] = [
 ];
 
 /** Max icons shown in dock on mobile before hiding to sm: breakpoint */
-export const DOCK_MOBILE_LIMIT = 4;
+export const DOCK_MOBILE_LIMIT = 3;
