@@ -22,7 +22,8 @@ export function ProjectCard({ project, onClick, t }: ProjectCardProps) {
 			onMouseEnter={(e) => {
 				(e.currentTarget as HTMLElement).style.borderColor = project.color;
 				(e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-				(e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px ${project.color}20`;
+				(e.currentTarget as HTMLElement).style.boxShadow =
+					`0 4px 20px ${project.color}20`;
 			}}
 			onMouseLeave={(e) => {
 				(e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
