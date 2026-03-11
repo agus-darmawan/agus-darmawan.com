@@ -1,6 +1,6 @@
 "use client";
 
-import React, { type ReactNode } from "react";
+import React, { type ReactNode, useEffect, useState } from "react";
 import type { WindowState } from "@/types/app";
 import { WindowHeader } from "./WindowHeader";
 
@@ -16,10 +16,19 @@ interface WindowFrameProps {
 	onMaximize: () => void;
 }
 
-/**
- * WindowFrame — draggable, resizable window shell with macOS-style
- * traffic-light controls. Supports maximized/minimized states.
- */
+function useIsMobile() {
+	const [isMobile, setIsMobile] = useState(false);
+
+	useEffect(() => {
+		const check = () => setIsMobile(window.innerWidth < 768);
+		check();
+		window.addEventListener("resize", check);
+		return () => window.removeEventListener("resize", check);
+	}, []);
+
+	return isMobile;
+}
+
 export function WindowFrame({
 	window: win,
 	isActive,
@@ -31,14 +40,18 @@ export function WindowFrame({
 	onMinimize,
 	onMaximize,
 }: WindowFrameProps) {
+	const isMobile = useIsMobile();
+
 	if (win.minimized) return null;
 
-	const positionStyle: React.CSSProperties = win.maximized
+	// On mobile, always fullscreen
+	const isFullscreen = win.maximized || isMobile;
+
+	const positionStyle: React.CSSProperties = isFullscreen
 		? { top: 0, left: 0, right: 0, bottom: 0, width: "100%", height: "100%" }
 		: {
 				top: win.position.y,
 				left: win.position.x,
-				// Responsive: full width on small screens, fixed on desktop
 				width: "clamp(320px, 90vw, 900px)",
 				height: "clamp(400px, 80vh, 650px)",
 			};
@@ -47,7 +60,8 @@ export function WindowFrame({
 		<div
 			className={[
 				"absolute rounded-lg overflow-hidden flex flex-col transition-shadow duration-200",
-				isDragging ? "cursor-grabbing select-none" : "",
+				isMobile ? "rounded-none" : "",
+				isDragging && !isMobile ? "cursor-grabbing select-none" : "",
 				isActive ? "shadow-ubuntu-lg" : "shadow-ubuntu",
 			]
 				.filter(Boolean)
@@ -62,10 +76,11 @@ export function WindowFrame({
 			<WindowHeader
 				title={win.title}
 				isActive={isActive}
-				isMaximized={win.maximized}
+				isMaximized={isFullscreen}
 				onClose={onClose}
 				onMinimize={onMinimize}
 				onMaximize={onMaximize}
+				isMobile={isMobile}
 			/>
 
 			<div
