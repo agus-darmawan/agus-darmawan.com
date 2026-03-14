@@ -12,20 +12,20 @@ const LINKS = [
 	{
 		icon: Linkedin,
 		label: "LinkedIn",
-		href: "https://linkedin.com/in/agus-darmawan",
-		value: "agus-darmawan",
+		href: "https://www.linkedin.com/in/agusdarmawnn/",
+		value: "Agus Darmawan",
 	},
 	{
 		icon: Mail,
 		label: "Email",
-		href: "mailto:agus@example.com",
-		value: "agus@example.com",
+		href: "mailto:darmawandeveloper@gmail.com",
+		value: "darmawandeveloper@gmail.com",
 	},
 	{
 		icon: Globe,
 		label: "Website",
-		href: "https://agus.dev",
-		value: "agus.dev",
+		href: "https://agus-darmawan.com",
+		value: "agus-darmawan",
 	},
 ] as const;
 
@@ -36,10 +36,7 @@ interface AboutContactProps {
 export function AboutContact({ t }: AboutContactProps) {
 	return (
 		<div className="px-6 py-5">
-			<h2
-				className="text-xs font-semibold uppercase tracking-wider mb-4"
-				style={{ color: "var(--text-muted)" }}
-			>
+			<h2 className="text-xs font-semibold uppercase tracking-wider mb-4 text-(--text-muted)">
 				{t("connect")}
 			</h2>
 
@@ -50,22 +47,10 @@ export function AboutContact({ t }: AboutContactProps) {
 						href={href}
 						target="_blank"
 						rel="noreferrer"
-						className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border transition-all group"
-						style={{
-							background: "var(--surface-secondary)",
-							borderColor: "var(--border)",
-							color: "var(--text-secondary)",
-						}}
-						onMouseEnter={(e) => {
-							(e.currentTarget as HTMLElement).style.borderColor = "#e95420";
-							(e.currentTarget as HTMLElement).style.color = "#e95420";
-						}}
-						onMouseLeave={(e) => {
-							(e.currentTarget as HTMLElement).style.borderColor =
-								"var(--border)";
-							(e.currentTarget as HTMLElement).style.color =
-								"var(--text-secondary)";
-						}}
+						className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border
+						bg-(--surface-secondary) border-(--border) text-(--text-secondary)
+						transition-all
+						hover:border-ubuntu-orange hover:text-ubuntu-orange"
 					>
 						<Icon size={14} className="shrink-0" />
 						<div className="min-w-0">

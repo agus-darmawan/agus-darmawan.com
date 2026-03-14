@@ -4,22 +4,17 @@ const SKILL_GROUPS = [
 	{
 		label: "Frontend",
 		color: "#e95420",
-		skills: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Vue 3"],
+		skills: ["Swiff", "React", "Next.js", "TypeScript", "Tailwind CSS"],
 	},
 	{
 		label: "Backend",
 		color: "#3b82f6",
-		skills: ["Node.js", "Go", "Express", "Fastify", "REST API"],
+		skills: ["Node.js", "Express", "PostgreSQL", "Prisma"],
 	},
 	{
-		label: "Database",
+		label: "Robotics",
 		color: "#10b981",
-		skills: ["PostgreSQL", "MongoDB", "Redis", "Prisma"],
-	},
-	{
-		label: "DevOps",
-		color: "#8b5cf6",
-		skills: ["Docker", "GitHub Actions", "Vercel", "AWS"],
+		skills: ["ROS", "Gazebo", "OpenCV", "Python", "C++", "ESP-IDF"],
 	},
 ] as const;
 
@@ -29,14 +24,8 @@ interface AboutSkillsProps {
 
 export function AboutSkills({ t }: AboutSkillsProps) {
 	return (
-		<div
-			className="px-6 py-5 border-b"
-			style={{ borderColor: "var(--border)" }}
-		>
-			<h2
-				className="text-xs font-semibold uppercase tracking-wider mb-4"
-				style={{ color: "var(--text-muted)" }}
-			>
+		<div className="px-6 py-5 border-b border-(--border)">
+			<h2 className="text-xs font-semibold uppercase tracking-wider mb-4 text-(--text-muted)">
 				{t("skills")}
 			</h2>
 
@@ -49,15 +38,16 @@ export function AboutSkills({ t }: AboutSkillsProps) {
 						>
 							{group.label}
 						</p>
+
 						<div className="flex flex-wrap gap-1.5">
 							{group.skills.map((skill) => (
 								<span
 									key={skill}
-									className="text-xs px-2 py-0.5 rounded-full font-medium"
+									className="text-xs px-2 py-0.5 rounded-full font-medium border"
 									style={{
-										background: `${group.color}14`,
+										backgroundColor: `${group.color}14`,
 										color: group.color,
-										border: `1px solid ${group.color}28`,
+										borderColor: `${group.color}28`,
 									}}
 								>
 									{skill}
