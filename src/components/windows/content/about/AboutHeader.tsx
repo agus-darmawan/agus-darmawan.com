@@ -15,7 +15,7 @@ export function AboutHeader({ t }: AboutHeaderProps) {
 			<div className="relative flex items-start gap-5">
 				<div className="relative shrink-0">
 					<Image
-						src="/foto/avatar.png"
+						src="/avatar.png"
 						alt="Profile"
 						width={80}
 						height={80}
