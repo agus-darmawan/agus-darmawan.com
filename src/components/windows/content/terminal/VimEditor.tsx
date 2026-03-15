@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import { defaultVim, type FSNode, type VimState } from "./terminalTypes";
+import { defaultVim, type FSNode, type VimState } from "@/types/terminal";
 
 interface VimEditorProps {
 	vim: VimState;
@@ -9,6 +9,7 @@ interface VimEditorProps {
 	cwd: string;
 	setFs: (updater: (prev: FSNode) => FSNode) => void;
 	onClose: (savedContent: string | null, filename: string) => void;
+	hints: { key: string; desc: string }[];
 }
 
 export function VimEditor({
@@ -17,6 +18,7 @@ export function VimEditor({
 	cwd,
 	setFs,
 	onClose,
+	hints,
 }: VimEditorProps) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const vimRef = useRef(vim);
@@ -288,7 +290,7 @@ export function VimEditor({
 				aria-label="vim input"
 			/>
 
-			{/* Title */}
+			{/* Title bar */}
 			<div
 				className="px-3 py-1 text-xs flex justify-between shrink-0"
 				style={{
@@ -304,7 +306,7 @@ export function VimEditor({
 				<span style={{ color: "#e94560" }}>{vim.mode.toUpperCase()}</span>
 			</div>
 
-			{/* Editor */}
+			{/* Editor body */}
 			<div className="flex-1 overflow-hidden">
 				{visibleLines.map((line, idx) => {
 					const absLine = start + idx;
@@ -365,7 +367,7 @@ export function VimEditor({
 				)}
 			</div>
 
-			{/* Status */}
+			{/* Status bar */}
 			<div
 				className="px-3 py-1 text-xs flex justify-between shrink-0"
 				style={{
@@ -381,7 +383,7 @@ export function VimEditor({
 				</span>
 			</div>
 
-			{/* Hints */}
+			{/* Hints bar */}
 			<div
 				className="px-3 py-1 text-xs shrink-0"
 				style={{
@@ -390,11 +392,13 @@ export function VimEditor({
 					borderTop: "1px solid #1a1a3e",
 				}}
 			>
-				<span style={{ color: "#00d4ff" }}>i</span>=insert{" "}
-				<span style={{ color: "#00d4ff" }}>Esc</span>=normal{" "}
-				<span style={{ color: "#00d4ff" }}>:w</span>=save{" "}
-				<span style={{ color: "#00d4ff" }}>:q!</span>=quit{" "}
-				<span style={{ color: "#00d4ff" }}>:wq</span>=save&amp;quit
+				{hints.map(({ key, desc }, i) => (
+					<span key={i}>
+						<span style={{ color: "#00d4ff" }}>{key}</span>
+						{desc}
+						{i < hints.length - 1 ? " " : ""}
+					</span>
+				))}
 			</div>
 		</div>
 	);

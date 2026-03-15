@@ -62,10 +62,39 @@
 		"readMore": "Selengkapnya"
 	},
 	"ResumeWindow": {
-		"title": "Resume"
+		"title": "Resume",
+		"download": "Unduh PDF",
+		"loading": "Memuat PDF…",
+		"errorLoad": "Gagal memuat PDF. Pastikan file ada di folder /public.",
+		"zoomIn": "Perbesar",
+		"zoomOut": "Perkecil",
+		"resetZoom": "Reset zoom",
+		"prevPage": "Halaman sebelumnya",
+		"nextPage": "Halaman berikutnya",
+		"pageOf": "dari"
 	},
 	"TerminalWindow": {
-		"title": "Terminal"
+		"title": "Terminal",
+		"welcome": "Ubuntu 22.04.3 LTS — darm@wan — terminal portofolio",
+		"helpHint": "Ketik \"help\" untuk melihat perintah yang tersedia.",
+		"placeholder": "Ketik perintah...",
+		"hintTab": "Tab",
+		"hintTabDesc": "=autocomplete",
+		"hintArrows": "↑↓",
+		"hintArrowsDesc": "=riwayat",
+		"hintClear": "Ctrl+L",
+		"hintClearDesc": "=bersihkan",
+		"vimInsert": "i",
+		"vimInsertDesc": "=masukkan",
+		"vimEsc": "Esc",
+		"vimEscDesc": "=normal",
+		"vimSave": ":w",
+		"vimSaveDesc": "=simpan",
+		"vimQuit": ":q!",
+		"vimQuitDesc": "=keluar",
+		"vimSaveQuit": ":wq",
+		"vimSaveQuitDesc": "=simpan & keluar",
+		"sessionClosed": "Sesi ditutup. Sampai jumpa!"
 	},
 	"ContactWindow": {
 		"title": "Kontak"

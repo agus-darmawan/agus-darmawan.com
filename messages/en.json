@@ -62,10 +62,39 @@
 		"readMore": "Read More"
 	},
 	"ResumeWindow": {
-		"title": "Resume"
+		"title": "Resume",
+		"download": "Download PDF",
+		"loading": "Loading PDF…",
+		"errorLoad": "Failed to load PDF. Make sure the file exists in /public.",
+		"zoomIn": "Zoom in",
+		"zoomOut": "Zoom out",
+		"resetZoom": "Reset zoom",
+		"prevPage": "Previous page",
+		"nextPage": "Next page",
+		"pageOf": "of"
 	},
 	"TerminalWindow": {
-		"title": "Terminal"
+		"title": "Terminal",
+		"welcome": "Ubuntu 22.04.3 LTS — darm@wan — portfolio terminal",
+		"helpHint": "Type \"help\" for available commands.",
+		"placeholder": "Type a command...",
+		"hintTab": "Tab",
+		"hintTabDesc": "=autocomplete",
+		"hintArrows": "↑↓",
+		"hintArrowsDesc": "=history",
+		"hintClear": "Ctrl+L",
+		"hintClearDesc": "=clear",
+		"vimInsert": "i",
+		"vimInsertDesc": "=insert",
+		"vimEsc": "Esc",
+		"vimEscDesc": "=normal",
+		"vimSave": ":w",
+		"vimSaveDesc": "=save",
+		"vimQuit": ":q!",
+		"vimQuitDesc": "=quit",
+		"vimSaveQuit": ":wq",
+		"vimSaveQuitDesc": "=save & quit",
+		"sessionClosed": "Session closed. Goodbye!"
 	},
 	"ContactWindow": {
 		"title": "Contact"
