@@ -1,4 +1,11 @@
-import { Briefcase, FileText, Folder, Terminal, User } from "lucide-react";
+import {
+	Briefcase,
+	FileText,
+	Folder,
+	Mail,
+	Terminal,
+	User,
+} from "lucide-react";
 import type { AppConfig } from "@/types/app";
 
 export const APPS: AppConfig[] = [
@@ -12,7 +19,7 @@ export const APPS: AppConfig[] = [
 		color: "bg-blue-600",
 	},
 	{ id: "projects", name: "projects", icon: Folder, color: "bg-teal-500" },
+	{ id: "contact", name: "contact", icon: Mail, color: "bg-purple-600" },
 ];
 
-/** Max icons shown in dock on mobile before hiding to sm: breakpoint */
-export const DOCK_MOBILE_LIMIT = 3;
+export const DOCK_MOBILE_LIMIT = 4;

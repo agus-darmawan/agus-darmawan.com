@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { Dock } from "@/components/dock/Dock";
 import TopBar from "@/components/top-bar/TopBar";
 import AboutWindow from "@/components/windows/content/about/AboutWindow";
+import ContactWindow from "@/components/windows/content/contact/ContactWindow";
 import ExperienceWindow from "@/components/windows/content/experience/ExperienceWindow";
 import ProjectsWindow from "@/components/windows/content/projects/ProjectsWindow";
 import ResumeWindow from "@/components/windows/content/resume/ResumeWindow";
@@ -27,6 +28,8 @@ function WindowContent({ win }: { win: WindowState }) {
 			return <ProjectsWindow />;
 		case "terminal":
 			return <TerminalWindow />;
+		case "contact":
+			return <ContactWindow />;
 		default:
 			return (
 				<div

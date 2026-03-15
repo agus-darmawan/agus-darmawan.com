@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { AboutAwards } from "./AboutAwards";
-import { AboutContact } from "./AboutContact";
 import { AboutCurrently } from "./AboutCurrently";
 import { AboutEducation } from "./AboutEducation";
 import { AboutHeader } from "./AboutHeader";
@@ -20,7 +19,6 @@ export default function AboutWindow() {
 			<AboutEducation t={t} />
 			<AboutAwards t={t} />
 			<AboutPublications t={t} />
-			<AboutContact t={t} />
 		</div>
 	);
 }
