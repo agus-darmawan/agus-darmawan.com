@@ -1,7 +1,7 @@
 "use client";
 
 import NextImage from "next/image";
-import type { InlineNode } from "./types";
+import type { InlineNode } from "@/types/project";
 
 interface InlineProps {
 	nodes: InlineNode[];
@@ -61,6 +61,7 @@ export function Inline({ nodes, accentColor }: InlineProps) {
 								rel={isExternal ? "noreferrer" : undefined}
 								className="underline underline-offset-2 transition-opacity hover:opacity-70"
 								style={{ color: accentColor }}
+								title={node.href}
 							>
 								<Inline nodes={node.children} accentColor={accentColor} />
 							</a>
