@@ -4,7 +4,7 @@ const SKILL_GROUPS = [
 	{
 		label: "Frontend",
 		color: "#e95420",
-		skills: ["Swiff", "React", "Next.js", "TypeScript", "Tailwind CSS"],
+		skills: ["Swift", "React", "Next.js", "TypeScript", "Tailwind CSS"],
 	},
 	{
 		label: "Backend",
@@ -31,11 +31,11 @@ export function AboutSkills({ t }: AboutSkillsProps) {
 
 			<div className="space-y-3">
 				{SKILL_GROUPS.map((group) => (
-					<div key={group.label}>
-						<p
-							className="text-xs font-medium mb-1.5"
-							style={{ color: group.color }}
-						>
+					<div
+						key={group.label}
+						style={{ "--skill": group.color } as React.CSSProperties}
+					>
+						<p className="text-xs font-medium mb-1.5 text-(--skill)">
 							{group.label}
 						</p>
 
@@ -43,12 +43,10 @@ export function AboutSkills({ t }: AboutSkillsProps) {
 							{group.skills.map((skill) => (
 								<span
 									key={skill}
-									className="text-xs px-2 py-0.5 rounded-full font-medium border"
-									style={{
-										backgroundColor: `${group.color}14`,
-										color: group.color,
-										borderColor: `${group.color}28`,
-									}}
+									className="text-xs px-2 py-0.5 rounded-full font-medium border
+                  text-(--skill)
+                  bg-[color-mix(in_srgb,var(--skill)_10%,transparent)]
+                  border-[color-mix(in_srgb,var(--skill)_20%,transparent)]"
 								>
 									{skill}
 								</span>
