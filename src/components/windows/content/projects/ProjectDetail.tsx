@@ -2,16 +2,28 @@
 
 import { ExternalLink, Github, Star, X } from "lucide-react";
 import { useEffect, useRef } from "react";
-import type { Project } from "./projectsData";
+import type { ProjectMeta } from "./projectsData";
 import { ReadmeRenderer } from "./readme/ReadmeRenderer";
 
 interface ProjectDetailProps {
-	project: Project;
+	project: ProjectMeta;
+	name: string;
+	desc: string;
+	readmeContent: string;
 	onClose: () => void;
-	t: (key: string) => string;
+	viewCodeLabel: string;
+	viewDemoLabel: string;
 }
 
-export function ProjectDetail({ project, onClose, t }: ProjectDetailProps) {
+export function ProjectDetail({
+	project,
+	name,
+	desc,
+	readmeContent,
+	onClose,
+	viewCodeLabel,
+	viewDemoLabel,
+}: ProjectDetailProps) {
 	const overlayRef = useRef<HTMLDivElement>(null);
 	const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -59,13 +71,13 @@ export function ProjectDetail({ project, onClose, t }: ProjectDetailProps) {
 							className="font-bold text-base"
 							style={{ color: "var(--text-primary)" }}
 						>
-							{project.name}
+							{name}
 						</h2>
 						<p
 							className="text-xs mt-0.5"
 							style={{ color: "var(--text-muted)" }}
 						>
-							{project.desc}
+							{desc}
 						</p>
 						<div className="flex items-center gap-3 mt-2 flex-wrap">
 							<span
@@ -89,8 +101,9 @@ export function ProjectDetail({ project, onClose, t }: ProjectDetailProps) {
 					</div>
 
 					<button
-						title="Close"
 						type="button"
+						title="Close"
+						aria-label="Close project detail"
 						onClick={onClose}
 						className="p-1.5 rounded-lg transition-colors shrink-0"
 						style={{ color: "var(--text-muted)" }}
@@ -126,10 +139,10 @@ export function ProjectDetail({ project, onClose, t }: ProjectDetailProps) {
 					))}
 				</div>
 
-				{/* README — scrollable container, ref passed to renderer for TOC tracking */}
+				{/* README */}
 				<div ref={scrollRef} className="flex-1 overflow-auto min-h-0 px-5 py-4">
 					<ReadmeRenderer
-						content={project.readme}
+						content={readmeContent}
 						accentColor={project.color}
 						scrollRef={scrollRef}
 					/>
@@ -162,7 +175,7 @@ export function ProjectDetail({ project, onClose, t }: ProjectDetailProps) {
 						}}
 					>
 						<Github size={13} />
-						{t("viewCode")}
+						{viewCodeLabel}
 					</a>
 
 					{project.demo && (
@@ -174,7 +187,7 @@ export function ProjectDetail({ project, onClose, t }: ProjectDetailProps) {
 							style={{ background: project.color }}
 						>
 							<ExternalLink size={13} />
-							{t("viewDemo")}
+							{viewDemoLabel}
 						</a>
 					)}
 				</div>

@@ -56,10 +56,15 @@ export function AboutEducation({ t }: AboutEducationProps) {
 									{edu.highlight}
 								</span>
 							</div>
-							<p className="text-[11px] mt-0.5 font-medium" style={{ color: edu.color }}>
+							<p
+								className="text-[11px] mt-0.5 font-medium"
+								style={{ color: edu.color }}
+							>
 								{edu.degree}
 							</p>
-							<p className="text-[11px] mt-0.5 text-(--text-muted)">{edu.period}</p>
+							<p className="text-[11px] mt-0.5 text-(--text-muted)">
+								{edu.period}
+							</p>
 						</div>
 					</div>
 				))}

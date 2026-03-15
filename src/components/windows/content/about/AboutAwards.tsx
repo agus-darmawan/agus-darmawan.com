@@ -65,12 +65,16 @@ export function AboutAwards({ t }: AboutAwardsProps) {
 						key={i}
 						className="flex items-start gap-3 p-3 rounded-xl border bg-(--surface-secondary) border-(--border) group"
 						onMouseEnter={(e) => {
-							(e.currentTarget as HTMLElement).style.borderColor = `${award.color}40`;
-							(e.currentTarget as HTMLElement).style.background = `${award.color}08`;
+							(e.currentTarget as HTMLElement).style.borderColor =
+								`${award.color}40`;
+							(e.currentTarget as HTMLElement).style.background =
+								`${award.color}08`;
 						}}
 						onMouseLeave={(e) => {
-							(e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
-							(e.currentTarget as HTMLElement).style.background = "var(--surface-secondary)";
+							(e.currentTarget as HTMLElement).style.borderColor =
+								"var(--border)";
+							(e.currentTarget as HTMLElement).style.background =
+								"var(--surface-secondary)";
 						}}
 					>
 						<span className="text-xl shrink-0">{award.emoji}</span>
@@ -89,10 +93,14 @@ export function AboutAwards({ t }: AboutAwardsProps) {
 									>
 										{award.level}
 									</span>
-									<span className="text-[10px] text-(--text-muted)">{award.year}</span>
+									<span className="text-[10px] text-(--text-muted)">
+										{award.year}
+									</span>
 								</div>
 							</div>
-							<p className="text-[11px] mt-0.5 text-(--text-muted)">{award.event}</p>
+							<p className="text-[11px] mt-0.5 text-(--text-muted)">
+								{award.event}
+							</p>
 						</div>
 					</div>
 				))}

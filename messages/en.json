@@ -36,12 +36,16 @@
 	"AboutWindow": {
 		"title": "About Me",
 		"name": "I Wayan Agus Darmawan",
-		"role": "Full-Stack Developer",
+		"role": "Full-Stack & Robotics Developer",
 		"location": "Denpasar, Bali, Indonesia",
 		"experience": "3+ years experience",
-		"bio": "Computer Engineering graduate (2025) with experience in full-stack web development, having completed over 20 freelance projects. Skilled in building responsive web applications, dashboards, and custom solutions using React and Express, delivering scalable and user-friendly software for a wide range of clients. In addition to web development, I have experience in robotics software, contributing to ROS-based autonomous robots and inspection systems, which strengthened my ability to integrate software with hardware, implement navigation and control systems, and ensure reliable performance in real-world environments. I am passionate about creating innovative solutions that combine technical excellence with practical usability, solving challenging problems, and delivering projects that create meaningful impact.",
+		"bio": "Computer Engineering graduate (2025) from Institut Teknologi Sepuluh Nopember with experience in full-stack web development, completing over 20 freelance projects. Skilled in building responsive web applications, dashboards, and custom solutions using React and Express. Additionally experienced in robotics software, contributing to ROS-based autonomous robots and inspection systems — integrating software with hardware, implementing navigation and control systems, and ensuring reliable real-world performance.",
 		"skills": "Technical Skills",
-		"connect": "Connect"
+		"education": "Education",
+		"awards": "Awards & Honors",
+		"publications": "Publications",
+		"currentlyDoing": "Currently",
+		"scrollHint": "Scroll to explore"
 	},
 	"ExperienceWindow": {
 		"title": "Work Experience",
@@ -61,7 +65,11 @@
 		"featured": "Featured",
 		"viewCode": "Code",
 		"viewDemo": "Demo",
-		"readMore": "Read More"
+		"readMore": "Read More",
+		"openProject": "Open",
+		"backToProjects": "← Projects",
+		"stars": "stars",
+		"repos": "repos"
 	},
 	"ResumeWindow": {
 		"title": "Resume",
@@ -99,6 +107,175 @@
 		"sessionClosed": "Session closed. Goodbye!"
 	},
 	"ContactWindow": {
-		"title": "Contact"
+		"title": "Contact",
+		"subtitle": "Let's build something together",
+		"sendMessage": "Send a Message",
+		"namePlaceholder": "Your name",
+		"emailPlaceholder": "your@email.com",
+		"messagePlaceholder": "Tell me about your project or idea…",
+		"send": "Send Message",
+		"sent": "Message sent!"
+	},
+	"Experience": {
+		"ezraRobotics": {
+			"company": "PT. Ezra Robotics Teknologi",
+			"location": "Tangerang Selatan, Banten, Indonesia",
+			"roles": {
+				"roboticsEngineer": {
+					"title": "Robotics Engineer",
+					"responsibilities": [
+						"Designed, developed, and tested quadruped inspection robots for electrical substations, including ROS-based applications, custom GUI interfaces, and automated inspection features",
+						"Led outdoor localization and mapping improvements, resolving LIO challenges using RTK GPS to ensure precise navigation in complex environments",
+						"Performed extensive field testing and delivered technical demonstrations to end users, supporting industrial applications across PLN, Pertamina (oil & gas), and PTPN plantations"
+					]
+				},
+				"juniorRoboticsEngineer": {
+					"title": "Junior Robotics Engineer",
+					"responsibilities": [
+						"Implemented base system integration on Deep Robotics Lite3 and X30 quadruped robots to support PPE detection applications and indoor autonomous navigation",
+						"Developed ROS-based base programs integrating LiDAR–Inertial Odometry (LIO) navigation and thermal imaging for electrical substation inspection",
+						"Built basic web-based monitoring for telemetry and inspection visualization"
+					]
+				}
+			}
+		},
+		"aseec": {
+			"company": "ASEEC Education",
+			"location": "Indonesia",
+			"roles": {
+				"researchMentor": {
+					"title": "Research Mentor",
+					"responsibilities": [
+						"Mentored middle and high school students for KOPSI, FIKSI, and national-level innovation competitions, guiding technical project development and scientific research writing",
+						"Supported multidisciplinary student projects across IoT, Machine Learning, Embedded Systems, and Web Development",
+						"Ensured structured project execution, timely proposal delivery, and consistent competition participation with multiple returning mentees"
+					]
+				}
+			}
+		},
+		"itsTeknoSains": {
+			"company": "PT. ITS TEKNO SAINS",
+			"location": "Surabaya, Jawa Timur, Indonesia",
+			"roles": {
+				"roboticsSoftwareEngineer": {
+					"title": "Robotics Software Engineer – iCar ITS",
+					"responsibilities": [
+						"Implemented and enhanced ROS-based autonomous driving software on Ubuntu, improving LiDAR-based obstacle avoidance and vehicle stability through PID parameter tuning",
+						"Integrated Direct LiDAR–Inertial Odometry fused with GPS for reliable localization in both GPS-available and GPS-denied environments",
+						"Designed and developed a real-time web-based monitoring, tracking, and maintenance logging system using Next.js integrated with ROS (rosbridge/roslib)"
+					]
+				},
+				"roboticsEngineerAsv": {
+					"title": "Robotics Engineer – Hidrooseanografi ASV",
+					"responsibilities": [
+						"Developed and tested a ROS-based autonomous navigation system for an ASV with RViz-based control and monitoring interface",
+						"Implemented Pure Pursuit path-following using GPS RTK and IMU localization and buoy obstacle avoidance using YOLO-based object detection",
+						"Conducted system integration and field testing collaborating with MBKM ITS teams, Robomarine, and STTAL as end user"
+					]
+				}
+			}
+		},
+		"b401Lab": {
+			"company": "B401 Robotics Laboratory",
+			"location": "Surabaya, Jawa Timur, Indonesia",
+			"roles": {
+				"labAssistant": {
+					"title": "Laboratory Assistant",
+					"responsibilities": [
+						"Engineered full-stack ROS-based autonomy and manipulation systems, integrating perception, mapping, localization, motion planning, control, and behavior decision architectures",
+						"Validated autonomous robotic capabilities through real-world deployment and high-fidelity simulations (Gazebo, Isaac Sim, Webots)",
+						"Led Digital Circuit laboratory modernization, managing teaching assistants and enhancing practical learning effectiveness"
+					]
+				}
+			}
+		},
+		"barunastra": {
+			"company": "Barunastra ITS Roboboat Team",
+			"location": "Surabaya, Jawa Timur, Indonesia",
+			"roles": {
+				"divisionLeader": {
+					"title": "Electrical-Programming Division Leader",
+					"responsibilities": [
+						"Led the Electrical & Programming Division as a hands-on robotics engineer, contributing to electrical system design, autonomous software development, and overall robot architecture",
+						"Designed and built end-to-end robotic platforms integrating electrical systems, sensor stack selection, control software, and system integration for competition-ready deployments",
+						"Coordinated with mechanical and non-technical teams while balancing mission requirements, technical performance, and budget constraints"
+					]
+				},
+				"roboticsSoftwareEngineer": {
+					"title": "Robotics Software Engineer",
+					"responsibilities": [
+						"Developed ROS-based autonomous navigation systems for an Autonomous Surface Vehicle (ASV), integrating multi-sensor fusion of LiDAR, camera, GPS, IMU, and compass",
+						"Implemented PID-based thruster control and real-time sensor data processing enabling fully autonomous maritime navigation",
+						"Collaborated with electrical and computer vision teams to deliver fully integrated autonomous robotic systems deployed in KKI 2022, IRC 2023, and KKI 2023"
+					]
+				}
+			}
+		},
+		"satkomindo": {
+			"company": "PT Satkomindo Mediyasa",
+			"location": "Jakarta Selatan, Jakarta Raya, Indonesia",
+			"roles": {
+				"fullStackDeveloper": {
+					"title": "Full Stack Developer",
+					"responsibilities": [
+						"Developed an internal Career Management Platform featuring Easy Apply and automated CV standardization, building candidate, recruiter, and admin dashboards with RBAC and Docker deployment",
+						"Engineered backend services for a Document Tracking system using AdonisJS, implementing secure authentication, role management, email verification, and workflow monitoring",
+						"Designed the concept architecture of an IoT-based NVR Monitoring System to monitor surveillance device operational status"
+					]
+				}
+			}
+		},
+		"mage9": {
+			"company": "MAGE (Multimedia And Game Event) 9",
+			"location": "Surabaya, Jawa Timur, Indonesia",
+			"roles": {
+				"frontendDeveloper": {
+					"title": "Frontend Developer",
+					"responsibilities": [
+						"Developed the official MAGE 9 ITS landing website using Next.js and Tailwind CSS as first professional web development project",
+						"Took full ownership of development when other team members were unavailable, self-learning Next.js while maintaining and deploying the production website",
+						"Implemented responsive UI and Firebase authentication integration"
+					]
+				}
+			}
+		}
+	},
+	"Projects": {
+		"ubuntuPortfolio": {
+			"name": "Ubuntu Portfolio",
+			"desc": "Interactive OS-themed developer portfolio with draggable windows, Spotify integration, i18n, and dark mode.",
+			"longDesc": "A fully interactive Ubuntu 22.04 GNOME desktop simulation built as a developer portfolio.",
+			"readmeFile": "ubuntu-portfolio"
+		},
+		"asvNavigation": {
+			"name": "ASV Autonomous Navigation",
+			"desc": "ROS-based autonomous navigation system for Autonomous Surface Vehicle with multi-sensor fusion, winning Grand Champion at IRC 2023.",
+			"longDesc": "Full autonomous navigation stack for maritime competition robot integrating LiDAR, camera, GPS, IMU, and compass for fully autonomous operation.",
+			"readmeFile": "asv-navigation"
+		},
+		"quadrupedInspection": {
+			"name": "Quadruped Inspection Robot",
+			"desc": "ROS-based inspection system for electrical substations using Deep Robotics X30, thermal imaging, and LiDAR-Inertial Odometry.",
+			"longDesc": "Industrial-grade inspection robot system for PLN substations and Pertamina oil & gas facilities, featuring autonomous navigation and PPE detection.",
+			"readmeFile": "quadruped-inspection"
+		},
+		"icarMonitoring": {
+			"name": "iCar ITS Web Monitoring",
+			"desc": "Real-time web monitoring dashboard for autonomous vehicle telemetry, built with Next.js + ROS bridge integration.",
+			"longDesc": "Production monitoring system for the iCar ITS autonomous vehicle project, providing live telemetry, tracking, and maintenance logging.",
+			"readmeFile": "icar-monitoring"
+		},
+		"careerPlatform": {
+			"name": "Career Management Platform",
+			"desc": "Internal HR platform with Easy Apply, automated CV standardization, and role-based access control built for PT Satkomindo.",
+			"longDesc": "Full-stack career management platform featuring candidate, recruiter, and admin dashboards with Docker containerized deployment.",
+			"readmeFile": "career-platform"
+		},
+		"handGestureRobot": {
+			"name": "Hand Gesture Recognition Robot",
+			"desc": "Lightweight deep learning system for real-time hand gesture recognition enabling collaborative robot control.",
+			"longDesc": "Published research: real-time gesture recognition system using lightweight CNN for collaborative robot (cobot) control without physical interfaces.",
+			"readmeFile": "hand-gesture-robot"
+		}
 	}
 }

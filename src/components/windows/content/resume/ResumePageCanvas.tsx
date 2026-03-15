@@ -1,11 +1,13 @@
 "use client";
 
-import * as pdfjsLib from "pdfjs-dist";
 import { useEffect, useRef } from "react";
 import type { PDFDocumentProxy } from "@/hooks/resume/usePdfLoader";
 
-const DEVICE_PIXEL_RATIO =
-	typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+// Access devicePixelRatio lazily inside the effect — never at module scope
+// (would crash in SSR even though this file is "use client").
+function getDpr() {
+	return typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+}
 
 interface ResumePageCanvasProps {
 	pdf: PDFDocumentProxy;
@@ -21,7 +23,7 @@ export function ResumePageCanvas({
 	canvasRef,
 }: ResumePageCanvasProps) {
 	const localRef = useRef<HTMLCanvasElement | null>(null);
-	const renderTaskRef = useRef<pdfjsLib.RenderTask | null>(null);
+	const renderTaskRef = useRef<{ cancel: () => void } | null>(null);
 
 	useEffect(() => {
 		const canvas = localRef.current;
@@ -36,16 +38,23 @@ export function ResumePageCanvas({
 			}
 
 			try {
-				const page = await pdf.getPage(pageNumber);
+				// Cast to `any` here — PDFDocumentProxy is `unknown` at compile
+				// time to avoid importing pdfjs-dist at the module level (SSR crash).
+				// The value is always the real PDFDocumentProxy at runtime because
+				// this component is only ever rendered after the dynamic import resolves.
+				// biome-ignore lint/suspicious/noExplicitAny: intentional SSR workaround
+				const doc = pdf as any;
+				const page = await doc.getPage(pageNumber);
 				if (cancelled) return;
 
-				const scale = zoom * DEVICE_PIXEL_RATIO;
+				const dpr = getDpr();
+				const scale = zoom * dpr;
 				const viewport = page.getViewport({ scale });
 
 				canvas.width = viewport.width;
 				canvas.height = viewport.height;
-				canvas.style.width = `${viewport.width / DEVICE_PIXEL_RATIO}px`;
-				canvas.style.height = `${viewport.height / DEVICE_PIXEL_RATIO}px`;
+				canvas.style.width = `${viewport.width / dpr}px`;
+				canvas.style.height = `${viewport.height / dpr}px`;
 
 				const ctx = canvas.getContext("2d");
 				if (!ctx || cancelled) return;

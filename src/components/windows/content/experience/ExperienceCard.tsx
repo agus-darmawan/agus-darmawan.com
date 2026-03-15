@@ -106,10 +106,14 @@ export function ExperienceCard({ exp, isLast, t, tExp }: ExperienceCardProps) {
 
 				<div className="space-y-4">
 					{exp.roles.map((role, roleIdx) => {
-						const roleTitle = tExp(`${exp.i18nKey}.roles.${role.i18nKey}.title`);
+						const roleTitle = tExp(
+							`${exp.i18nKey}.roles.${role.i18nKey}.title`,
+						);
 						const responsibilities = Array.from({ length: 3 }, (_, i) => {
 							try {
-								return tExp(`${exp.i18nKey}.roles.${role.i18nKey}.responsibilities.${i}`);
+								return tExp(
+									`${exp.i18nKey}.roles.${role.i18nKey}.responsibilities.${i}`,
+								);
 							} catch {
 								return null;
 							}

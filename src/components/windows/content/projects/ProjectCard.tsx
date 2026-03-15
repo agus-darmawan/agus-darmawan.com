@@ -1,15 +1,23 @@
 "use client";
 
 import { ArrowUpRight, GitFork, Star } from "lucide-react";
-import type { Project } from "./projectsData";
+import type { ProjectMeta } from "./projectsData";
 
 interface ProjectCardProps {
-	project: Project;
-	onClick: (project: Project) => void;
-	t: (key: string) => string;
+	project: ProjectMeta;
+	name: string;
+	desc: string;
+	onClick: (project: ProjectMeta) => void;
+	readMoreLabel: string;
 }
 
-export function ProjectCard({ project, onClick, t }: ProjectCardProps) {
+export function ProjectCard({
+	project,
+	name,
+	desc,
+	onClick,
+	readMoreLabel,
+}: ProjectCardProps) {
 	return (
 		<button
 			type="button"
@@ -32,7 +40,6 @@ export function ProjectCard({ project, onClick, t }: ProjectCardProps) {
 				el.style.boxShadow = "none";
 			}}
 		>
-			{/* Colored top bar — full width for featured, small notch for regular */}
 			<div
 				className="h-0.5 w-full"
 				style={{
@@ -41,8 +48,6 @@ export function ProjectCard({ project, onClick, t }: ProjectCardProps) {
 						: `${project.color}40`,
 				}}
 			/>
-
-			{/* Subtle noise-like gradient background on hover */}
 			<div
 				className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
 				style={{
@@ -51,10 +56,8 @@ export function ProjectCard({ project, onClick, t }: ProjectCardProps) {
 			/>
 
 			<div className="relative p-4">
-				{/* Top row: emoji + name + arrow indicator */}
 				<div className="flex items-start justify-between gap-3 mb-3">
 					<div className="flex items-start gap-3">
-						{/* Emoji/icon box */}
 						<div
 							className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 transition-transform duration-200 group-hover:scale-110"
 							style={{
@@ -71,7 +74,7 @@ export function ProjectCard({ project, onClick, t }: ProjectCardProps) {
 									className="font-semibold text-sm leading-tight"
 									style={{ color: "var(--text-primary)" }}
 								>
-									{project.name}
+									{name}
 								</h2>
 								{project.featured && (
 									<span
@@ -86,9 +89,8 @@ export function ProjectCard({ project, onClick, t }: ProjectCardProps) {
 									</span>
 								)}
 							</div>
-							{/* Category pill */}
 							<span
-								className="text-[10px] mt-0.5 inline-block"
+								className="text-[10px] mt-0.5 inline-block capitalize"
 								style={{ color: "var(--text-muted)" }}
 							>
 								{project.category}
@@ -96,27 +98,21 @@ export function ProjectCard({ project, onClick, t }: ProjectCardProps) {
 						</div>
 					</div>
 
-					{/* Click-me arrow — always visible but brightens on hover */}
 					<div
 						className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-						style={{
-							background: `${project.color}18`,
-							color: project.color,
-						}}
+						style={{ background: `${project.color}18`, color: project.color }}
 					>
 						<ArrowUpRight size={14} />
 					</div>
 				</div>
 
-				{/* Description */}
 				<p
 					className="text-xs leading-relaxed mb-3 line-clamp-2"
 					style={{ color: "var(--text-secondary)" }}
 				>
-					{project.desc}
+					{desc}
 				</p>
 
-				{/* Tech stack */}
 				<div className="flex flex-wrap gap-1.5 mb-3">
 					{project.tech.slice(0, 4).map((tech) => (
 						<span
@@ -141,7 +137,6 @@ export function ProjectCard({ project, onClick, t }: ProjectCardProps) {
 					)}
 				</div>
 
-				{/* Footer: stats + click hint */}
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
 						<span
@@ -160,12 +155,11 @@ export function ProjectCard({ project, onClick, t }: ProjectCardProps) {
 						</span>
 					</div>
 
-					{/* Tap/click hint */}
 					<span
 						className="text-[10px] font-medium transition-all duration-200 opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0"
 						style={{ color: project.color }}
 					>
-						{t("readMore")} →
+						{readMoreLabel} →
 					</span>
 				</div>
 			</div>

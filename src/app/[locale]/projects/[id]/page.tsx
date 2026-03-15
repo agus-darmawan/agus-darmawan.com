@@ -1,11 +1,11 @@
 "use client";
 
 import { ArrowLeft, ExternalLink, Github, Star } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { ReadmeRenderer } from "@/components/windows/content/projects/readme/ReadmeRenderer";
 import { PROJECTS_META } from "@/components/windows/content/projects/projectsData";
+import { ReadmeRenderer } from "@/components/windows/content/projects/readme/ReadmeRenderer";
 
 export default function ProjectPage() {
 	const params = useParams();
@@ -127,14 +127,20 @@ export default function ProjectPage() {
 					<div className="flex items-start gap-5">
 						<div
 							className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shrink-0 shadow-lg"
-							style={{ background: `${meta.color}20`, border: `1px solid ${meta.color}30` }}
+							style={{
+								background: `${meta.color}20`,
+								border: `1px solid ${meta.color}30`,
+							}}
 						>
 							{meta.emoji}
 						</div>
 
 						<div className="flex-1 min-w-0">
 							<div className="flex flex-wrap items-center gap-2 mb-1">
-								<h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+								<h1
+									className="text-2xl font-bold"
+									style={{ color: "var(--text-primary)" }}
+								>
 									{name}
 								</h1>
 								{meta.featured && (
@@ -151,7 +157,10 @@ export default function ProjectPage() {
 								)}
 							</div>
 
-							<p className="text-sm mb-4" style={{ color: "var(--text-secondary)" }}>
+							<p
+								className="text-sm mb-4"
+								style={{ color: "var(--text-secondary)" }}
+							>
 								{desc}
 							</p>
 
@@ -203,7 +212,10 @@ export default function ProjectPage() {
 					<div className="flex items-center justify-center py-24">
 						<div
 							className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin"
-							style={{ borderColor: "var(--border)", borderTopColor: meta.color }}
+							style={{
+								borderColor: "var(--border)",
+								borderTopColor: meta.color,
+							}}
 						/>
 					</div>
 				) : (

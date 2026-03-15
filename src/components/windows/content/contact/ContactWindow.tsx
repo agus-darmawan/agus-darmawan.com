@@ -1,6 +1,13 @@
 "use client";
 
-import { Github, Linkedin, Mail, MapPin, MessageSquare, Send } from "lucide-react";
+import {
+	Github,
+	Linkedin,
+	Mail,
+	MapPin,
+	MessageSquare,
+	Send,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -56,7 +63,8 @@ export default function ContactWindow() {
 		setTimeout(() => setStatus("idle"), 4000);
 	};
 
-	const inputClass = "w-full px-3 py-2 rounded-xl text-sm outline-none border transition-colors";
+	const inputClass =
+		"w-full px-3 py-2 rounded-xl text-sm outline-none border transition-colors";
 
 	return (
 		<div
@@ -75,7 +83,9 @@ export default function ContactWindow() {
 					<div className="w-8 h-8 rounded-xl bg-ubuntu-orange flex items-center justify-center">
 						<MessageSquare size={16} className="text-white" />
 					</div>
-					<h1 className="text-lg font-bold text-(--text-primary)">{t("title")}</h1>
+					<h1 className="text-lg font-bold text-(--text-primary)">
+						{t("title")}
+					</h1>
 				</div>
 				<p className="text-xs text-(--text-muted) ml-11">
 					{t("subtitle") ?? "Let's build something together"}
@@ -107,7 +117,10 @@ export default function ContactWindow() {
 
 						if (!href) {
 							return (
-								<div key={label} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border bg-(--surface-secondary) border-(--border)">
+								<div
+									key={label}
+									className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border bg-(--surface-secondary) border-(--border)"
+								>
 									{content}
 								</div>
 							);
@@ -122,12 +135,16 @@ export default function ContactWindow() {
 								className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border bg-(--surface-secondary) border-(--border) transition-all hover:scale-[1.02]"
 								style={{ "--c": color } as React.CSSProperties}
 								onMouseEnter={(e) => {
-									(e.currentTarget as HTMLElement).style.borderColor = `${color}50`;
-									(e.currentTarget as HTMLElement).style.background = `${color}08`;
+									(e.currentTarget as HTMLElement).style.borderColor =
+										`${color}50`;
+									(e.currentTarget as HTMLElement).style.background =
+										`${color}08`;
 								}}
 								onMouseLeave={(e) => {
-									(e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
-									(e.currentTarget as HTMLElement).style.background = "var(--surface-secondary)";
+									(e.currentTarget as HTMLElement).style.borderColor =
+										"var(--border)";
+									(e.currentTarget as HTMLElement).style.background =
+										"var(--surface-secondary)";
 								}}
 							>
 								{content}
@@ -155,8 +172,13 @@ export default function ContactWindow() {
 							border: "1px solid var(--border)",
 							color: "var(--text-primary)",
 						}}
-						onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#e9542050"; }}
-						onBlur={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; }}
+						onFocus={(e) => {
+							(e.currentTarget as HTMLElement).style.borderColor = "#e9542050";
+						}}
+						onBlur={(e) => {
+							(e.currentTarget as HTMLElement).style.borderColor =
+								"var(--border)";
+						}}
 					/>
 
 					<input
@@ -170,12 +192,19 @@ export default function ContactWindow() {
 							border: "1px solid var(--border)",
 							color: "var(--text-primary)",
 						}}
-						onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#e9542050"; }}
-						onBlur={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; }}
+						onFocus={(e) => {
+							(e.currentTarget as HTMLElement).style.borderColor = "#e9542050";
+						}}
+						onBlur={(e) => {
+							(e.currentTarget as HTMLElement).style.borderColor =
+								"var(--border)";
+						}}
 					/>
 
 					<textarea
-						placeholder={t("messagePlaceholder") ?? "Tell me about your project or idea…"}
+						placeholder={
+							t("messagePlaceholder") ?? "Tell me about your project or idea…"
+						}
 						value={message}
 						onChange={(e) => setMessage(e.target.value)}
 						rows={4}
@@ -185,14 +214,25 @@ export default function ContactWindow() {
 							border: "1px solid var(--border)",
 							color: "var(--text-primary)",
 						}}
-						onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#e9542050"; }}
-						onBlur={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; }}
+						onFocus={(e) => {
+							(e.currentTarget as HTMLElement).style.borderColor = "#e9542050";
+						}}
+						onBlur={(e) => {
+							(e.currentTarget as HTMLElement).style.borderColor =
+								"var(--border)";
+						}}
 					/>
 
 					<button
 						type="button"
 						onClick={handleSubmit}
-						disabled={status === "sending" || status === "sent" || !name || !email || !message}
+						disabled={
+							status === "sending" ||
+							status === "sent" ||
+							!name ||
+							!email ||
+							!message
+						}
 						className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
 						style={{
 							background: status === "sent" ? "#10b981" : "#e95420",

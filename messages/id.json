@@ -36,12 +36,16 @@
 	"AboutWindow": {
 		"title": "Tentang Saya",
 		"name": "I Wayan Agus Darmawan",
-		"role": "Web and Robotics Developer",
-		"location": "Tabanan, Bali, Indonesia",
+		"role": "Full-Stack & Robotics Developer",
+		"location": "Denpasar, Bali, Indonesia",
 		"experience": "3+ tahun pengalaman",
-		"bio": "Lulusan Teknik Komputer tahun 2025 dengan pengalaman dalam pengembangan web full-stack dan telah menyelesaikan lebih dari 20 proyek freelance. Memiliki kemampuan membangun aplikasi web responsif, dashboard, dan solusi kustom menggunakan React dan Express, dengan fokus pada pengembangan perangkat lunak yang scalable dan mudah digunakan untuk berbagai klien. Selain pengembangan web, saya juga memiliki pengalaman dalam perangkat lunak robotika, berkontribusi pada robot otonom dan sistem inspeksi berbasis ROS, yang memperkuat kemampuan saya dalam mengintegrasikan perangkat lunak dengan perangkat keras, mengimplementasikan sistem navigasi dan kontrol, serta memastikan performa yang andal di lingkungan nyata. Saya memiliki minat besar dalam menciptakan solusi inovatif yang menggabungkan keunggulan teknis dengan kegunaan praktis serta menyelesaikan tantangan teknis untuk menghasilkan solusi yang berdampak nyata.",
+		"bio": "Lulusan Teknik Komputer 2025 dari Institut Teknologi Sepuluh Nopember dengan pengalaman di pengembangan web full-stack, menyelesaikan lebih dari 20 proyek freelance. Ahli dalam membangun aplikasi web responsif, dashboard, dan solusi kustom menggunakan React dan Express. Selain itu, berpengalaman dalam perangkat lunak robotika, berkontribusi pada robot otonom berbasis ROS dan sistem inspeksi — mengintegrasikan perangkat lunak dengan perangkat keras, mengimplementasikan sistem navigasi dan kontrol, serta memastikan performa andal di lingkungan nyata.",
 		"skills": "Keahlian Teknis",
-		"connect": "Terhubung"
+		"education": "Pendidikan",
+		"awards": "Penghargaan",
+		"publications": "Publikasi",
+		"currentlyDoing": "Saat Ini",
+		"scrollHint": "Gulir untuk jelajahi"
 	},
 	"ExperienceWindow": {
 		"title": "Pengalaman Kerja",
@@ -61,7 +65,11 @@
 		"featured": "Unggulan",
 		"viewCode": "Kode",
 		"viewDemo": "Demo",
-		"readMore": "Selengkapnya"
+		"readMore": "Selengkapnya",
+		"openProject": "Buka",
+		"backToProjects": "← Proyek",
+		"stars": "bintang",
+		"repos": "repo"
 	},
 	"ResumeWindow": {
 		"title": "Resume",
@@ -99,6 +107,175 @@
 		"sessionClosed": "Sesi ditutup. Sampai jumpa!"
 	},
 	"ContactWindow": {
-		"title": "Kontak"
+		"title": "Kontak",
+		"subtitle": "Mari bangun sesuatu bersama",
+		"sendMessage": "Kirim Pesan",
+		"namePlaceholder": "Nama kamu",
+		"emailPlaceholder": "email@kamu.com",
+		"messagePlaceholder": "Ceritakan proyek atau ide kamu…",
+		"send": "Kirim Pesan",
+		"sent": "Pesan terkirim!"
+	},
+	"Experience": {
+		"ezraRobotics": {
+			"company": "PT. Ezra Robotics Teknologi",
+			"location": "Tangerang Selatan, Banten, Indonesia",
+			"roles": {
+				"roboticsEngineer": {
+					"title": "Robotics Engineer",
+					"responsibilities": [
+						"Merancang, mengembangkan, dan menguji robot inspeksi berkaki empat untuk gardu listrik, termasuk aplikasi berbasis ROS, antarmuka GUI kustom, dan fitur inspeksi otomatis",
+						"Memimpin peningkatan lokalisasi dan pemetaan outdoor, mengatasi tantangan LIO menggunakan RTK GPS untuk navigasi presisi di lingkungan kompleks",
+						"Melakukan pengujian lapangan ekstensif dan demonstrasi teknis kepada pengguna akhir, mendukung aplikasi industri di PLN, Pertamina, dan PTPN"
+					]
+				},
+				"juniorRoboticsEngineer": {
+					"title": "Junior Robotics Engineer",
+					"responsibilities": [
+						"Mengimplementasikan integrasi sistem dasar pada robot berkaki empat Deep Robotics Lite3 dan X30 untuk mendukung aplikasi deteksi APD dan navigasi otonom indoor",
+						"Mengembangkan program dasar berbasis ROS yang mengintegrasikan navigasi LiDAR–Inertial Odometry (LIO) dan thermal imaging untuk inspeksi gardu listrik",
+						"Membangun sistem monitoring berbasis web untuk visualisasi telemetri dan inspeksi"
+					]
+				}
+			}
+		},
+		"aseec": {
+			"company": "ASEEC Education",
+			"location": "Indonesia",
+			"roles": {
+				"researchMentor": {
+					"title": "Research Mentor",
+					"responsibilities": [
+						"Membimbing siswa SMP dan SMA untuk kompetisi KOPSI, FIKSI, dan inovasi tingkat nasional, memandu pengembangan proyek teknis dan penulisan riset ilmiah",
+						"Mendukung proyek multidisiplin siswa di bidang IoT, Machine Learning, Embedded Systems, dan Web Development",
+						"Memastikan eksekusi proyek terstruktur, penyerahan proposal tepat waktu, dan partisipasi kompetisi konsisten"
+					]
+				}
+			}
+		},
+		"itsTeknoSains": {
+			"company": "PT. ITS TEKNO SAINS",
+			"location": "Surabaya, Jawa Timur, Indonesia",
+			"roles": {
+				"roboticsSoftwareEngineer": {
+					"title": "Robotics Software Engineer – iCar ITS",
+					"responsibilities": [
+						"Mengimplementasikan dan meningkatkan perangkat lunak mengemudi otonom berbasis ROS di Ubuntu, memperbaiki penghindaran rintangan berbasis LiDAR dan stabilitas kendaraan",
+						"Mengintegrasikan Direct LiDAR–Inertial Odometry yang digabungkan dengan GPS untuk lokalisasi andal di lingkungan dengan dan tanpa GPS",
+						"Merancang dan mengembangkan sistem monitoring berbasis web real-time menggunakan Next.js terintegrasi dengan ROS (rosbridge/roslib)"
+					]
+				},
+				"roboticsEngineerAsv": {
+					"title": "Robotics Engineer – Hidrooseanografi ASV",
+					"responsibilities": [
+						"Mengembangkan dan menguji sistem navigasi otonom berbasis ROS untuk ASV dengan antarmuka kontrol dan monitoring berbasis RViz",
+						"Mengimplementasikan Pure Pursuit path-following menggunakan GPS RTK dan IMU, serta penghindaran rintangan pelampung menggunakan deteksi objek YOLO",
+						"Melakukan integrasi sistem dan pengujian lapangan bersama tim MBKM ITS, Robomarine, dan STTAL sebagai pengguna akhir"
+					]
+				}
+			}
+		},
+		"b401Lab": {
+			"company": "B401 Robotics Laboratory",
+			"location": "Surabaya, Jawa Timur, Indonesia",
+			"roles": {
+				"labAssistant": {
+					"title": "Asisten Laboratorium",
+					"responsibilities": [
+						"Merancang sistem otonomi dan manipulasi berbasis ROS secara full-stack, mengintegrasikan persepsi, pemetaan, lokalisasi, perencanaan gerak, kontrol, dan arsitektur keputusan perilaku",
+						"Memvalidasi kemampuan robotik otonom melalui deployment dunia nyata dan simulasi fidelitas tinggi (Gazebo, Isaac Sim, Webots)",
+						"Memimpin modernisasi laboratorium Digital Circuit, mengelola asisten pengajar dan meningkatkan efektivitas pembelajaran praktis"
+					]
+				}
+			}
+		},
+		"barunastra": {
+			"company": "Barunastra ITS Roboboat Team",
+			"location": "Surabaya, Jawa Timur, Indonesia",
+			"roles": {
+				"divisionLeader": {
+					"title": "Ketua Divisi Elektro-Programming",
+					"responsibilities": [
+						"Memimpin Divisi Elektro & Programming sebagai insinyur robotika, berkontribusi pada desain sistem elektrikal, pengembangan perangkat lunak otonom, dan arsitektur robot keseluruhan",
+						"Merancang dan membangun platform robotik end-to-end yang mengintegrasikan sistem elektrikal, pemilihan sensor stack, perangkat lunak kontrol, untuk deployment kompetisi",
+						"Berkoordinasi dengan tim mekanikal dan non-teknis sambil menyeimbangkan persyaratan misi, performa teknis, dan batasan anggaran"
+					]
+				},
+				"roboticsSoftwareEngineer": {
+					"title": "Robotics Software Engineer",
+					"responsibilities": [
+						"Mengembangkan sistem navigasi otonom berbasis ROS untuk ASV, mengintegrasikan fusi multi-sensor LiDAR, kamera, GPS, IMU, dan kompas",
+						"Mengimplementasikan kontrol thruster berbasis PID dan pemrosesan data sensor real-time yang memungkinkan navigasi maritim sepenuhnya otonom",
+						"Berkolaborasi dengan tim elektrikal dan computer vision untuk menghasilkan sistem robotik terintegrasi penuh yang digunakan di KKI 2022, IRC 2023, dan KKI 2023"
+					]
+				}
+			}
+		},
+		"satkomindo": {
+			"company": "PT Satkomindo Mediyasa",
+			"location": "Jakarta Selatan, Jakarta Raya, Indonesia",
+			"roles": {
+				"fullStackDeveloper": {
+					"title": "Full Stack Developer",
+					"responsibilities": [
+						"Mengembangkan Platform Manajemen Karir internal dengan Easy Apply dan standarisasi CV otomatis, membangun dashboard kandidat, rekruter, dan admin dengan RBAC dan deployment Docker",
+						"Mengerjakan layanan backend untuk sistem Document Tracking menggunakan AdonisJS, mengimplementasikan autentikasi aman, manajemen peran, verifikasi email, dan pemantauan alur kerja",
+						"Merancang arsitektur konsep Sistem NVR Monitoring berbasis IoT untuk memantau status operasional perangkat pengawasan"
+					]
+				}
+			}
+		},
+		"mage9": {
+			"company": "MAGE (Multimedia And Game Event) 9",
+			"location": "Surabaya, Jawa Timur, Indonesia",
+			"roles": {
+				"frontendDeveloper": {
+					"title": "Frontend Developer",
+					"responsibilities": [
+						"Mengembangkan website resmi MAGE 9 ITS menggunakan Next.js dan Tailwind CSS sebagai proyek pengembangan web profesional pertama",
+						"Mengambil alih pengembangan secara penuh ketika anggota tim lain tidak tersedia, belajar mandiri Next.js sambil memelihara dan mendeploy website produksi",
+						"Mengimplementasikan UI responsif dan integrasi autentikasi Firebase"
+					]
+				}
+			}
+		}
+	},
+	"Projects": {
+		"ubuntuPortfolio": {
+			"name": "Ubuntu Portfolio",
+			"desc": "Portofolio developer bertema OS interaktif dengan jendela yang bisa diseret, integrasi Spotify, i18n, dan mode gelap.",
+			"longDesc": "Simulasi desktop GNOME Ubuntu 22.04 yang sepenuhnya interaktif dibangun sebagai portofolio developer.",
+			"readmeFile": "ubuntu-portfolio"
+		},
+		"asvNavigation": {
+			"name": "Navigasi Otonom ASV",
+			"desc": "Sistem navigasi otonom berbasis ROS untuk Autonomous Surface Vehicle dengan fusi multi-sensor, meraih Grand Champion di IRC 2023.",
+			"longDesc": "Stack navigasi otonom lengkap untuk robot kompetisi maritim yang mengintegrasikan LiDAR, kamera, GPS, IMU, dan kompas untuk operasi sepenuhnya otonom.",
+			"readmeFile": "asv-navigation"
+		},
+		"quadrupedInspection": {
+			"name": "Robot Inspeksi Berkaki Empat",
+			"desc": "Sistem inspeksi berbasis ROS untuk gardu listrik menggunakan Deep Robotics X30, thermal imaging, dan LiDAR-Inertial Odometry.",
+			"longDesc": "Sistem robot inspeksi tingkat industri untuk gardu listrik PLN dan fasilitas minyak & gas Pertamina, dengan navigasi otonom dan deteksi APD.",
+			"readmeFile": "quadruped-inspection"
+		},
+		"icarMonitoring": {
+			"name": "iCar ITS Web Monitoring",
+			"desc": "Dashboard monitoring web real-time untuk telemetri kendaraan otonom, dibangun dengan Next.js + integrasi ROS bridge.",
+			"longDesc": "Sistem monitoring produksi untuk proyek kendaraan otonom iCar ITS, menyediakan telemetri langsung, pelacakan, dan pencatatan pemeliharaan.",
+			"readmeFile": "icar-monitoring"
+		},
+		"careerPlatform": {
+			"name": "Platform Manajemen Karir",
+			"desc": "Platform HR internal dengan Easy Apply, standarisasi CV otomatis, dan kontrol akses berbasis peran untuk PT Satkomindo.",
+			"longDesc": "Platform manajemen karir full-stack dengan dashboard kandidat, rekruter, dan admin dengan deployment terkontainerisasi Docker.",
+			"readmeFile": "career-platform"
+		},
+		"handGestureRobot": {
+			"name": "Robot Pengenalan Gestur Tangan",
+			"desc": "Sistem deep learning ringan untuk pengenalan gestur tangan real-time yang memungkinkan kontrol robot kolaboratif.",
+			"longDesc": "Penelitian yang dipublikasikan: sistem pengenalan gestur real-time menggunakan CNN ringan untuk kontrol robot kolaboratif (cobot) tanpa antarmuka fisik.",
+			"readmeFile": "hand-gesture-robot"
+		}
 	}
 }

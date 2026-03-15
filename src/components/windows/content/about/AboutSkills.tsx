@@ -4,17 +4,40 @@ const SKILL_GROUPS = [
 	{
 		label: "Frontend & Mobile",
 		color: "#e95420",
-		skills: ["Swift", "SwiftUI", "React", "Next.js", "TypeScript", "Tailwind CSS"],
+		skills: [
+			"Swift",
+			"SwiftUI",
+			"React",
+			"Next.js",
+			"TypeScript",
+			"Tailwind CSS",
+		],
 	},
 	{
 		label: "Backend",
 		color: "#3b82f6",
-		skills: ["Node.js", "Express", "AdonisJS", "PostgreSQL", "Prisma", "Docker"],
+		skills: [
+			"Node.js",
+			"Express",
+			"AdonisJS",
+			"PostgreSQL",
+			"Prisma",
+			"Docker",
+		],
 	},
 	{
 		label: "Robotics & AI",
 		color: "#10b981",
-		skills: ["ROS / ROS2", "Python", "C++", "OpenCV", "YOLO", "TensorFlow", "Gazebo", "ESP-IDF"],
+		skills: [
+			"ROS / ROS2",
+			"Python",
+			"C++",
+			"OpenCV",
+			"YOLO",
+			"TensorFlow",
+			"Gazebo",
+			"ESP-IDF",
+		],
 	},
 ] as const;
 
@@ -35,7 +58,9 @@ export function AboutSkills({ t }: AboutSkillsProps) {
 						key={group.label}
 						style={{ "--skill": group.color } as React.CSSProperties}
 					>
-						<p className="text-xs font-medium mb-1.5 text-(--skill)">{group.label}</p>
+						<p className="text-xs font-medium mb-1.5 text-(--skill)">
+							{group.label}
+						</p>
 						<div className="flex flex-wrap gap-1.5">
 							{group.skills.map((skill) => (
 								<span

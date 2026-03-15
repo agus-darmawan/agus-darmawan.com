@@ -4,7 +4,8 @@ import { BookOpen, ExternalLink } from "lucide-react";
 
 const PUBLICATIONS = [
 	{
-		title: "Development of a Quadruped-Legged Robot for Position Estimation of Overheat Components in Electrical Substations Using a Thermal Camera",
+		title:
+			"Development of a Quadruped-Legged Robot for Position Estimation of Overheat Components in Electrical Substations Using a Thermal Camera",
 		authors: "Agus Darmawan et al.",
 		venue: "PT. Ezra Robotics Teknologi / Research Journal",
 		year: "2025",
@@ -12,7 +13,8 @@ const PUBLICATIONS = [
 		link: null,
 	},
 	{
-		title: "Hand Gesture Recognition for Collaborative Robots Using Lightweight Deep Learning in Real-Time Robotic Systems",
+		title:
+			"Hand Gesture Recognition for Collaborative Robots Using Lightweight Deep Learning in Real-Time Robotic Systems",
 		authors: "Agus Darmawan et al.",
 		venue: "Institut Teknologi Sepuluh Nopember (ITS)",
 		year: "2024",
@@ -53,7 +55,9 @@ export function AboutPublications({ t }: AboutPublicationsProps) {
 								<p className="text-xs font-semibold text-(--text-primary) leading-snug mb-1">
 									{pub.title}
 								</p>
-								<p className="text-[11px] text-(--text-muted) mb-1">{pub.authors}</p>
+								<p className="text-[11px] text-(--text-muted) mb-1">
+									{pub.authors}
+								</p>
 								<div className="flex items-center justify-between flex-wrap gap-1">
 									<span
 										className="text-[10px] font-medium"
@@ -62,7 +66,9 @@ export function AboutPublications({ t }: AboutPublicationsProps) {
 										{pub.venue}
 									</span>
 									<div className="flex items-center gap-2">
-										<span className="text-[10px] text-(--text-muted)">{pub.year}</span>
+										<span className="text-[10px] text-(--text-muted)">
+											{pub.year}
+										</span>
 										{pub.link && (
 											<a
 												href={pub.link}

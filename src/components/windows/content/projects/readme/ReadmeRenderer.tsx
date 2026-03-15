@@ -25,7 +25,7 @@ export function ReadmeRenderer({
 
 	return (
 		<div className="flex gap-5">
-			{/* Main content — ref tracks scroll if no external ref given */}
+			{/* Main content */}
 			<div ref={scrollRef ? undefined : innerRef} className="flex-1 min-w-0">
 				<ReadmeBlocks tokens={tokens} accentColor={accentColor} />
 			</div>

@@ -1,61 +1,24 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { useCallback, useRef } from "react";
-import { usePdfLoader } from "@/hooks/resume/usePdfLoader";
-import { usePdfPageTracker } from "@/hooks/resume/usePdfPageTracker";
-import { usePdfZoom } from "@/hooks/resume/usePdfZoom";
-import { ResumeToolbar } from "./ResumeToolbar";
-import { ResumeViewer } from "./ResumeViewer";
+
+// pdfjs-dist calls `new DOMMatrix()` at module-evaluation time,
+// which crashes in Node/SSR. Dynamic import with ssr:false defers
+// the entire module until it runs in the browser.
+const ResumeViewerClient = dynamic(() => import("./ResumeViewerClient"), {
+	ssr: false,
+	loading: () => (
+		<div className="h-full flex items-center justify-center bg-[#525659]">
+			<div className="flex flex-col items-center gap-3">
+				<div className="w-7 h-7 rounded-full border-2 border-zinc-400 border-t-transparent animate-spin" />
+				<p className="text-sm text-zinc-300">Loading PDF viewer…</p>
+			</div>
+		</div>
+	),
+});
 
 export default function ResumeWindow() {
 	const t = useTranslations("ResumeWindow");
-	const params = useParams();
-	const locale = (params?.locale as string) ?? "en";
-	const pdfPath = `/resume/resume_${locale}.pdf`;
-
-	const { zoom, zoomIn, zoomOut, resetZoom } = usePdfZoom();
-	const { pdf, numPages, isLoading, error } = usePdfLoader(pdfPath);
-
-	const containerRef = useRef<HTMLDivElement>(null);
-	const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
-
-	const { currentPage, goToPage } = usePdfPageTracker(containerRef, canvasRefs);
-
-	const handleDownload = useCallback(() => {
-		const a = document.createElement("a");
-		a.href = pdfPath;
-		a.download = `resume_${locale}.pdf`;
-		a.click();
-	}, [pdfPath, locale]);
-
-	return (
-		<div className="h-full flex flex-col bg-(--window-bg) text-(--text-primary)">
-			<ResumeToolbar
-				zoom={zoom}
-				numPages={numPages}
-				currentPage={currentPage}
-				onZoomIn={zoomIn}
-				onZoomOut={zoomOut}
-				onResetZoom={resetZoom}
-				onPrevPage={() => goToPage(currentPage - 1)}
-				onNextPage={() => goToPage(currentPage + 1)}
-				onDownload={handleDownload}
-				t={t}
-			/>
-
-			<ResumeViewer
-				pdf={pdf}
-				numPages={numPages}
-				isLoading={isLoading}
-				error={error}
-				zoom={zoom}
-				containerRef={containerRef}
-				canvasRefs={canvasRefs}
-				loadingText={t("loading")}
-				errorText={t("errorLoad")}
-			/>
-		</div>
-	);
+	return <ResumeViewerClient t={t} />;
 }

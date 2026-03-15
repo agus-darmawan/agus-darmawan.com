@@ -43,7 +43,9 @@ export function AboutCurrently({ t }: AboutCurrentlyProps) {
 							<p className="text-xs font-semibold text-(--text-primary) leading-snug">
 								{item.text}
 							</p>
-							<p className="text-[11px] mt-0.5 text-(--text-muted)">{item.sub}</p>
+							<p className="text-[11px] mt-0.5 text-(--text-muted)">
+								{item.sub}
+							</p>
 						</div>
 						<div
 							className="w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 animate-pulse"
