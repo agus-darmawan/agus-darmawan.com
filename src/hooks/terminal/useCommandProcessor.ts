@@ -67,7 +67,7 @@ export function useCommandProcessor({
 			setHistory((h) => [trimmed, ...h.slice(0, 99)]);
 			setHistIdx(-1);
 
-			addLines(mkLine("input", `agus@ubuntu:${cwd}$ ${trimmed}`));
+			addLines(mkLine("input", `darm@wan:${cwd}$ ${trimmed}`));
 
 			const parts = trimmed.split(/\s+/);
 			const cmd = parts[0];
@@ -312,7 +312,7 @@ export function useCommandProcessor({
 					addLines(
 						mkLine(
 							"output",
-							`            .-/+oossssoo+/-.               agus@ubuntu
+							`            .-/+oossssoo+/-.               darm@wan
         \`:+ssssssssssssssssss+:\`           OS: Ubuntu 22.04.3 LTS x86_64
       -+ssssssssssssssssssyyssss+-         Kernel: 5.15.0-91-generic
     .ossssssssssssssssssdMMMNysssso.       Shell: bash 5.1.16

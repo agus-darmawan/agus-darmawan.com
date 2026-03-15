@@ -16,7 +16,7 @@ export const mkLine = (type: TermLine["type"], text: string): TermLine => ({
 export const INITIAL_FS: FSNode = {
 	"~": {
 		".bashrc":
-			"# ~/.bashrc\nexport PS1='agus@ubuntu:~$ '\nexport PATH=$PATH:/usr/local/bin\nalias ll='ls -la'\nalias gs='git status'",
+			"# ~/.bashrc\nexport PS1='darm@wan:~$ '\nexport PATH=$PATH:/usr/local/bin\nalias ll='ls -la'\nalias gs='git status'",
 		"README.md":
 			"# Welcome to Agus's Portfolio Terminal\n\nType `help` to see available commands.\n\nGitHub: github.com/agus-darmawan",
 	},

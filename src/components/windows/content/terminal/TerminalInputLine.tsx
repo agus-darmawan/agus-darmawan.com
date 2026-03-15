@@ -60,7 +60,7 @@ export function TerminalInputLine({
 				onClear();
 			} else if (e.key === "c" && e.ctrlKey) {
 				e.preventDefault();
-				onAddLines(`agus@ubuntu:${cwd}$ ${input}^C`);
+				onAddLines(`darm@wan:${cwd}$ ${input}^C`);
 				onChange("");
 			}
 		},

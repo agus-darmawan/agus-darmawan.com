@@ -36,10 +36,10 @@
 	"AboutWindow": {
 		"title": "Tentang Saya",
 		"name": "I Wayan Agus Darmawan",
-		"role": "Full-Stack Developer",
-		"location": "Denpasar, Bali, Indonesia",
+		"role": "Web and Robotics Developer",
+		"location": "Tabanan, Bali, Indonesia",
 		"experience": "3+ tahun pengalaman",
-		"bio": "Full-stack developer yang bersemangat membangun aplikasi web yang elegan dan performan. Berpengalaman dengan TypeScript modern, ekosistem React, backend Go, dan infrastruktur cloud. Berbasis di Bali, bekerja remote dengan tim global.",
+		"bio": "Lulusan Teknik Komputer tahun 2025 dengan pengalaman dalam pengembangan web full-stack dan telah menyelesaikan lebih dari 20 proyek freelance. Memiliki kemampuan membangun aplikasi web responsif, dashboard, dan solusi kustom menggunakan React dan Express, dengan fokus pada pengembangan perangkat lunak yang scalable dan mudah digunakan untuk berbagai klien. Selain pengembangan web, saya juga memiliki pengalaman dalam perangkat lunak robotika, berkontribusi pada robot otonom dan sistem inspeksi berbasis ROS, yang memperkuat kemampuan saya dalam mengintegrasikan perangkat lunak dengan perangkat keras, mengimplementasikan sistem navigasi dan kontrol, serta memastikan performa yang andal di lingkungan nyata. Saya memiliki minat besar dalam menciptakan solusi inovatif yang menggabungkan keunggulan teknis dengan kegunaan praktis serta menyelesaikan tantangan teknis untuk menghasilkan solusi yang berdampak nyata.",
 		"skills": "Keahlian Teknis",
 		"connect": "Terhubung"
 	},
