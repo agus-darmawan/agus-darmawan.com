@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+# 🖥️ agus-darmawan.com
 
-First, run the development server:
+> Interactive Ubuntu 22.04-themed developer portfolio
+
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![Zustand](https://img.shields.io/badge/Zustand-000000?style=flat-square&logo=react&logoColor=white)](https://zustand-demo.pmnd.rs)
+[![Deploy](https://img.shields.io/badge/Live-agus--darmawan.com-E95420?style=flat-square)](https://agus-darmawan.com)
+
+</div>
+
+---
+
+A portfolio that runs like a real desktop — draggable windows, a working terminal, live Spotify integration, and full EN/ID localization. Built with Next.js 16 App Router.
+
+## Features
+
+- **Window manager** — drag, minimize, maximize, z-index stacking
+- **Terminal** — bash-like with vim mode, file system simulation, tab completion
+- **Spotify** — live "Now Playing" in the top bar with album art
+- **i18n** — English & Indonesian via next-intl
+- **PDF viewer** — resume rendered in-browser with zoom controls
+- **Dark / Light mode** — always-dark top bar, toggleable window theme
+
+## Stack
+
+| | |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript (strict) |
+| Styling | Tailwind CSS v4 + CSS variables |
+| State | Zustand + TanStack Query |
+| i18n | next-intl |
+| Linter | Biome |
+
+## Quick start
 
 ```bash
+git clone https://github.com/agus-darmawan/ubuntu-portfolio
+cd ubuntu-portfolio
+npm install
+cp .env.example .env.local   # add Spotify credentials
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Env vars
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+SPOTIFY_CLIENT_ID=
+SPOTIFY_CLIENT_SECRET=
+SPOTIFY_REFRESH_TOKEN=
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+<div align="center">
+<sub>Made with ☕ in Bali · <a href="https://agus-darmawan.com">agus-darmawan.com</a></sub>
+</div>
