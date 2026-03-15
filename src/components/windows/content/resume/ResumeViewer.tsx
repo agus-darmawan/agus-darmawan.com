@@ -28,6 +28,11 @@ export function ResumeViewer({
 	loadingText,
 	errorText,
 }: ResumeViewerProps) {
+	// Cast to any so Array.from can render pages — PDFDocumentProxy is `unknown`
+	// at compile time to avoid importing pdfjs-dist at module level (SSR crash).
+	// biome-ignore lint/suspicious/noExplicitAny: intentional SSR workaround
+	const doc = pdf as any;
+
 	return (
 		<div ref={containerRef} className="flex-1 overflow-auto bg-[#525659]">
 			<div className="py-6 px-4 flex flex-col items-center gap-5">
@@ -44,11 +49,11 @@ export function ResumeViewer({
 					</div>
 				)}
 
-				{pdf &&
+				{doc !== null &&
 					Array.from({ length: numPages }, (_, i) => (
 						<ResumePageCanvas
 							key={`page-${i + 1}`}
-							pdf={pdf}
+							pdf={doc}
 							pageNumber={i + 1}
 							zoom={zoom}
 							canvasRef={(el) => {
