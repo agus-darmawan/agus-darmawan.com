@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, MapPin } from "lucide-react";
+import { Calendar, ChevronDown, MapPin } from "lucide-react";
 import Image from "next/image";
 
 interface AboutHeaderProps {
@@ -21,7 +21,6 @@ export function AboutHeader({ t }: AboutHeaderProps) {
 						height={80}
 						className="rounded-full object-cover shadow-lg"
 					/>
-
 					<span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-(--window-bg) bg-green-500 flex items-center justify-center text-[9px]">
 						✓
 					</span>
@@ -31,7 +30,6 @@ export function AboutHeader({ t }: AboutHeaderProps) {
 					<h1 className="text-xl font-bold text-(--text-primary)">
 						{t("name")}
 					</h1>
-
 					<p className="text-sm font-medium mt-0.5 text-ubuntu-orange">
 						{t("role")}
 					</p>
@@ -41,7 +39,6 @@ export function AboutHeader({ t }: AboutHeaderProps) {
 							<MapPin size={11} />
 							{t("location")}
 						</span>
-
 						<span className="flex items-center gap-1">
 							<Calendar size={11} />
 							{t("experience")}
@@ -53,6 +50,12 @@ export function AboutHeader({ t }: AboutHeaderProps) {
 			<p className="relative mt-4 text-sm leading-relaxed text-(--text-secondary)">
 				{t("bio")}
 			</p>
+
+			{/* Scroll hint */}
+			<div className="flex items-center justify-center mt-4 gap-1.5 text-[10px] text-(--text-muted) animate-bounce">
+				<ChevronDown size={12} />
+				<span>{t("scrollHint")}</span>
+			</div>
 		</div>
 	);
 }
