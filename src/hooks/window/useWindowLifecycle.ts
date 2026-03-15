@@ -14,15 +14,34 @@ interface UseWindowLifecycleOptions {
 	nextZ: () => number;
 }
 
-/**
- * Manages window open/close/minimize/maximize state and dock-click logic.
- * Uses refs to avoid stale closures in event-driven callbacks.
- */
+function getIsMobile() {
+	if (typeof window === "undefined") return false;
+	return window.innerWidth < 768;
+}
+
+function deriveTitle(
+	appId: string,
+	data: WindowPayload,
+	t?: TranslateFn,
+): string {
+	// README windows carry their name in data
+	if (appId.startsWith("readme-") && data) {
+		const d = data as { name?: string; project?: { emoji?: string } };
+		const emoji = d.project?.emoji ?? "📄";
+		const name = d.name ?? "README";
+		return `${emoji} ${name}`;
+	}
+	try {
+		return t ? t(appId) : (FALLBACK_TITLES[appId] ?? appId);
+	} catch {
+		return FALLBACK_TITLES[appId] ?? appId;
+	}
+}
+
 export function useWindowLifecycle({ t, nextZ }: UseWindowLifecycleOptions) {
 	const [windows, setWindows] = useState<WindowState[]>([]);
 	const [activeWindow, setActiveWindow] = useState<string | null>(null);
 
-	// Refs always hold latest values — prevents stale closure bugs
 	const windowsRef = useRef<WindowState[]>([]);
 	const activeWindowRef = useRef<string | null>(null);
 
@@ -33,17 +52,6 @@ export function useWindowLifecycle({ t, nextZ }: UseWindowLifecycleOptions) {
 	useEffect(() => {
 		activeWindowRef.current = activeWindow;
 	}, [activeWindow]);
-
-	const getTitle = useCallback(
-		(appId: string) => {
-			try {
-				return t ? t(appId) : (FALLBACK_TITLES[appId] ?? appId);
-			} catch {
-				return FALLBACK_TITLES[appId] ?? appId;
-			}
-		},
-		[t],
-	);
 
 	const bringToFront = useCallback(
 		(id: string) => {
@@ -84,6 +92,7 @@ export function useWindowLifecycle({ t, nextZ }: UseWindowLifecycleOptions) {
 
 			const id = `${appId}-${Date.now()}`;
 			const z = nextZ();
+			const isMobile = getIsMobile();
 			const visibleCount = windowsRef.current.filter(
 				(w) => !w.minimized,
 			).length;
@@ -91,10 +100,10 @@ export function useWindowLifecycle({ t, nextZ }: UseWindowLifecycleOptions) {
 			const newWindow: WindowState = {
 				id,
 				appId,
-				title: getTitle(appId),
+				title: deriveTitle(appId, data, t),
 				data,
 				minimized: false,
-				maximized: false,
+				maximized: isMobile,
 				position: {
 					x: WINDOW_OFFSET_X + visibleCount * WINDOW_STAGGER,
 					y: WINDOW_OFFSET_Y + visibleCount * WINDOW_STAGGER,
@@ -105,7 +114,7 @@ export function useWindowLifecycle({ t, nextZ }: UseWindowLifecycleOptions) {
 			setWindows((prev) => [...prev, newWindow]);
 			setActiveWindow(id);
 		},
-		[nextZ, getTitle],
+		[nextZ, t],
 	);
 
 	const closeWindow = useCallback((id: string) => {
@@ -135,13 +144,11 @@ export function useWindowLifecycle({ t, nextZ }: UseWindowLifecycleOptions) {
 		(appId: string) => {
 			const win = windowsRef.current.find((w) => w.appId === appId);
 
-			// Case 1: no window exists yet → open fresh
 			if (!win) {
 				openWindow(appId);
 				return;
 			}
 
-			// Case 2: window is minimized → restore
 			if (win.minimized) {
 				const z = nextZ();
 				setWindows((prev) =>
@@ -153,7 +160,6 @@ export function useWindowLifecycle({ t, nextZ }: UseWindowLifecycleOptions) {
 				return;
 			}
 
-			// Case 3: window is focused → minimize (toggle behavior)
 			if (activeWindowRef.current === win.id) {
 				setWindows((prev) =>
 					prev.map((w) => (w.id === win.id ? { ...w, minimized: true } : w)),
@@ -162,7 +168,6 @@ export function useWindowLifecycle({ t, nextZ }: UseWindowLifecycleOptions) {
 				return;
 			}
 
-			// Case 4: window exists but not focused → bring to front
 			const z = nextZ();
 			setWindows((prev) =>
 				prev.map((w) => (w.id === win.id ? { ...w, zIndex: z } : w)),

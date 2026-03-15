@@ -5,20 +5,15 @@ import {
 	ExternalLink,
 	GitFork,
 	Github,
-	Loader2,
 	Star,
-	X,
 } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
 import {
 	PROJECTS_META,
 	type ProjectCategory,
 	type ProjectMeta,
 } from "./projectsData";
-import { ReadmeRenderer } from "./readme/ReadmeRenderer";
-
-// ── Category labels ──────────────────────────────────────────────────────────
 
 const CATEGORY_LABELS: Record<ProjectCategory | "all", string> = {
 	all: "All",
@@ -27,14 +22,20 @@ const CATEGORY_LABELS: Record<ProjectCategory | "all", string> = {
 	research: "Research",
 };
 
-// ── Main window ──────────────────────────────────────────────────────────────
+interface ProjectsWindowProps {
+	/** Called when user wants to open README as a new window */
+	onOpenReadme?: (
+		project: ProjectMeta,
+		name: string,
+		desc: string,
+		readmeFile: string,
+	) => void;
+}
 
-export default function ProjectsWindow() {
+export default function ProjectsWindow({ onOpenReadme }: ProjectsWindowProps) {
 	const t = useTranslations("ProjectsWindow");
 	const tProjects = useTranslations("Projects");
-	const locale = useLocale();
 	const [filter, setFilter] = useState<ProjectCategory | "all">("all");
-	const [selected, setSelected] = useState<ProjectMeta | null>(null);
 
 	const filtered = useMemo(
 		() =>
@@ -53,7 +54,7 @@ export default function ProjectsWindow() {
 
 	return (
 		<div
-			className="h-full flex flex-col relative"
+			className="h-full flex flex-col"
 			style={{ background: "var(--window-bg)", color: "var(--text-primary)" }}
 		>
 			{/* ── Header ─────────────────────────────────────────── */}
@@ -182,26 +183,24 @@ export default function ProjectsWindow() {
 								name={tProjects(`${project.i18nKey}.name`)}
 								desc={tProjects(`${project.i18nKey}.desc`)}
 								readMoreLabel={t("readMore")}
-								onClick={setSelected}
+								viewCodeLabel={t("viewCode")}
+								viewDemoLabel={t("viewDemo")}
+								onReadMore={
+									onOpenReadme
+										? () =>
+												onOpenReadme(
+													project,
+													tProjects(`${project.i18nKey}.name`),
+													tProjects(`${project.i18nKey}.desc`),
+													tProjects(`${project.i18nKey}.readmeFile`),
+												)
+										: undefined
+								}
 							/>
 						))}
 					</div>
 				)}
 			</div>
-
-			{/* ── Detail popup ───────────────────────────────────── */}
-			{selected && (
-				<ProjectDetail
-					project={selected}
-					name={tProjects(`${selected.i18nKey}.name`)}
-					desc={tProjects(`${selected.i18nKey}.desc`)}
-					readmeFile={tProjects(`${selected.i18nKey}.readmeFile`)}
-					locale={locale}
-					onClose={() => setSelected(null)}
-					viewCodeLabel={t("viewCode")}
-					viewDemoLabel={t("viewDemo")}
-				/>
-			)}
 		</div>
 	);
 }
@@ -213,19 +212,21 @@ function ProjectCard({
 	name,
 	desc,
 	readMoreLabel,
-	onClick,
+	viewCodeLabel,
+	viewDemoLabel,
+	onReadMore,
 }: {
 	project: ProjectMeta;
 	name: string;
 	desc: string;
 	readMoreLabel: string;
-	onClick: (p: ProjectMeta) => void;
+	viewCodeLabel: string;
+	viewDemoLabel: string;
+	onReadMore?: () => void;
 }) {
 	return (
-		<button
-			type="button"
-			onClick={() => onClick(project)}
-			className="group w-full text-left rounded-2xl overflow-hidden transition-all duration-200 relative"
+		<div
+			className="group w-full rounded-2xl overflow-hidden transition-all duration-200 relative"
 			style={{
 				background: "var(--surface-secondary)",
 				border: "1px solid var(--border)",
@@ -233,16 +234,15 @@ function ProjectCard({
 			onMouseEnter={(e) => {
 				const el = e.currentTarget as HTMLElement;
 				el.style.borderColor = `${project.color}60`;
-				el.style.transform = "translateY(-2px)";
-				el.style.boxShadow = `0 8px 32px ${project.color}20`;
+				el.style.boxShadow = `0 4px 20px ${project.color}15`;
 			}}
 			onMouseLeave={(e) => {
 				const el = e.currentTarget as HTMLElement;
 				el.style.borderColor = "var(--border)";
-				el.style.transform = "none";
 				el.style.boxShadow = "none";
 			}}
 		>
+			{/* Top color bar */}
 			<div
 				className="h-0.5 w-full"
 				style={{
@@ -251,62 +251,58 @@ function ProjectCard({
 						: `${project.color}40`,
 				}}
 			/>
+
+			{/* Hover glow */}
 			<div
 				className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
 				style={{
-					background: `radial-gradient(ellipse at top left, ${project.color}08 0%, transparent 60%)`,
+					background: `radial-gradient(ellipse at top left, ${project.color}06 0%, transparent 60%)`,
 				}}
 			/>
 
 			<div className="relative p-4">
-				<div className="flex items-start justify-between gap-3 mb-3">
-					<div className="flex items-start gap-3">
-						<div
-							className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 transition-transform duration-200 group-hover:scale-110"
-							style={{
-								background: `${project.color}18`,
-								border: `1px solid ${project.color}28`,
-							}}
-						>
-							{project.emoji}
-						</div>
-						<div className="min-w-0">
-							<div className="flex items-center gap-2 flex-wrap">
-								<h2
-									className="font-semibold text-sm leading-tight"
-									style={{ color: "var(--text-primary)" }}
-								>
-									{name}
-								</h2>
-								{project.featured && (
-									<span
-										className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold uppercase tracking-wide"
-										style={{
-											background: `${project.color}18`,
-											color: project.color,
-											border: `1px solid ${project.color}30`,
-										}}
-									>
-										Featured
-									</span>
-								)}
-							</div>
-							<span
-								className="text-[10px] mt-0.5 inline-block capitalize"
-								style={{ color: "var(--text-muted)" }}
-							>
-								{project.category}
-							</span>
-						</div>
-					</div>
+				{/* Top row */}
+				<div className="flex items-start gap-3 mb-3">
 					<div
-						className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-						style={{ background: `${project.color}18`, color: project.color }}
+						className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 transition-transform duration-200 group-hover:scale-110"
+						style={{
+							background: `${project.color}18`,
+							border: `1px solid ${project.color}28`,
+						}}
 					>
-						<ArrowUpRight size={14} />
+						{project.emoji}
+					</div>
+					<div className="flex-1 min-w-0">
+						<div className="flex items-center gap-2 flex-wrap">
+							<h2
+								className="font-semibold text-sm leading-tight"
+								style={{ color: "var(--text-primary)" }}
+							>
+								{name}
+							</h2>
+							{project.featured && (
+								<span
+									className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold uppercase tracking-wide"
+									style={{
+										background: `${project.color}18`,
+										color: project.color,
+										border: `1px solid ${project.color}30`,
+									}}
+								>
+									Featured
+								</span>
+							)}
+						</div>
+						<span
+							className="text-[10px] mt-0.5 inline-block capitalize"
+							style={{ color: "var(--text-muted)" }}
+						>
+							{project.category}
+						</span>
 					</div>
 				</div>
 
+				{/* Description */}
 				<p
 					className="text-xs leading-relaxed mb-3 line-clamp-2"
 					style={{ color: "var(--text-secondary)" }}
@@ -314,6 +310,7 @@ function ProjectCard({
 					{desc}
 				</p>
 
+				{/* Tech tags */}
 				<div className="flex flex-wrap gap-1.5 mb-3">
 					{project.tech.slice(0, 4).map((tech) => (
 						<span
@@ -338,6 +335,7 @@ function ProjectCard({
 					)}
 				</div>
 
+				{/* Footer row */}
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
 						<span
@@ -355,215 +353,73 @@ function ProjectCard({
 							{Math.floor(project.stars * 0.4)}
 						</span>
 					</div>
-					<span
-						className="text-[10px] font-medium transition-all duration-200 opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0"
-						style={{ color: project.color }}
-					>
-						{readMoreLabel} →
-					</span>
-				</div>
-			</div>
-		</button>
-	);
-}
 
-// ── Project detail popup ─────────────────────────────────────────────────────
-
-function ProjectDetail({
-	project,
-	name,
-	desc,
-	readmeFile,
-	locale,
-	onClose,
-	viewCodeLabel,
-	viewDemoLabel,
-}: {
-	project: ProjectMeta;
-	name: string;
-	desc: string;
-	readmeFile: string;
-	locale: string;
-	onClose: () => void;
-	viewCodeLabel: string;
-	viewDemoLabel: string;
-}) {
-	// The scrollable container ref — passed into ReadmeRenderer so TOC
-	// can attach its scroll listener to the correct element.
-	const scrollRef = useRef<HTMLDivElement>(null);
-	const [readmeContent, setReadmeContent] = useState<string | null>(null);
-	const [loading, setLoading] = useState(true);
-
-	// Fetch README on mount
-	useEffect(() => {
-		fetch(`/readme/${locale}/${readmeFile}.mdx`)
-			.then((r) => (r.ok ? r.text() : Promise.reject(new Error("not found"))))
-			.then((text) => setReadmeContent(text))
-			.catch(() => setReadmeContent(`# ${name}\n\n${desc}`))
-			.finally(() => setLoading(false));
-	}, [locale, readmeFile, name, desc]);
-
-	return (
-		<div
-			className="absolute inset-0 z-50 flex animate-fade-in"
-			style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
-			onClick={(e) => {
-				if (e.target === e.currentTarget) onClose();
-			}}
-		>
-			<div
-				className="m-auto w-full max-w-2xl max-h-[90%] rounded-2xl overflow-hidden flex flex-col shadow-2xl"
-				style={{
-					background: "var(--window-bg)",
-					border: `1px solid ${project.color}40`,
-				}}
-			>
-				{/* Header */}
-				<div
-					className="flex items-start gap-4 px-5 py-4 border-b shrink-0"
-					style={{
-						borderColor: "var(--border)",
-						background: `linear-gradient(135deg, ${project.color}12 0%, transparent 60%)`,
-					}}
-				>
-					<div
-						className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
-						style={{ background: `${project.color}20` }}
-					>
-						{project.emoji}
-					</div>
-					<div className="flex-1 min-w-0">
-						<h2
-							className="font-bold text-base"
-							style={{ color: "var(--text-primary)" }}
-						>
-							{name}
-						</h2>
-						<p
-							className="text-xs mt-0.5"
-							style={{ color: "var(--text-muted)" }}
-						>
-							{desc}
-						</p>
-						<div className="flex items-center gap-3 mt-2 flex-wrap">
-							<span
-								className="flex items-center gap-1 text-xs"
-								style={{ color: "var(--text-muted)" }}
-							>
-								<Star size={11} />
-								{project.stars} stars
-							</span>
-							<span
-								className="text-[10px] px-2 py-0.5 rounded-full font-medium capitalize"
-								style={{
-									background: `${project.color}18`,
-									color: project.color,
-									border: `1px solid ${project.color}30`,
-								}}
-							>
-								{project.category}
-							</span>
-						</div>
-					</div>
-					<button
-						type="button"
-						title="Close"
-						aria-label="Close project detail"
-						onClick={onClose}
-						className="p-1.5 rounded-lg transition-colors shrink-0"
-						style={{ color: "var(--text-muted)" }}
-						onMouseEnter={(e) => {
-							(e.currentTarget as HTMLElement).style.background =
-								"var(--surface-secondary)";
-						}}
-						onMouseLeave={(e) => {
-							(e.currentTarget as HTMLElement).style.background = "transparent";
-						}}
-					>
-						<X size={16} />
-					</button>
-				</div>
-
-				{/* Tech badges */}
-				<div
-					className="px-5 py-3 flex flex-wrap gap-1.5 border-b shrink-0"
-					style={{ borderColor: "var(--border)" }}
-				>
-					{project.tech.map((tech) => (
-						<span
-							key={tech}
-							className="text-xs px-2 py-0.5 rounded-full font-medium"
-							style={{
-								background: `${project.color}12`,
-								color: project.color,
-								border: `1px solid ${project.color}28`,
-							}}
-						>
-							{tech}
-						</span>
-					))}
-				</div>
-
-				{/* README — this div is the scroll container, ref passed to ReadmeRenderer */}
-				<div ref={scrollRef} className="flex-1 overflow-auto min-h-0 px-5 py-4">
-					{loading ? (
-						<div className="flex items-center justify-center py-16">
-							<Loader2
-								size={22}
-								className="animate-spin"
-								style={{ color: project.color }}
-							/>
-						</div>
-					) : (
-						<ReadmeRenderer
-							content={readmeContent ?? ""}
-							accentColor={project.color}
-							scrollRef={scrollRef}
-						/>
-					)}
-				</div>
-
-				{/* Footer */}
-				<div
-					className="px-5 py-3 border-t flex gap-2 shrink-0"
-					style={{ borderColor: "var(--border)" }}
-				>
-					<a
-						href={project.github}
-						target="_blank"
-						rel="noreferrer"
-						className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border font-medium transition-colors"
-						style={{
-							color: "var(--text-secondary)",
-							borderColor: "var(--border)",
-						}}
-						onMouseEnter={(e) => {
-							(e.currentTarget as HTMLElement).style.borderColor =
-								project.color;
-							(e.currentTarget as HTMLElement).style.color = project.color;
-						}}
-						onMouseLeave={(e) => {
-							(e.currentTarget as HTMLElement).style.borderColor =
-								"var(--border)";
-							(e.currentTarget as HTMLElement).style.color =
-								"var(--text-secondary)";
-						}}
-					>
-						<Github size={13} />
-						{viewCodeLabel}
-					</a>
-					{project.demo && (
+					{/* Action buttons */}
+					<div className="flex items-center gap-1.5">
 						<a
-							href={project.demo}
+							href={project.github}
 							target="_blank"
 							rel="noreferrer"
-							className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg font-medium text-white"
-							style={{ background: project.color }}
+							onClick={(e) => e.stopPropagation()}
+							className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg border font-medium transition-colors"
+							style={{
+								color: "var(--text-muted)",
+								borderColor: "var(--border)",
+							}}
+							onMouseEnter={(e) => {
+								(e.currentTarget as HTMLElement).style.borderColor =
+									project.color;
+								(e.currentTarget as HTMLElement).style.color = project.color;
+							}}
+							onMouseLeave={(e) => {
+								(e.currentTarget as HTMLElement).style.borderColor =
+									"var(--border)";
+								(e.currentTarget as HTMLElement).style.color =
+									"var(--text-muted)";
+							}}
 						>
-							<ExternalLink size={13} />
-							{viewDemoLabel}
+							<Github size={10} />
+							{viewCodeLabel}
 						</a>
-					)}
+
+						{project.demo && (
+							<a
+								href={project.demo}
+								target="_blank"
+								rel="noreferrer"
+								onClick={(e) => e.stopPropagation()}
+								className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg font-medium text-white transition-opacity hover:opacity-80"
+								style={{ background: project.color }}
+							>
+								<ExternalLink size={10} />
+								{viewDemoLabel}
+							</a>
+						)}
+
+						{onReadMore && (
+							<button
+								type="button"
+								onClick={onReadMore}
+								className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg border font-medium transition-all duration-150"
+								style={{
+									color: project.color,
+									borderColor: `${project.color}40`,
+									background: `${project.color}08`,
+								}}
+								onMouseEnter={(e) => {
+									(e.currentTarget as HTMLElement).style.background =
+										`${project.color}18`;
+								}}
+								onMouseLeave={(e) => {
+									(e.currentTarget as HTMLElement).style.background =
+										`${project.color}08`;
+								}}
+							>
+								<ArrowUpRight size={10} />
+								{readMoreLabel}
+							</button>
+						)}
+					</div>
 				</div>
 			</div>
 		</div>

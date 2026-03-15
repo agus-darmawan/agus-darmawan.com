@@ -9,7 +9,7 @@ import ContactWindow from "@/components/windows/content/contact/ContactWindow";
 import ExperienceWindow from "@/components/windows/content/experience/ExperienceWindow";
 import ProjectsWindow from "@/components/windows/content/projects/ProjectsWindow";
 import type { ProjectMeta } from "@/components/windows/content/projects/projectsData";
-import ReadmeWindow from "@/components/windows/content/readme/ReadmeWindow";
+import ReadmeWindow from "@/components/windows/content/projects/readme/ReadmeWindow";
 import ResumeWindow from "@/components/windows/content/resume/ResumeWindow";
 import TerminalWindow from "@/components/windows/content/terminal/TerminalWindow";
 import { WindowFrame } from "@/components/windows/frame/WindowFrame";
