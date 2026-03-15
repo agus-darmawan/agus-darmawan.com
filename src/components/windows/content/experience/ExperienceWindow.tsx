@@ -6,6 +6,7 @@ import { EXPERIENCES } from "./experienceData";
 
 export default function ExperienceWindow() {
 	const t = useTranslations("ExperienceWindow");
+	const tExp = useTranslations("Experience");
 
 	const totalRoles = EXPERIENCES.reduce((acc, e) => acc + e.roles.length, 0);
 
@@ -42,10 +43,11 @@ export default function ExperienceWindow() {
 			<div className="px-6 py-5 space-y-8">
 				{EXPERIENCES.map((exp, idx) => (
 					<ExperienceCard
-						key={exp.company}
+						key={exp.i18nKey}
 						exp={exp}
 						isLast={idx === EXPERIENCES.length - 1}
 						t={translate}
+						tExp={tExp}
 					/>
 				))}
 			</div>

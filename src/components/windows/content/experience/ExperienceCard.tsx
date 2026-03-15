@@ -8,22 +8,22 @@ interface ExperienceCardProps {
 	exp: ExperienceEntry;
 	isLast: boolean;
 	t: (key: string, values?: Record<string, string>) => string;
+	tExp: (key: string) => string;
 }
 
 function CompanyLogo({
 	src,
 	company,
 	color,
-	t,
+	alt,
 }: {
 	src: string;
 	company: string;
 	color: string;
-	t: ExperienceCardProps["t"];
+	alt: string;
 }) {
 	const [errored, setErrored] = useState(false);
 	const initial = company.charAt(0).toUpperCase();
-	const alt = t("logoAlt", { company });
 
 	if (errored) {
 		return (
@@ -56,8 +56,10 @@ function CompanyLogo({
 	);
 }
 
-export function ExperienceCard({ exp, isLast, t }: ExperienceCardProps) {
+export function ExperienceCard({ exp, isLast, t, tExp }: ExperienceCardProps) {
 	const hasPromotion = exp.roles.length > 1;
+	const companyName = tExp(`${exp.i18nKey}.company`);
+	const location = tExp(`${exp.i18nKey}.location`);
 
 	return (
 		<div className="relative flex gap-4">
@@ -73,16 +75,16 @@ export function ExperienceCard({ exp, isLast, t }: ExperienceCardProps) {
 
 			<CompanyLogo
 				src={exp.logo}
-				company={exp.company}
+				company={companyName}
 				color={exp.color}
-				t={t}
+				alt={companyName}
 			/>
 
 			<div className="flex-1 min-w-0 pb-2">
 				<div className="mb-3">
 					<div className="flex items-center gap-2 flex-wrap">
 						<h2 className="font-bold text-sm text-(--text-primary)">
-							{exp.company}
+							{companyName}
 						</h2>
 
 						{hasPromotion && (
@@ -99,77 +101,86 @@ export function ExperienceCard({ exp, isLast, t }: ExperienceCardProps) {
 						)}
 					</div>
 
-					<p className="text-xs text-(--text-muted)">{exp.location}</p>
+					<p className="text-xs text-(--text-muted)">{location}</p>
 				</div>
 
 				<div className="space-y-4">
-					{exp.roles.map((role, roleIdx) => (
-						<div key={`${role.title}-${roleIdx}`} className="relative">
-							{hasPromotion && roleIdx < exp.roles.length - 1 && (
+					{exp.roles.map((role, roleIdx) => {
+						const roleTitle = tExp(`${exp.i18nKey}.roles.${role.i18nKey}.title`);
+						const responsibilities = Array.from({ length: 3 }, (_, i) => {
+							try {
+								return tExp(`${exp.i18nKey}.roles.${role.i18nKey}.responsibilities.${i}`);
+							} catch {
+								return null;
+							}
+						}).filter(Boolean) as string[];
+
+						return (
+							<div key={`${role.i18nKey}-${roleIdx}`} className="relative">
+								{hasPromotion && roleIdx < exp.roles.length - 1 && (
+									<div
+										className="absolute left-0 top-full w-px h-4 mt-1"
+										style={{ background: `${exp.color}30` }}
+									/>
+								)}
+
 								<div
-									className="absolute left-0 top-full w-px h-4 mt-1"
-									style={{ background: `${exp.color}30` }}
-								/>
-							)}
-
-							{/* role header */}
-							<div
-								className="flex flex-wrap items-start justify-between gap-1 mb-2 p-2.5 rounded-lg"
-								style={{ background: `${exp.color}0c` }}
-							>
-								<h3 className="font-semibold text-sm text-(--text-primary)">
-									{role.title}
-								</h3>
-
-								<span
-									className="text-[10px] px-2 py-0.5 rounded-full border shrink-0 font-medium"
-									style={{
-										color: exp.color,
-										borderColor: `${exp.color}40`,
-										background: `${exp.color}10`,
-									}}
+									className="flex flex-wrap items-start justify-between gap-1 mb-2 p-2.5 rounded-lg"
+									style={{ background: `${exp.color}0c` }}
 								>
-									{role.period.start} – {role.period.end ?? t("present")}
-								</span>
-							</div>
+									<h3 className="font-semibold text-sm text-(--text-primary)">
+										{roleTitle}
+									</h3>
 
-							{/* responsibilities */}
-							<div className="rounded-xl p-3 mb-2.5 border bg-(--surface-secondary) border-(--border)">
-								<ul className="space-y-1.5">
-									{role.responsibilities.map((r, i) => (
-										<li
-											key={i}
-											className="flex gap-2 text-xs text-(--text-secondary)"
-										>
-											<span
-												className="mt-0.5 shrink-0 text-[10px]"
-												style={{ color: exp.color }}
-											>
-												▸
-											</span>
-											<span>{r}</span>
-										</li>
-									))}
-								</ul>
-							</div>
-
-							<div className="flex flex-wrap gap-1.5">
-								{role.tech.map((tech) => (
 									<span
-										key={tech}
-										className="text-[10px] px-2 py-0.5 rounded-full font-medium border"
+										className="text-[10px] px-2 py-0.5 rounded-full border shrink-0 font-medium"
 										style={{
-											background: `${exp.color}12`,
 											color: exp.color,
-											borderColor: `${exp.color}28`,
+											borderColor: `${exp.color}40`,
+											background: `${exp.color}10`,
 										}}
 									>
-										{tech}
+										{role.period.start} – {role.period.end ?? t("present")}
 									</span>
-								))}
+								</div>
+
+								<div className="rounded-xl p-3 mb-2.5 border bg-(--surface-secondary) border-(--border)">
+									<ul className="space-y-1.5">
+										{responsibilities.map((r, i) => (
+											<li
+												key={i}
+												className="flex gap-2 text-xs text-(--text-secondary)"
+											>
+												<span
+													className="mt-0.5 shrink-0 text-[10px]"
+													style={{ color: exp.color }}
+												>
+													▸
+												</span>
+												<span>{r}</span>
+											</li>
+										))}
+									</ul>
+								</div>
+
+								<div className="flex flex-wrap gap-1.5">
+									{role.tech.map((tech) => (
+										<span
+											key={tech}
+											className="text-[10px] px-2 py-0.5 rounded-full font-medium border"
+											style={{
+												background: `${exp.color}12`,
+												color: exp.color,
+												borderColor: `${exp.color}28`,
+											}}
+										>
+											{tech}
+										</span>
+									))}
+								</div>
 							</div>
-						</div>
-					))}
+						);
+					})}
 				</div>
 			</div>
 		</div>

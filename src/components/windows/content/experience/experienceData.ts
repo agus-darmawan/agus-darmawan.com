@@ -1,97 +1,186 @@
 export interface ExperienceRole {
-	title: string;
+	i18nKey: string; // key under Experience.{companyKey}.roles.{roleKey}
 	period: { start: string; end: string | null };
-	responsibilities: string[];
 	tech: string[];
 }
 
 export interface ExperienceEntry {
-	company: string;
-	location: string;
+	i18nKey: string; // key under Experience namespace e.g. "ezraRobotics"
 	color: string;
-	/** Path relative to /public, e.g. "/companies/techcorp.png" */
 	logo: string;
+	totalDuration: string; // display string e.g. "1 year 4 months"
 	roles: ExperienceRole[];
 }
 
 export const EXPERIENCES: ExperienceEntry[] = [
 	{
-		company: "TechCorp Indonesia",
-		location: "Denpasar, Bali",
+		i18nKey: "ezraRobotics",
 		color: "#e95420",
-		logo: "/companies/techcorp.png",
+		logo: "/companies/ezra-robotics.png",
+		totalDuration: "1y 4m",
 		roles: [
 			{
-				title: "Senior Frontend Developer",
-				period: { start: "Jul 2024", end: null },
-				responsibilities: [
-					"Architected micro-frontend system serving 500k+ monthly active users with zero-downtime deployments",
-					"Led a team of 5 engineers, conducting design reviews and mentoring junior developers",
-					"Drove Core Web Vitals improvements: LCP reduced from 4.2s to 1.1s across all products",
+				i18nKey: "roboticsEngineer",
+				period: { start: "Nov 2025", end: null },
+				tech: [
+					"ROS2",
+					"Python",
+					"C++",
+					"YOLOv8",
+					"RTK GPS",
+					"LIO",
+					"Deep Robotics X30",
 				],
-				tech: ["Next.js", "TypeScript", "Micro-frontends", "AWS", "Turborepo"],
 			},
 			{
-				title: "Frontend Developer",
-				period: { start: "Jan 2023", end: "Jun 2024" },
-				responsibilities: [
-					"Led migration of legacy jQuery codebase to Next.js 14, reducing initial load time by 60%",
-					"Designed and built a reusable component library with Storybook, adopted across 3 product teams",
-					"Introduced unit and integration testing with Jest, raising coverage from 5% to 72%",
-					"Collaborated with designers to implement pixel-perfect UIs with WCAG 2.1 AA compliance",
-				],
+				i18nKey: "juniorRoboticsEngineer",
+				period: { start: "Dec 2024", end: "Nov 2025" },
 				tech: [
+					"ROS2",
+					"Python",
+					"LiDAR",
+					"Thermal Camera",
 					"Next.js",
-					"TypeScript",
-					"Tailwind CSS",
-					"Storybook",
-					"Jest",
-					"PostgreSQL",
-				],
-			},
-		],
-	},
-	{
-		company: "StartupXYZ",
-		location: "Remote",
-		color: "#3b82f6",
-		logo: "/companies/startupxyz.png",
-		roles: [
-			{
-				title: "Full-stack Developer",
-				period: { start: "Jun 2022", end: "Dec 2022" },
-				responsibilities: [
-					"Developed RESTful APIs using Express.js and PostgreSQL for a SaaS B2B platform",
-					"Implemented real-time collaboration features using WebSocket and Redis pub/sub",
-					"Optimized complex SQL queries, reducing average API response time from 800ms to 95ms",
-					"Integrated Stripe, Twilio SMS, and SendGrid across the product",
-				],
-				tech: [
-					"Express.js",
-					"PostgreSQL",
-					"Redis",
 					"WebSocket",
-					"Stripe",
-					"Docker",
 				],
 			},
 		],
 	},
 	{
-		company: "Self-Employed",
-		location: "Bali, Indonesia",
-		color: "#10b981",
-		logo: "/companies/freelance.png",
+		i18nKey: "aseec",
+		color: "#3b82f6",
+		logo: "/companies/aseec.png",
+		totalDuration: "3y",
 		roles: [
 			{
-				title: "Freelance Web Developer",
-				period: { start: "Jan 2021", end: "May 2022" },
-				responsibilities: [
-					"Delivered 10+ custom websites and web applications for small businesses across Bali",
-					"Built e-commerce solutions with WooCommerce and custom React storefronts",
-					"Worked directly with clients to gather requirements, design wireframes, and iterate",
+				i18nKey: "researchMentor",
+				period: { start: "Apr 2023", end: "Mar 2026" },
+				tech: [
+					"IoT",
+					"Machine Learning",
+					"Embedded Systems",
+					"Web Development",
 				],
-				tech: ["React", "WordPress", "WooCommerce", "PHP", "MySQL", "Figma"],
+			},
+		],
+	},
+	{
+		i18nKey: "itsTeknoSains",
+		color: "#10b981",
+		logo: "/companies/its-tekno.png",
+		totalDuration: "1y 8m",
+		roles: [
+			{
+				i18nKey: "roboticsSoftwareEngineer",
+				period: { start: "Sep 2024", end: "Aug 2025" },
+				tech: [
+					"ROS Noetic",
+					"DLIO",
+					"Next.js",
+					"rosbridge",
+					"roslib.js",
+					"PostgreSQL",
+				],
+			},
+			{
+				i18nKey: "roboticsEngineerAsv",
+				period: { start: "Sep 2023", end: "Dec 2023" },
+				tech: [
+					"ROS Noetic",
+					"GPS RTK",
+					"IMU",
+					"YOLOv8",
+					"Pure Pursuit",
+					"Python",
+				],
+			},
+		],
+	},
+	{
+		i18nKey: "b401Lab",
+		color: "#8b5cf6",
+		logo: "/companies/b401.png",
+		totalDuration: "1y 3m",
+		roles: [
+			{
+				i18nKey: "labAssistant",
+				period: { start: "Jun 2024", end: "Aug 2025" },
+				tech: [
+					"ROS",
+					"Gazebo",
+					"Isaac Sim",
+					"Webots",
+					"TurtleBot",
+					"UR5",
+					"Python",
+				],
+			},
+		],
+	},
+	{
+		i18nKey: "barunastra",
+		color: "#0ea5e9",
+		logo: "/companies/barunastra.png",
+		totalDuration: "2y 8m",
+		roles: [
+			{
+				i18nKey: "divisionLeader",
+				period: { start: "Dec 2023", end: "Nov 2024" },
+				tech: [
+					"ROS",
+					"Electronics Design",
+					"Sensor Integration",
+					"C++",
+					"Python",
+				],
+			},
+			{
+				i18nKey: "roboticsSoftwareEngineer",
+				period: { start: "Apr 2022", end: "Dec 2023" },
+				tech: [
+					"ROS Noetic",
+					"LiDAR",
+					"GPS RTK",
+					"IMU",
+					"YOLO",
+					"PID",
+					"Python",
+					"C++",
+				],
+			},
+		],
+	},
+	{
+		i18nKey: "satkomindo",
+		color: "#f59e0b",
+		logo: "/companies/satkomindo.png",
+		totalDuration: "5m",
+		roles: [
+			{
+				i18nKey: "fullStackDeveloper",
+				period: { start: "Feb 2024", end: "Jun 2024" },
+				tech: [
+					"React",
+					"AdonisJS",
+					"TypeScript",
+					"PostgreSQL",
+					"Docker",
+					"JWT",
+					"RBAC",
+				],
+			},
+		],
+	},
+	{
+		i18nKey: "mage9",
+		color: "#ec4899",
+		logo: "/companies/mage9.png",
+		totalDuration: "1y 2m",
+		roles: [
+			{
+				i18nKey: "frontendDeveloper",
+				period: { start: "Jan 2023", end: "Feb 2024" },
+				tech: ["Next.js", "Tailwind CSS", "TypeScript", "Firebase"],
 			},
 		],
 	},
