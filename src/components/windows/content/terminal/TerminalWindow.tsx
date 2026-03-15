@@ -34,12 +34,10 @@ export default function TerminalWindow() {
 		sessionClosedMsg: t("sessionClosed"),
 	});
 
-	// Scroll to bottom on new lines
 	useEffect(() => {
 		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, [bottomRef]);
 
-	// Refocus input when vim closes
 	useEffect(() => {
 		if (!vim.active) inputRef.current?.focus();
 	}, [vim.active, inputRef]);
@@ -73,8 +71,7 @@ export default function TerminalWindow() {
 
 	return (
 		<div
-			className="h-full flex flex-col font-mono text-sm"
-			style={{ background: "#0e0e0e", color: "#c8c8c8" }}
+			className="h-full flex flex-col bg-neutral-950 text-zinc-200 font-mono text-sm"
 			onClick={() => inputRef.current?.focus()}
 		>
 			<div className="flex-1 overflow-y-auto p-3 space-y-0.5">

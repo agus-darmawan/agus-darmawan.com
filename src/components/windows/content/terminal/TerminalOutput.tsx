@@ -7,10 +7,10 @@ interface TerminalOutputProps {
 }
 
 const lineColor: Record<TermLine["type"], string> = {
-	error: "#ff5555",
-	system: "#666",
-	input: "#50fa7b",
-	output: "#c8c8c8",
+	error: "text-red-400",
+	system: "text-zinc-500",
+	input: "text-green-400",
+	output: "text-zinc-200",
 };
 
 export function TerminalOutput({ lines }: TerminalOutputProps) {
@@ -19,8 +19,7 @@ export function TerminalOutput({ lines }: TerminalOutputProps) {
 			{lines.map((line) => (
 				<div
 					key={line.id}
-					className="whitespace-pre-wrap leading-5 break-all"
-					style={{ color: lineColor[line.type], fontSize: "0.8rem" }}
+					className={`whitespace-pre-wrap break-all leading-5 text-xs font-mono ${lineColor[line.type]}`}
 				>
 					{line.text}
 				</div>
