@@ -9,12 +9,16 @@ export default function ExperienceWindow() {
 
 	const totalRoles = EXPERIENCES.reduce((acc, e) => acc + e.roles.length, 0);
 
+	const translate = (key: string, values?: Record<string, string>) => {
+		if (!values) return t(key);
+		return t(key, values as Record<string, string>);
+	};
+
 	return (
 		<div
 			className="h-full overflow-auto"
 			style={{ background: "var(--window-bg)", color: "var(--text-primary)" }}
 		>
-			{/* Header */}
 			<div
 				className="px-6 pt-6 pb-4 border-b sticky top-0 z-10"
 				style={{
@@ -35,14 +39,13 @@ export default function ExperienceWindow() {
 				</p>
 			</div>
 
-			{/* Timeline */}
 			<div className="px-6 py-5 space-y-8">
 				{EXPERIENCES.map((exp, idx) => (
 					<ExperienceCard
 						key={exp.company}
 						exp={exp}
 						isLast={idx === EXPERIENCES.length - 1}
-						t={t}
+						t={translate}
 					/>
 				))}
 			</div>

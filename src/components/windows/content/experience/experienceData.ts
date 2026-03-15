@@ -9,6 +9,7 @@ export interface ExperienceEntry {
 	company: string;
 	location: string;
 	color: string;
+	/** Path relative to /public, e.g. "/companies/techcorp.png" */
 	logo: string;
 	roles: ExperienceRole[];
 }
@@ -18,7 +19,7 @@ export const EXPERIENCES: ExperienceEntry[] = [
 		company: "TechCorp Indonesia",
 		location: "Denpasar, Bali",
 		color: "#e95420",
-		logo: "🏢",
+		logo: "/companies/techcorp.png",
 		roles: [
 			{
 				title: "Senior Frontend Developer",
@@ -54,7 +55,7 @@ export const EXPERIENCES: ExperienceEntry[] = [
 		company: "StartupXYZ",
 		location: "Remote",
 		color: "#3b82f6",
-		logo: "🚀",
+		logo: "/companies/startupxyz.png",
 		roles: [
 			{
 				title: "Full-stack Developer",
@@ -80,7 +81,7 @@ export const EXPERIENCES: ExperienceEntry[] = [
 		company: "Self-Employed",
 		location: "Bali, Indonesia",
 		color: "#10b981",
-		logo: "💻",
+		logo: "/companies/freelance.png",
 		roles: [
 			{
 				title: "Freelance Web Developer",

@@ -51,7 +51,9 @@
 		"present": "Sekarang",
 		"promoted": "Dipromosikan",
 		"responsibilities": "Tanggung Jawab Utama",
-		"techStack": "Tech Stack"
+		"techStack": "Tech Stack",
+		"logoAlt": "Logo {company}",
+		"logoFallback": "{initial}"
 	},
 	"ProjectsWindow": {
 		"title": "Proyek",
