@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { type FSNode, mkLine, type TermLine } from "./terminalTypes";
+import { type FSNode, mkLine, type TermLine } from "@/types/terminal";
 
 interface UseCommandProcessorOptions {
 	cwd: string;
@@ -12,6 +12,7 @@ interface UseCommandProcessorOptions {
 	setHistIdx: (idx: number) => void;
 	openVim: (filename: string, content: string) => void;
 	clearTerminal: () => void;
+	sessionClosedMsg: string;
 }
 
 const HELP_TEXT = `
@@ -56,6 +57,7 @@ export function useCommandProcessor({
 	setHistIdx,
 	openVim,
 	clearTerminal,
+	sessionClosedMsg,
 }: UseCommandProcessorOptions) {
 	const processCommand = useCallback(
 		(raw: string) => {
@@ -141,7 +143,6 @@ export function useCommandProcessor({
 						}
 					}
 
-					// Show subdirectories
 					const subdirs = Object.keys(fs).filter(
 						(k) =>
 							k !== normalTarget &&
@@ -372,7 +373,7 @@ export function useCommandProcessor({
 				}
 
 				case "exit":
-					addLines(mkLine("system", "Session closed. Goodbye!"));
+					addLines(mkLine("system", sessionClosedMsg));
 					break;
 
 				default:
@@ -395,6 +396,7 @@ export function useCommandProcessor({
 			setHistIdx,
 			openVim,
 			clearTerminal,
+			sessionClosedMsg,
 		],
 	);
 
