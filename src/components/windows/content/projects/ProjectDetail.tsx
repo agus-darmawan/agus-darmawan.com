@@ -3,7 +3,7 @@
 import { ExternalLink, Github, Star, X } from "lucide-react";
 import { useEffect, useRef } from "react";
 import type { Project } from "./projectsData";
-import { ReadmeRenderer } from "./ReadmeRenderer";
+import { ReadmeRenderer } from "./readme/ReadmeRenderer";
 
 interface ProjectDetailProps {
 	project: Project;
@@ -13,8 +13,8 @@ interface ProjectDetailProps {
 
 export function ProjectDetail({ project, onClose, t }: ProjectDetailProps) {
 	const overlayRef = useRef<HTMLDivElement>(null);
+	const scrollRef = useRef<HTMLDivElement>(null);
 
-	// Close on Escape
 	useEffect(() => {
 		const handler = (e: KeyboardEvent) => {
 			if (e.key === "Escape") onClose();
@@ -67,8 +67,6 @@ export function ProjectDetail({ project, onClose, t }: ProjectDetailProps) {
 						>
 							{project.desc}
 						</p>
-
-						{/* Meta row */}
 						<div className="flex items-center gap-3 mt-2 flex-wrap">
 							<span
 								className="flex items-center gap-1 text-xs"
@@ -77,7 +75,6 @@ export function ProjectDetail({ project, onClose, t }: ProjectDetailProps) {
 								<Star size={11} />
 								{project.stars} stars
 							</span>
-
 							<span
 								className="text-[10px] px-2 py-0.5 rounded-full font-medium capitalize"
 								style={{
@@ -92,6 +89,7 @@ export function ProjectDetail({ project, onClose, t }: ProjectDetailProps) {
 					</div>
 
 					<button
+						title="Close"
 						type="button"
 						onClick={onClose}
 						className="p-1.5 rounded-lg transition-colors shrink-0"
@@ -128,15 +126,16 @@ export function ProjectDetail({ project, onClose, t }: ProjectDetailProps) {
 					))}
 				</div>
 
-				{/* README content */}
-				<div className="flex-1 overflow-auto px-5 py-4">
+				{/* README — scrollable container, ref passed to renderer for TOC tracking */}
+				<div ref={scrollRef} className="flex-1 overflow-auto min-h-0 px-5 py-4">
 					<ReadmeRenderer
 						content={project.readme}
 						accentColor={project.color}
+						scrollRef={scrollRef}
 					/>
 				</div>
 
-				{/* Footer actions */}
+				{/* Footer */}
 				<div
 					className="px-5 py-3 border-t flex gap-2 shrink-0"
 					style={{ borderColor: "var(--border)" }}

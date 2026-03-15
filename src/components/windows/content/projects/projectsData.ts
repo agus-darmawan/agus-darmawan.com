@@ -52,14 +52,13 @@ An interactive Ubuntu 22.04-themed developer portfolio that turns a boring resum
 
 ## 🛠 Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS v4 |
-| State | Zustand + TanStack Query |
-| i18n | next-intl |
-| Icons | lucide-react |
+| Layer | Technology | Notes |
+|-------|-----------|-------|
+| Framework | Next.js 16 | App Router |
+| Language | TypeScript | Strict mode |
+| Styling | Tailwind CSS v4 | CSS variables |
+| State | Zustand + TanStack Query | Client + server |
+| i18n | next-intl | EN + ID |
 
 ## 🚀 Getting Started
 
@@ -71,12 +70,15 @@ cp .env.example .env.local
 npm run dev
 \`\`\`
 
-## 📸 Screenshots
+## Architecture
 
-The portfolio mimics the GNOME Shell desktop with:
-- A top bar showing time, Spotify status, battery, and network ping
-- A dock at the bottom for launching apps
-- Draggable window frames with macOS-style traffic lights
+> The portfolio is designed to be a faithful recreation of GNOME Shell, with each "app" as an isolated React component mounted into a draggable window frame.
+
+The window management system uses three cooperating hooks:
+
+1. \`useWindowZIndex\` — monotonic z-index counter
+2. \`useWindowLifecycle\` — open / close / minimize / maximize state
+3. \`useWindowDrag\` — mouse drag with ref-based stale closure prevention
 
 ## 🤝 Contributing
 
@@ -116,13 +118,34 @@ client (React) ←→ WebSocket ←→ Node.js server ←→ PostgreSQL
                                     Redis (pub/sub)
 \`\`\`
 
-## Tech Stack
+## Setup
 
-- **Frontend**: React, TanStack Query, Framer Motion
-- **Backend**: Node.js, Express, Socket.io
-- **Database**: PostgreSQL with Prisma ORM
-- **Cache**: Redis for sessions and pub/sub
-- **AI**: OpenAI GPT-4o for task suggestions
+\`\`\`bash
+npm install
+cp .env.example .env
+docker-compose up -d   # starts Postgres + Redis
+npm run dev
+\`\`\`
+
+## API Reference
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/boards | List all boards |
+| POST | /api/boards | Create board |
+| PATCH | /api/cards/:id | Update card |
+| DELETE | /api/cards/:id | Remove card |
+
+## AI Integration
+
+> Task suggestions are powered by GPT-4o with a custom system prompt that understands project context and past velocity.
+
+The suggestion pipeline:
+
+1. Collect recent completed tasks from the board
+2. Build context window with project metadata
+3. Call OpenAI with structured output format
+4. Parse and display inline suggestion chips
 `,
 	},
 	{
@@ -145,15 +168,37 @@ A beautiful weather dashboard with rich data visualizations.
 ## Features
 
 - Multi-location weather tracking
-- Interactive D3.js temperature and precipitation charts  
+- Interactive D3.js temperature and precipitation charts
 - 7-day hourly forecasts
 - Customizable widget layouts
 - Local storage persistence
 
+## Charts
+
+### Temperature Chart
+
+Uses a D3 area chart with smooth interpolation. The gradient fill transitions from the accent color at the peak temperature down to transparent at the baseline.
+
+\`\`\`ts
+const area = d3.area<HourlyPoint>()
+  .x(d => xScale(d.time))
+  .y0(height)
+  .y1(d => yScale(d.temp))
+  .curve(d3.curveCatmullRom.alpha(0.5))
+\`\`\`
+
+### Precipitation
+
+Bar chart with rounded tops. Each bar's opacity scales with precipitation probability.
+
 ## Data Sources
 
-- OpenWeatherMap API for current conditions
-- Open-Meteo for historical data and forecasts
+| Source | Used for | Free tier |
+|--------|----------|-----------|
+| OpenWeatherMap | Current + 5-day | 1000 calls/day |
+| Open-Meteo | Historical | Unlimited |
+
+> All API calls are proxied through a Next.js API route to keep keys server-side.
 `,
 	},
 	{
@@ -187,35 +232,26 @@ devkit git flow              Interactive git workflow helper
 devkit env setup             Bootstrap environment variables
 devkit deploy                One-command deployment helper
 \`\`\`
-`,
-	},
-	{
-		id: "bali-umkm",
-		name: "Bali UMKM Platform",
-		emoji: "🛒",
-		desc: "E-commerce platform connecting local Balinese artisans with customers worldwide.",
-		longDesc: "A marketplace platform for local Balinese small businesses.",
-		tech: ["Next.js", "Stripe", "Prisma", "PostgreSQL", "Cloudinary"],
-		github: "https://github.com/agus-darmawan/bali-umkm",
-		demo: "https://bali-umkm.vercel.app",
-		stars: 9,
-		featured: false,
-		category: "web",
-		color: "#f59e0b",
-		readme: `# Bali UMKM Platform
 
-Empowering local Balinese artisans to reach global customers.
+## Templates
 
-## About
+| Template | Stack | Description |
+|----------|-------|-------------|
+| \`next-ts\` | Next.js + TS | Full-stack web app |
+| \`fastapi\` | Python + FastAPI | REST API service |
+| \`go-gin\` | Go + Gin | High-perf API |
+| \`cli-py\` | Click + Rich | Another CLI tool |
 
-This platform connects traditional Balinese craft makers with customers around the world, featuring local payment gateway integration and multi-language support.
+## Git Flow
 
-## Features
+> The \`git flow\` command wraps the conventional git workflow into a guided interactive TUI powered by Rich.
 
-- Product catalog with rich media support (Cloudinary)
-- Stripe + local payment gateway integration
-- Order management and tracking
-- Artisan profiles and stories
+Steps it automates:
+
+1. Branch name validation (conventional format)
+2. Pre-commit lint and test run
+3. Squash merge with auto-generated commit message
+4. Branch cleanup after merge
 `,
 	},
 	{
@@ -251,18 +287,31 @@ function Gallery() {
     direction: 'horizontal',
     easing: 'ease-out',
   })
-  
-  return <div ref={containerRef}>...</div>
+
+  return (
+    <div ref={containerRef}>
+      <Slide />
+      <Slide />
+      <Slide />
+    </div>
+  )
 }
 \`\`\`
 
 ## API
 
-| Prop | Type | Default |
-|------|------|---------|
-| direction | 'horizontal' \| 'vertical' | 'vertical' |
-| easing | string | 'ease' |
-| duration | number | 300 |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| \`direction\` | \`'horizontal' \| 'vertical'\` | \`'vertical'\` | Scroll axis |
+| \`easing\` | \`string\` | \`'ease'\` | CSS easing function |
+| \`duration\` | \`number\` | \`300\` | Animation duration ms |
+| \`onSnap\` | \`(index: number) => void\` | — | Callback on snap |
+
+## Accessibility
+
+> Snap scrolling can interfere with keyboard navigation. This library adds \`role="region"\` and \`aria-label\` to the container, and supports arrow-key navigation out of the box.
+
+All motion respects \`prefers-reduced-motion\` — when the user has reduced motion enabled, snapping is instant with no animation.
 `,
 	},
 ];
