@@ -67,7 +67,7 @@ export function useCommandProcessor({
 			setHistory((h) => [trimmed, ...h.slice(0, 99)]);
 			setHistIdx(-1);
 
-			addLines(mkLine("input", `darm@wan:${cwd}$ ${trimmed}`));
+			addLines(mkLine("input", `agus@ubuntu:${cwd}$ ${trimmed}`));
 
 			const parts = trimmed.split(/\s+/);
 			const cmd = parts[0];
@@ -121,10 +121,11 @@ export function useCommandProcessor({
 				}
 
 				case "ls": {
-					const target = args[0]
-						? args[0].startsWith("~") || args[0].startsWith("/")
-							? args[0]
-							: `${cwd}/${args[0]}`
+					const rawLsArg = args[0] ? args[0].replace(/\/+$/, "") : "";
+					const target = rawLsArg
+						? rawLsArg.startsWith("~") || rawLsArg.startsWith("/")
+							? rawLsArg
+							: `${cwd}/${rawLsArg}`
 						: cwd;
 					const normalTarget = target.replace("/home/agus", "~");
 					const dir = fs[normalTarget];
@@ -157,7 +158,12 @@ export function useCommandProcessor({
 				}
 
 				case "cd": {
-					const target = args[0] ?? "~";
+					// Strip trailing slash so "cd downloads/" works the same as "cd downloads"
+					const rawTarget = args[0] ?? "~";
+					const target =
+						rawTarget.endsWith("/") && rawTarget !== "/"
+							? rawTarget.slice(0, -1)
+							: rawTarget;
 					let resolved: string;
 
 					if (target === "~" || target === "") {
@@ -312,7 +318,7 @@ export function useCommandProcessor({
 					addLines(
 						mkLine(
 							"output",
-							`            .-/+oossssoo+/-.               darm@wan
+							`            .-/+oossssoo+/-.               agus@ubuntu
         \`:+ssssssssssssssssss+:\`           OS: Ubuntu 22.04.3 LTS x86_64
       -+ssssssssssssssssssyyssss+-         Kernel: 5.15.0-91-generic
     .ossssssssssssssssssdMMMNysssso.       Shell: bash 5.1.16
