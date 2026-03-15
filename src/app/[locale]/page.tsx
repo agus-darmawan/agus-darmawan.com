@@ -4,11 +4,11 @@ import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { Dock } from "@/components/dock/Dock";
 import TopBar from "@/components/top-bar/TopBar";
-import AboutWindow from "@/components/windows/content/AboutWindow";
-import ExperienceWindow from "@/components/windows/content/ExperienceWindow";
-import ProjectsWindow from "@/components/windows/content/ProjectsWindow";
-import ResumeWindow from "@/components/windows/content/ResumeWindow";
-import TerminalWindow from "@/components/windows/content/TerminalWindow";
+import AboutWindow from "@/components/windows/content/about/AboutWindow";
+import ExperienceWindow from "@/components/windows/content/experience/ExperienceWindow";
+import ProjectsWindow from "@/components/windows/content/projects/ProjectsWindow";
+import ResumeWindow from "@/components/windows/content/resume/ResumeWindow";
+import TerminalWindow from "@/components/windows/content/terminal/TerminalWindow";
 import { WindowFrame } from "@/components/windows/frame/WindowFrame";
 import { APPS } from "@/config/apps";
 import { useWindowManager } from "@/hooks/window";
@@ -65,18 +65,12 @@ export default function IndexPage() {
 		return () => window.removeEventListener("minimizeAllWindows", handler);
 	}, [minimizeAllWindows]);
 
-	// Sync open windows (including minimized) to AppStore for TopBar
 	useEffect(() => {
 		windows.forEach((win) => {
-			addApp({
-				id: win.id,
-				name: win.title,
-				type: "app",
-			});
+			addApp({ id: win.id, name: win.title, type: "app" });
 		});
 	}, [windows, addApp]);
 
-	// Sync focused window to store for ActivityStatus
 	useEffect(() => {
 		setActiveApp(activeWindow);
 	}, [activeWindow, setActiveApp]);

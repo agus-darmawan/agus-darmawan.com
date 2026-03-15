@@ -6,28 +6,28 @@ interface WindowHeaderProps {
 	title: string;
 	isActive: boolean;
 	isMaximized: boolean;
+	isMobile?: boolean;
 	onClose: () => void;
 	onMinimize: () => void;
 	onMaximize: () => void;
 }
 
-/**
- * WindowHeader — macOS-style traffic-light title bar.
- * Draggable via .window-titlebar selector in useWindowManager.
- */
 export function WindowHeader({
 	title,
 	isActive,
 	isMaximized,
+	isMobile = false,
 	onClose,
 	onMinimize,
 	onMaximize,
 }: WindowHeaderProps) {
+	const draggable = !isMaximized && !isMobile;
+
 	return (
 		<div
 			className={[
 				"window-titlebar h-9 flex items-center justify-between px-3 select-none shrink-0",
-				!isMaximized ? "cursor-grab active:cursor-grabbing" : "",
+				draggable ? "cursor-grab active:cursor-grabbing" : "",
 			]
 				.filter(Boolean)
 				.join(" ")}
@@ -38,7 +38,6 @@ export function WindowHeader({
 				borderBottom: "1px solid var(--border)",
 			}}
 		>
-			{/* Traffic lights + title */}
 			<div className="flex items-center gap-2">
 				<div className="flex gap-2">
 					<TrafficButton
@@ -54,6 +53,7 @@ export function WindowHeader({
 						label="Minimize"
 						onClick={onMinimize}
 						icon={<Minimize2 size={8} />}
+						disabled={isMobile}
 					/>
 					<TrafficButton
 						color="#64c550"
@@ -61,6 +61,7 @@ export function WindowHeader({
 						label={isMaximized ? "Restore" : "Maximize"}
 						onClick={onMaximize}
 						icon={<Maximize2 size={8} />}
+						disabled={isMobile}
 					/>
 				</div>
 
@@ -81,6 +82,7 @@ interface TrafficButtonProps {
 	label: string;
 	onClick: (e: React.MouseEvent) => void;
 	icon: React.ReactNode;
+	disabled?: boolean;
 }
 
 function TrafficButton({
@@ -89,20 +91,23 @@ function TrafficButton({
 	label,
 	onClick,
 	icon,
+	disabled = false,
 }: TrafficButtonProps) {
 	return (
 		<button
 			type="button"
 			title={label}
 			aria-label={label}
+			disabled={disabled}
 			onClick={(e) => {
 				e.stopPropagation();
-				onClick(e);
+				if (!disabled) onClick(e);
 			}}
-			className="w-4 h-4 rounded-full flex items-center justify-center group transition-colors"
+			className="w-4 h-4 rounded-full flex items-center justify-center group transition-colors disabled:opacity-30"
 			style={{ background: color }}
 			onMouseEnter={(e) => {
-				(e.currentTarget as HTMLElement).style.background = hoverColor;
+				if (!disabled)
+					(e.currentTarget as HTMLElement).style.background = hoverColor;
 			}}
 			onMouseLeave={(e) => {
 				(e.currentTarget as HTMLElement).style.background = color;

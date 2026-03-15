@@ -35,18 +35,70 @@
 	},
 	"AboutWindow": {
 		"title": "About Me",
-		"description": "A passionate full-stack developer"
+		"name": "I Wayan Agus Darmawan",
+		"role": "Full-Stack Developer",
+		"location": "Denpasar, Bali, Indonesia",
+		"experience": "3+ years experience",
+		"bio": "Computer Engineering graduate (2025) with experience in full-stack web development, having completed over 20 freelance projects. Skilled in building responsive web applications, dashboards, and custom solutions using React and Express, delivering scalable and user-friendly software for a wide range of clients. In addition to web development, I have experience in robotics software, contributing to ROS-based autonomous robots and inspection systems, which strengthened my ability to integrate software with hardware, implement navigation and control systems, and ensure reliable performance in real-world environments. I am passionate about creating innovative solutions that combine technical excellence with practical usability, solving challenging problems, and delivering projects that create meaningful impact.",
+		"skills": "Technical Skills",
+		"connect": "Connect"
 	},
 	"ExperienceWindow": {
-		"title": "Experience"
+		"title": "Work Experience",
+		"companies": "companies",
+		"roles": "roles",
+		"years": "years",
+		"present": "Present",
+		"promoted": "Promoted",
+		"responsibilities": "Key Responsibilities",
+		"techStack": "Tech Stack",
+		"logoAlt": "{company} logo",
+		"logoFallback": "{initial}"
 	},
 	"ProjectsWindow": {
-		"title": "Projects"
+		"title": "Projects",
+		"allProjects": "All",
+		"featured": "Featured",
+		"viewCode": "Code",
+		"viewDemo": "Demo",
+		"readMore": "Read More"
 	},
 	"ResumeWindow": {
-		"title": "Resume"
+		"title": "Resume",
+		"download": "Download PDF",
+		"loading": "Loading PDF…",
+		"errorLoad": "Failed to load PDF. Make sure the file exists in /public.",
+		"zoomIn": "Zoom in",
+		"zoomOut": "Zoom out",
+		"resetZoom": "Reset zoom",
+		"prevPage": "Previous page",
+		"nextPage": "Next page",
+		"pageOf": "of"
 	},
 	"TerminalWindow": {
-		"title": "Terminal"
+		"title": "Terminal",
+		"welcome": "Ubuntu 22.04.3 LTS — darm@wan — portfolio terminal",
+		"helpHint": "Type \"help\" for available commands.",
+		"placeholder": "Type a command...",
+		"hintTab": "Tab",
+		"hintTabDesc": "=autocomplete",
+		"hintArrows": "↑↓",
+		"hintArrowsDesc": "=history",
+		"hintClear": "Ctrl+L",
+		"hintClearDesc": "=clear",
+		"vimInsert": "i",
+		"vimInsertDesc": "=insert",
+		"vimEsc": "Esc",
+		"vimEscDesc": "=normal",
+		"vimSave": ":w",
+		"vimSaveDesc": "=save",
+		"vimQuit": ":q!",
+		"vimQuitDesc": "=quit",
+		"vimSaveQuit": ":wq",
+		"vimSaveQuitDesc": "=save & quit",
+		"sessionClosed": "Session closed. Goodbye!"
+	},
+	"ContactWindow": {
+		"title": "Contact"
 	}
 }
