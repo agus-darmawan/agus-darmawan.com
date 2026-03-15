@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Dock } from "@/components/dock/Dock";
 import TopBar from "@/components/top-bar/TopBar";
 import AboutWindow from "@/components/windows/content/about/AboutWindow";
@@ -13,7 +13,6 @@ import ReadmeWindow from "@/components/windows/content/projects/readme/ReadmeWin
 import ResumeWindow from "@/components/windows/content/resume/ResumeWindow";
 import TerminalWindow from "@/components/windows/content/terminal/TerminalWindow";
 import { WindowFrame } from "@/components/windows/frame/WindowFrame";
-import { APPS } from "@/config/apps";
 import { useWindowManager } from "@/hooks/window";
 import { useAppStore } from "@/store/useAppStore";
 import type { WindowState } from "@/types/app";
@@ -44,7 +43,6 @@ function WindowContent({
 		case "contact":
 			return <ContactWindow />;
 		default:
-			// README windows use appId prefixed with "readme-"
 			if (win.appId.startsWith("readme-") && win.data) {
 				const d = win.data as {
 					project: ProjectMeta;
@@ -109,43 +107,64 @@ export default function IndexPage() {
 		setActiveApp(activeWindow);
 	}, [activeWindow, setActiveApp]);
 
-	// Opens a dedicated README window for a project
-	const handleOpenReadme = (
-		project: ProjectMeta,
-		name: string,
-		desc: string,
-		readmeFile: string,
-	) => {
-		const appId = `readme-${project.id}`;
-		openWindow(appId, { project, name, desc, readmeFile });
-	};
+	const handleOpenReadme = useCallback(
+		(project: ProjectMeta, name: string, desc: string, readmeFile: string) => {
+			openWindow(`readme-${project.id}`, { project, name, desc, readmeFile });
+		},
+		[openWindow],
+	);
+
+	// README windows always sit visually above all other windows.
+	// +500 offset ensures they can never be buried under Projects.
+	const effectiveZ = (win: WindowState): number =>
+		win.appId.startsWith("readme-") ? win.zIndex + 500 : win.zIndex;
+
+	// True when there's at least one non-minimized README open
+	const hasOpenReadme = windows.some(
+		(w) => w.appId.startsWith("readme-") && !w.minimized,
+	);
 
 	return (
 		<main className="w-full h-screen bg-ubuntu-purple overflow-hidden select-none">
 			<TopBar />
 
 			<div className="relative h-[calc(100vh-4rem)] mt-8">
-				{windows.map((win) => (
-					<WindowFrame
-						key={win.id}
-						window={win}
-						isActive={activeWindow === win.id}
-						isDragging={dragging === win.id}
-						onMouseDown={(e) => handleMouseDown(e, win.id)}
-						onClick={() => {
-							setActiveWindow(win.id);
-							bringToFront(win.id);
-						}}
-						onClose={() => {
-							closeWindow(win.id);
-							removeApp(win.id);
-						}}
-						onMinimize={() => minimizeWindow(win.id)}
-						onMaximize={() => toggleMaximize(win.id)}
-					>
-						<WindowContent win={win} onOpenReadme={handleOpenReadme} />
-					</WindowFrame>
-				))}
+				{windows.map((win) => {
+					// Projects window is locked (can't close) while any README is open
+					const closeLocked = win.appId === "projects" && hasOpenReadme;
+
+					return (
+						<WindowFrame
+							key={win.id}
+							window={{ ...win, zIndex: effectiveZ(win) }}
+							isActive={activeWindow === win.id}
+							isDragging={dragging === win.id}
+							onMouseDown={(e) => handleMouseDown(e, win.id)}
+							onClick={() => {
+								setActiveWindow(win.id);
+								bringToFront(win.id);
+							}}
+							onClose={() => {
+								if (closeLocked) {
+									// Flash all open README windows to hint the user
+									windows
+										.filter(
+											(w) => w.appId.startsWith("readme-") && !w.minimized,
+										)
+										.forEach((w) => bringToFront(w.id));
+									return;
+								}
+								closeWindow(win.id);
+								removeApp(win.id);
+							}}
+							onMinimize={() => minimizeWindow(win.id)}
+							onMaximize={() => toggleMaximize(win.id)}
+							closeLocked={closeLocked}
+						>
+							<WindowContent win={win} onOpenReadme={handleOpenReadme} />
+						</WindowFrame>
+					);
+				})}
 			</div>
 
 			<Dock

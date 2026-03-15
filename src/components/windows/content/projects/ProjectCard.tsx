@@ -1,6 +1,12 @@
 "use client";
 
-import { ArrowUpRight, GitFork, Star } from "lucide-react";
+import {
+	ArrowUpRight,
+	ExternalLink,
+	GitFork,
+	Github,
+	Star,
+} from "lucide-react";
 import type { ProjectMeta } from "./projectsData";
 
 interface ProjectCardProps {
@@ -8,7 +14,6 @@ interface ProjectCardProps {
 	name: string;
 	desc: string;
 	onClick: (project: ProjectMeta) => void;
-	readMoreLabel: string;
 }
 
 export function ProjectCard({
@@ -16,13 +21,11 @@ export function ProjectCard({
 	name,
 	desc,
 	onClick,
-	readMoreLabel,
 }: ProjectCardProps) {
 	return (
-		<button
-			type="button"
+		<div
 			onClick={() => onClick(project)}
-			className="group w-full text-left rounded-2xl overflow-hidden transition-all duration-200 relative"
+			className="group w-full text-left rounded-2xl overflow-hidden transition-all duration-200 relative cursor-pointer"
 			style={{
 				background: "var(--surface-secondary)",
 				border: "1px solid var(--border)",
@@ -40,6 +43,7 @@ export function ProjectCard({
 				el.style.boxShadow = "none";
 			}}
 		>
+			{/* Top accent bar */}
 			<div
 				className="h-0.5 w-full"
 				style={{
@@ -48,6 +52,8 @@ export function ProjectCard({
 						: `${project.color}40`,
 				}}
 			/>
+
+			{/* Hover glow */}
 			<div
 				className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
 				style={{
@@ -56,6 +62,7 @@ export function ProjectCard({
 			/>
 
 			<div className="relative p-4">
+				{/* Top row: icon + title + arrow */}
 				<div className="flex items-start justify-between gap-3 mb-3">
 					<div className="flex items-start gap-3">
 						<div
@@ -98,21 +105,24 @@ export function ProjectCard({
 						</div>
 					</div>
 
+					{/* Arrow — appears on hover, no text */}
 					<div
-						className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+						className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
 						style={{ background: `${project.color}18`, color: project.color }}
 					>
 						<ArrowUpRight size={14} />
 					</div>
 				</div>
 
+				{/* Description */}
 				<p
-					className="text-xs leading-relaxed mb-3 line-clamp-2"
+					className="text-xs leading-relaxed mb-3 line-clamp-2 text-left"
 					style={{ color: "var(--text-secondary)" }}
 				>
 					{desc}
 				</p>
 
+				{/* Tech tags */}
 				<div className="flex flex-wrap gap-1.5 mb-3">
 					{project.tech.slice(0, 4).map((tech) => (
 						<span
@@ -137,6 +147,7 @@ export function ProjectCard({
 					)}
 				</div>
 
+				{/* Footer: stats + GitHub/Demo links */}
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
 						<span
@@ -155,14 +166,49 @@ export function ProjectCard({
 						</span>
 					</div>
 
-					<span
-						className="text-[10px] font-medium transition-all duration-200 opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0"
-						style={{ color: project.color }}
-					>
-						{readMoreLabel} →
-					</span>
+					<div className="flex items-center gap-1.5">
+						<a
+							href={project.github}
+							target="_blank"
+							rel="noreferrer"
+							onClick={(e) => e.stopPropagation()}
+							className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg border font-medium transition-colors"
+							style={{
+								color: "var(--text-muted)",
+								borderColor: "var(--border)",
+							}}
+							onMouseEnter={(e) => {
+								(e.currentTarget as HTMLElement).style.borderColor =
+									project.color;
+								(e.currentTarget as HTMLElement).style.color = project.color;
+							}}
+							onMouseLeave={(e) => {
+								(e.currentTarget as HTMLElement).style.borderColor =
+									"var(--border)";
+								(e.currentTarget as HTMLElement).style.color =
+									"var(--text-muted)";
+							}}
+						>
+							<Github size={10} />
+							Code
+						</a>
+
+						{project.demo && (
+							<a
+								href={project.demo}
+								target="_blank"
+								rel="noreferrer"
+								onClick={(e) => e.stopPropagation()}
+								className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg font-medium text-white transition-opacity hover:opacity-80"
+								style={{ background: project.color }}
+							>
+								<ExternalLink size={10} />
+								Demo
+							</a>
+						)}
+					</div>
 				</div>
 			</div>
-		</button>
+		</div>
 	);
 }

@@ -9,6 +9,8 @@ interface WindowFrameProps {
 	isActive: boolean;
 	isDragging: boolean;
 	children: ReactNode;
+	/** When true the close button shakes and refuses to close */
+	closeLocked?: boolean;
 	onMouseDown: (e: React.MouseEvent) => void;
 	onClick: () => void;
 	onClose: () => void;
@@ -34,6 +36,7 @@ export function WindowFrame({
 	isActive,
 	isDragging,
 	children,
+	closeLocked = false,
 	onMouseDown,
 	onClick,
 	onClose,
@@ -44,7 +47,6 @@ export function WindowFrame({
 
 	if (win.minimized) return null;
 
-	// On mobile, always fullscreen
 	const isFullscreen = win.maximized || isMobile;
 
 	const positionStyle: React.CSSProperties = isFullscreen
@@ -77,6 +79,7 @@ export function WindowFrame({
 				title={win.title}
 				isActive={isActive}
 				isMaximized={isFullscreen}
+				closeLocked={closeLocked}
 				onClose={onClose}
 				onMinimize={onMinimize}
 				onMaximize={onMaximize}
