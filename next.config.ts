@@ -8,6 +8,18 @@ const nextConfig: NextConfig = {
 				protocol: "https",
 				hostname: "i.scdn.co",
 			},
+			{
+				protocol: "https",
+				hostname: "img.youtube.com",
+			},
+			{
+				protocol: "https",
+				hostname: "agus-darmawan.com",
+			},
+			{
+				protocol: "https",
+				hostname: "www.agus-darmawan.com",
+			},
 		],
 	},
 };
