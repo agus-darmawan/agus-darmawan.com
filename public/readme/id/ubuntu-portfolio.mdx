@@ -1,0 +1,60 @@
+# Ubuntu Portfolio
+
+Portofolio developer bertema Ubuntu 22.04 yang interaktif — mengubah resume biasa menjadi lingkungan desktop yang hidup. Setiap interaksi dirancang dengan sengaja, dari jendela yang bisa diseret hingga integrasi Spotify yang real-time.
+
+## ✨ Fitur
+
+- **Manajemen Jendela** — Jendela yang bisa diseret dan diubah ukurannya dengan kontrol minimize/maximize/close, persis seperti GNOME Shell asli
+- **Integrasi Spotify** — Widget "Now Playing" langsung di top bar dengan album art dan pelacakan progres
+- **Dukungan i18n** — Terjemahan lengkap bahasa Inggris dan Indonesia via next-intl
+- **Mode Gelap/Terang** — Pergantian tema yang mempertahankan top bar yang selalu gelap ala GNOME
+- **Emulator Terminal** — Terminal fungsional seperti bash dengan mode vim, simulasi file system, dan riwayat perintah
+- **Viewer Resume PDF** — Rendering PDF dalam jendela dengan kontrol zoom
+
+## 🛠 Tech Stack
+
+| Layer | Teknologi | Catatan |
+|-------|-----------|---------|
+| Framework | Next.js 16 | App Router |
+| Bahasa | TypeScript | Mode strict |
+| Styling | Tailwind CSS v4 | CSS variables |
+| State | Zustand + TanStack Query | Client + server |
+| i18n | next-intl | EN + ID |
+| PDF | pdfjs-dist | Rendering di browser |
+
+## 🚀 Memulai
+
+```bash
+git clone https://github.com/agus-darmawan/ubuntu-portfolio
+cd ubuntu-portfolio
+npm install
+cp .env.example .env.local
+# Tambahkan kredensial Spotify ke .env.local
+npm run dev
+```
+
+## Arsitektur
+
+> Portofolio ini dirancang sebagai rekreasi setia GNOME Shell, di mana setiap "aplikasi" adalah komponen React terisolasi yang dimuat ke dalam frame jendela yang bisa diseret.
+
+Sistem manajemen jendela menggunakan tiga hook yang bekerja bersama:
+
+1. `useWindowZIndex` — counter z-index yang monoton meningkat, memastikan urutan tumpukan yang benar
+2. `useWindowLifecycle` — state machine buka/tutup/minimize/maximize
+3. `useWindowDrag` — drag mouse dengan pencegahan stale closure berbasis ref
+
+### Manajemen State
+
+State jendela berada di satu hook komposit `useWindowManager`. Data track Spotify dan ping diambil server-side via API routes Next.js dan di-polling setiap 10 detik client-side menggunakan TanStack Query.
+
+## Variabel Environment
+
+```env
+SPOTIFY_CLIENT_ID=client_id_kamu
+SPOTIFY_CLIENT_SECRET=client_secret_kamu
+SPOTIFY_REFRESH_TOKEN=refresh_token_kamu
+```
+
+## 🤝 Kontribusi
+
+PR sangat diterima! Silakan baca panduan kontribusi dan ikuti gaya kode yang ada yang diberlakukan oleh Biome.

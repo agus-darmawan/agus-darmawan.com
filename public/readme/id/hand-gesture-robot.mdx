@@ -1,0 +1,82 @@
+# Pengenalan Gestur Tangan untuk Robot Kolaboratif
+
+**Penelitian Dipublikasikan** — Sistem deep learning ringan yang memungkinkan pengenalan gestur tangan real-time untuk kontrol robot kolaboratif (cobot), tanpa antarmuka fisik atau wearable.
+
+## Publikasi
+
+> *"Hand Gesture Recognition for Collaborative Robots Using Lightweight Deep Learning in Real-Time Robotic Systems"*
+
+Dipublikasikan sebagai bagian dari penelitian robotika di Institut Teknologi Sepuluh Nopember (ITS).
+
+## Motivasi
+
+Kolaborasi manusia-robot tradisional memerlukan kontroler fisik, teach pendant, atau pengaturan yang kompleks. Penelitian ini mengeksplorasi penggunaan gestur tangan alami sebagai antarmuka intuitif tanpa biaya hardware untuk mengontrol cobot di ruang kerja bersama.
+
+## Desain Sistem
+
+### Pipeline Pengenalan Gestur
+
+```
+Input Kamera (RGB)
+      ↓
+  MediaPipe Hands (deteksi landmark)
+      ↓
+  Ekstraksi Fitur (21 keypoint × 3D)
+      ↓
+  Classifier CNN Ringan
+      ↓
+  Label Gestur (8 kelas)
+      ↓
+  Publisher Command ROS
+      ↓
+  Eksekutor Gerak Cobot
+```
+
+### Mengapa Ringan?
+
+Cobot industri memiliki persyaratan real-time yang ketat. Model dirancang untuk berjalan di >30 FPS pada hardware edge (NVIDIA Jetson) dengan latensi end-to-end <50ms:
+
+| Metrik | Nilai |
+|--------|-------|
+| Latensi inferensi | <20ms |
+| Latensi pipeline penuh | <50ms |
+| Ukuran model | ~2.3MB |
+| Akurasi (test set) | 97.4% |
+| FPS di Jetson Nano | 34 FPS |
+
+### Kelas Gestur
+
+8 gestur kontrol yang dipetakan ke perintah robot:
+
+1. ✊ Kepalan — Stop / Henti darurat
+2. ✋ Telapak terbuka — Jeda gerak saat ini
+3. 👆 Tunjuk atas — Gerak ke atas
+4. 👇 Tunjuk bawah — Gerak ke bawah
+5. 👈 Tunjuk kiri — Gerak ke kiri
+6. 👉 Tunjuk kanan — Gerak ke kanan
+7. 👍 Jempol atas — Konfirmasi/Eksekusi
+8. 🤙 Hang loose — Kembali ke posisi awal
+
+### Integrasi ROS
+
+```python
+class GestureController(Node):
+    def __init__(self):
+        super().__init__('gesture_controller')
+        self.cmd_pub = self.create_publisher(
+            JointTrajectory, '/cobot/joint_trajectory', 10
+        )
+    
+    def on_gesture(self, gesture: str):
+        cmd = self.gesture_to_trajectory(gesture)
+        self.cmd_pub.publish(cmd)
+```
+
+## 🛠 Tech Stack
+
+- **Python** — pelatihan model dan pipeline inferensi
+- **MediaPipe** — deteksi landmark tangan real-time
+- **TensorFlow Lite** — deployment model ringan
+- **ROS2** — middleware komunikasi robot
+- **OpenCV** — pengambilan kamera dan preprocessing
+- **NVIDIA Jetson** — hardware inferensi edge

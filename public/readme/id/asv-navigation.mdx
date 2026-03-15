@@ -1,0 +1,63 @@
+# Sistem Navigasi Otonom ASV
+
+Stack navigasi otonom lengkap untuk Barunastra ITS Roboboat, yang meraih **Grand Champion** di International Roboboat Competition 2023 (IRC 2023) dan Juara 1 di KKI 2022 & 2023.
+
+## 🏆 Hasil Kompetisi
+
+| Kompetisi | Tahun | Hasil |
+|-----------|-------|-------|
+| KKI (Kontes Kapal Tak Berawak) | 2022 | 🥇 Juara 1 |
+| IRC 2023 (International Roboboat) | 2023 | 🏆 Grand Champion |
+| IRC 2023 Design Documentation | 2023 | 🥈 Juara 2 |
+| KKI (Kontes Kapal Tak Berawak) | 2023 | 🥇 Juara 1 |
+
+## 🧠 Arsitektur Sistem
+
+```
+Sensor (LiDAR + Kamera + GPS + IMU + Kompas)
+           ↓
+    Lapisan Fusi Sensor (ROS)
+           ↓
+  Lokalisasi & Pemetaan (RTK GPS + IMU)
+           ↓
+   Persepsi (Deteksi Objek - YOLO)
+           ↓
+   Perencanaan Jalur & Penghindaran Rintangan
+           ↓
+  Kontrol Thruster PID (Firmware level rendah)
+```
+
+## Kontribusi Teknis Utama
+
+### Fusi Multi-Sensor
+Mengintegrasikan 5 modalitas sensor menjadi estimasi state yang koheren:
+- **LiDAR** — deteksi rintangan dan pemetaan lingkungan
+- **Kamera** — klasifikasi warna pelampung dan deteksi tugas via YOLO
+- **GPS RTK** — posisi absolut tingkat sentimeter
+- **IMU** — estimasi attitude dan dead reckoning
+- **Kompas** — referensi heading
+
+### Kontrol Thruster PID
+Merancang kontroler PID dual-thruster untuk:
+- Kontrol heading (sumbu yaw)
+- Kontrol kecepatan (sumbu surge)
+- Station-keeping di zona tanpa GPS
+
+### Otonomi Tugas
+Mengimplementasikan eksekusi misi otonom penuh untuk tugas IRC:
+1. Traversal kanal navigasi
+2. Timing speed gate
+3. Penghindaran pelampung
+4. Manuver docking
+
+## 🛠 Tech Stack
+
+- **ROS Noetic** — middleware dan integrasi sensor
+- **Python** — navigasi tingkat tinggi dan logika misi
+- **C++** — node pemrosesan sensor real-time
+- **OpenCV + YOLO** — pipeline persepsi visual
+- **GPS RTK** — lokalisasi presisi sentimeter
+
+## Peran dalam Tim
+
+Menjabat sebagai **Robotics Software Engineer** (Apr 2022 – Des 2023) dan **Ketua Divisi Elektro-Programming** (Des 2023 – Nov 2024), bertanggung jawab atas seluruh software stack dari driver sensor hingga eksekusi misi.

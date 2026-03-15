@@ -1,0 +1,74 @@
+# Quadruped Inspection Robot System
+
+Industrial-grade autonomous inspection system built on the **Deep Robotics X30** quadruped platform, deployed for electrical substation inspection at PLN, Pertamina oil & gas facilities, and PTPN plantations.
+
+## 🎯 Mission
+
+Replace manual inspection walks in hazardous electrical substations with an autonomous robot that can:
+- Detect overheating components via thermal imaging
+- Navigate complex outdoor terrain with precise localization
+- Identify PPE compliance for personnel entering hazardous zones
+- Transmit real-time telemetry to operators via web dashboard
+
+## System Components
+
+### Hardware Platform
+- **Base Robot** — Deep Robotics X30 quadruped (also Lite3 for indoor tasks)
+- **Thermal Camera** — FLIR for component temperature monitoring
+- **LiDAR** — 3D point cloud for navigation and mapping
+- **RTK GPS** — Centimeter-level outdoor localization
+
+### Software Architecture
+
+```
+Robot Hardware (X30)
+      ↓
+  ROS2 Middleware
+      ↓
+ ┌────────────┐  ┌──────────────┐  ┌───────────────┐
+ │ LIO Nav    │  │ PPE Detection│  │ Thermal Detect│
+ │ (GPS+LiDAR)│  │ (YOLO v8)   │  │ (FLIR + CV)   │
+ └────────────┘  └──────────────┘  └───────────────┘
+      ↓
+  Mission Controller
+      ↓
+  Web Dashboard (Next.js + WebSocket)
+```
+
+### Key Technical Work
+
+**LIO Navigation (LiDAR-Inertial Odometry)**
+
+Resolved significant challenges with LIO in open outdoor environments (GPS-available) by fusing RTK GPS corrections into the LIO state estimate:
+- Drift correction during long traversals
+- Seamless indoor/outdoor transition
+- Reliable performance in high-electromagnetic-interference environments (substations)
+
+**PPE Detection Application**
+
+Implemented YOLOv8-based PPE detection to verify personnel are properly equipped before entering hazardous zones. Detects: hard hats, safety vests, safety boots.
+
+**Custom GUI Interface**
+
+Built operator-facing GUI for:
+- Live video feeds (thermal + RGB)
+- Robot state visualization
+- Waypoint mission programming
+- Anomaly logging and reporting
+
+## 🛠 Tech Stack
+
+- **ROS2** — robot middleware
+- **Python + C++** — navigation and perception nodes
+- **YOLOv8** — real-time object detection
+- **FLIR SDK** — thermal camera integration
+- **Next.js** — web monitoring dashboard
+- **WebSocket** — real-time telemetry streaming
+
+## Publications
+
+This work contributed to the paper:
+
+> *"Development of a Quadruped-Legged Robot for Position Estimation of Overheat Components in Electrical Substations Using a Thermal Camera"*
+
+Published as part of ongoing research at PT. Ezra Robotics Teknologi.

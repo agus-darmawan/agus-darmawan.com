@@ -1,0 +1,60 @@
+# Ubuntu Portfolio
+
+An interactive Ubuntu 22.04-themed developer portfolio that turns a boring resume into a living desktop environment. Every interaction is deliberate — from draggable windows to a real Spotify integration.
+
+## ✨ Features
+
+- **Window Management** — Draggable, resizable windows with minimize/maximize/close controls, just like real GNOME Shell
+- **Spotify Integration** — Live "Now Playing" widget in the top bar with album art and progress tracking
+- **i18n Support** — Full English and Indonesian translations via next-intl
+- **Dark/Light Mode** — Theme toggling that preserves GNOME's always-dark top bar
+- **Terminal Emulator** — Functional bash-like terminal with vim mode, file system simulation, and command history
+- **PDF Resume Viewer** — In-window PDF rendering with zoom controls
+
+## 🛠 Tech Stack
+
+| Layer | Technology | Notes |
+|-------|-----------|-------|
+| Framework | Next.js 16 | App Router |
+| Language | TypeScript | Strict mode |
+| Styling | Tailwind CSS v4 | CSS variables |
+| State | Zustand + TanStack Query | Client + server |
+| i18n | next-intl | EN + ID |
+| PDF | pdfjs-dist | In-browser rendering |
+
+## 🚀 Getting Started
+
+```bash
+git clone https://github.com/agus-darmawan/ubuntu-portfolio
+cd ubuntu-portfolio
+npm install
+cp .env.example .env.local
+# Add Spotify credentials to .env.local
+npm run dev
+```
+
+## Architecture
+
+> The portfolio is designed as a faithful recreation of GNOME Shell, where each "app" is an isolated React component mounted into a draggable window frame.
+
+The window management system uses three cooperating hooks:
+
+1. `useWindowZIndex` — monotonic z-index counter, ensures correct stacking order
+2. `useWindowLifecycle` — open/close/minimize/maximize state machine
+3. `useWindowDrag` — mouse drag with ref-based stale closure prevention
+
+### State Management
+
+Window state lives in a single `useWindowManager` composite hook. The Spotify track and ping data are fetched server-side via Next.js API routes and polled every 10 seconds client-side using TanStack Query.
+
+## Environment Variables
+
+```env
+SPOTIFY_CLIENT_ID=your_client_id
+SPOTIFY_CLIENT_SECRET=your_client_secret
+SPOTIFY_REFRESH_TOKEN=your_refresh_token
+```
+
+## 🤝 Contributing
+
+PRs welcome! Please read the contributing guide and follow the existing code style enforced by Biome.

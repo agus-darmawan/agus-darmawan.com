@@ -1,0 +1,63 @@
+# ASV Autonomous Navigation System
+
+Full autonomous navigation stack for the Barunastra ITS Roboboat, which earned **Grand Champion** at the International Roboboat Competition 2023 (IRC 2023) and 1st Place at KKI 2022 & 2023.
+
+## 🏆 Competition Results
+
+| Competition | Year | Result |
+|-------------|------|--------|
+| KKI (National Unmanned Water Vessel) | 2022 | 🥇 1st Place |
+| IRC 2023 (International Roboboat) | 2023 | 🏆 Grand Champion |
+| IRC 2023 Design Documentation | 2023 | 🥈 2nd Place |
+| KKI (National Unmanned Water Vessel) | 2023 | 🥇 1st Place |
+
+## 🧠 System Architecture
+
+```
+Sensors (LiDAR + Camera + GPS + IMU + Compass)
+           ↓
+    Sensor Fusion Layer (ROS)
+           ↓
+  Localization & Mapping (RTK GPS + IMU)
+           ↓
+   Perception (Object Detection - YOLO)
+           ↓
+   Path Planning & Obstacle Avoidance
+           ↓
+  PID Thruster Control (Low-level firmware)
+```
+
+## Key Technical Contributions
+
+### Multi-Sensor Fusion
+Integrated 5 sensor modalities into a coherent state estimate:
+- **LiDAR** — obstacle detection and environment mapping
+- **Camera** — buoy color classification and task detection via YOLO
+- **GPS RTK** — centimeter-level absolute positioning
+- **IMU** — attitude estimation and dead reckoning
+- **Compass** — heading reference
+
+### PID Thruster Control
+Designed dual-thruster PID controllers for:
+- Heading control (yaw axis)
+- Speed control (surge axis)
+- Station-keeping in GPS-denied zones
+
+### Task Autonomy
+Implemented fully autonomous mission execution for IRC tasks:
+1. Navigation channel traversal
+2. Speed gate timing
+3. Buoy avoidance
+4. Docking maneuver
+
+## 🛠 Tech Stack
+
+- **ROS Noetic** — middleware and sensor integration
+- **Python** — high-level navigation and mission logic
+- **C++** — real-time sensor processing nodes
+- **OpenCV + YOLO** — visual perception pipeline
+- **GPS RTK** — centimeter-precision localization
+
+## Team Role
+
+Served as **Robotics Software Engineer** (Apr 2022 – Dec 2023) and **Electrical-Programming Division Leader** (Dec 2023 – Nov 2024), responsible for the entire software stack from sensor drivers to mission execution.

@@ -1,0 +1,72 @@
+# Career Management Platform
+
+Internal HR platform built for **PT Satkomindo Mediyasa**, featuring Easy Apply workflow, automated CV standardization, and comprehensive role-based access control across candidate, recruiter, and admin personas.
+
+## Business Problem
+
+PT Satkomindo's HR team (HCD division) needed to:
+1. Streamline the application process for hundreds of candidates
+2. Standardize CV formats submitted in inconsistent formats
+3. Give recruiters a unified dashboard to review, filter, and track candidates
+4. Provide admins full visibility over the hiring funnel
+
+## Features by Role
+
+### Candidate Dashboard
+- Profile creation and document upload
+- **Easy Apply** — one-click application to open positions
+- Automated CV standardization to company template
+- Application status tracking
+
+### Recruiter Dashboard
+- Candidate pipeline management (Kanban-style)
+- Application review with standardized CV preview
+- Interview scheduling integration
+- Candidate notes and tagging
+
+### Admin Dashboard
+- Full user management (RBAC)
+- Job posting creation and management
+- Analytics: funnel metrics, time-to-hire, source tracking
+- Audit logs for all platform actions
+
+## Technical Implementation
+
+### Authentication & RBAC
+
+```typescript
+// Role-based middleware
+export async function authorize(roles: Role[]) {
+  const session = await getServerSession();
+  if (!roles.includes(session.user.role)) {
+    throw new UnauthorizedError();
+  }
+}
+```
+
+### CV Standardization Pipeline
+
+1. Candidate uploads PDF/DOCX CV
+2. Parser extracts structured data (name, experience, education, skills)
+3. Template engine renders standardized company-format PDF
+4. Recruiter receives consistent, comparable documents
+
+### Document Tracking System (AdonisJS)
+
+Separate service built for tracking HR documents through approval workflows:
+- Document upload → review → approval → archive pipeline
+- Email notifications at each stage
+- Role-based visibility (who can see/approve what)
+- Full audit trail with timestamp and user attribution
+
+## 🛠 Tech Stack
+
+| Component | Technology |
+|-----------|-----------|
+| Frontend | React, TypeScript, Tailwind CSS |
+| Backend API | AdonisJS (TypeScript) |
+| Database | PostgreSQL |
+| Auth | JWT + Role-based middleware |
+| File Storage | MinIO (S3-compatible) |
+| Deployment | Docker + Docker Compose |
+| CI/CD | Sprint-based with Git flow |

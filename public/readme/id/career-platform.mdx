@@ -1,0 +1,72 @@
+# Platform Manajemen Karir
+
+Platform HR internal yang dibangun untuk **PT Satkomindo Mediyasa**, menampilkan alur Easy Apply, standarisasi CV otomatis, dan kontrol akses berbasis peran yang komprehensif untuk persona kandidat, rekruter, dan admin.
+
+## Masalah Bisnis
+
+Tim HR PT Satkomindo (divisi HCD) membutuhkan:
+1. Menyederhanakan proses lamaran untuk ratusan kandidat
+2. Menstandarisasi format CV yang diserahkan dalam format yang tidak konsisten
+3. Memberi rekruter dashboard terpadu untuk meninjau, memfilter, dan melacak kandidat
+4. Memberi admin visibilitas penuh atas funnel perekrutan
+
+## Fitur per Peran
+
+### Dashboard Kandidat
+- Pembuatan profil dan upload dokumen
+- **Easy Apply** — lamaran satu klik ke posisi yang terbuka
+- Standarisasi CV otomatis ke template perusahaan
+- Pelacakan status lamaran
+
+### Dashboard Rekruter
+- Manajemen pipeline kandidat (gaya Kanban)
+- Tinjauan lamaran dengan preview CV terstandarisasi
+- Integrasi penjadwalan wawancara
+- Catatan dan penandaan kandidat
+
+### Dashboard Admin
+- Manajemen pengguna penuh (RBAC)
+- Pembuatan dan manajemen posting pekerjaan
+- Analitik: metrik funnel, time-to-hire, pelacakan sumber
+- Log audit untuk semua aksi platform
+
+## Implementasi Teknis
+
+### Autentikasi & RBAC
+
+```typescript
+// Middleware berbasis peran
+export async function authorize(roles: Role[]) {
+  const session = await getServerSession();
+  if (!roles.includes(session.user.role)) {
+    throw new UnauthorizedError();
+  }
+}
+```
+
+### Pipeline Standarisasi CV
+
+1. Kandidat upload CV PDF/DOCX
+2. Parser mengekstrak data terstruktur (nama, pengalaman, pendidikan, keahlian)
+3. Template engine merender PDF format perusahaan yang terstandarisasi
+4. Rekruter menerima dokumen yang konsisten dan dapat dibandingkan
+
+### Sistem Document Tracking (AdonisJS)
+
+Layanan terpisah yang dibangun untuk melacak dokumen HR melalui alur persetujuan:
+- Pipeline upload dokumen → tinjauan → persetujuan → arsip
+- Notifikasi email di setiap tahap
+- Visibilitas berbasis peran (siapa yang dapat melihat/menyetujui apa)
+- Jejak audit penuh dengan timestamp dan atribusi pengguna
+
+## 🛠 Tech Stack
+
+| Komponen | Teknologi |
+|----------|-----------|
+| Frontend | React, TypeScript, Tailwind CSS |
+| Backend API | AdonisJS (TypeScript) |
+| Database | PostgreSQL |
+| Auth | JWT + Middleware berbasis peran |
+| Penyimpanan File | MinIO (kompatibel S3) |
+| Deployment | Docker + Docker Compose |
+| CI/CD | Sprint-based dengan Git flow |

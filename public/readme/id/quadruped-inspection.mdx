@@ -1,0 +1,74 @@
+# Sistem Robot Inspeksi Berkaki Empat
+
+Sistem inspeksi otonom tingkat industri yang dibangun di atas platform berkaki empat **Deep Robotics X30**, digunakan untuk inspeksi gardu listrik di PLN, fasilitas minyak & gas Pertamina, dan perkebunan PTPN.
+
+## 🎯 Misi
+
+Menggantikan inspeksi manual di gardu listrik berbahaya dengan robot otonom yang dapat:
+- Mendeteksi komponen overheat via thermal imaging
+- Menavigasi medan outdoor kompleks dengan lokalisasi presisi
+- Mengidentifikasi kepatuhan APD untuk personel yang memasuki zona berbahaya
+- Mengirimkan telemetri real-time ke operator via dashboard web
+
+## Komponen Sistem
+
+### Platform Hardware
+- **Robot Dasar** — Deep Robotics X30 berkaki empat (juga Lite3 untuk tugas indoor)
+- **Kamera Thermal** — FLIR untuk pemantauan suhu komponen
+- **LiDAR** — Point cloud 3D untuk navigasi dan pemetaan
+- **RTK GPS** — Lokalisasi outdoor tingkat sentimeter
+
+### Arsitektur Perangkat Lunak
+
+```
+Hardware Robot (X30)
+      ↓
+  Middleware ROS2
+      ↓
+ ┌────────────┐  ┌──────────────┐  ┌───────────────┐
+ │ Navigasi   │  │ Deteksi APD  │  │ Deteksi Thermal│
+ │ LIO+GPS    │  │ (YOLO v8)   │  │ (FLIR + CV)   │
+ └────────────┘  └──────────────┘  └───────────────┘
+      ↓
+  Kontroler Misi
+      ↓
+  Dashboard Web (Next.js + WebSocket)
+```
+
+### Pekerjaan Teknis Utama
+
+**Navigasi LIO (LiDAR-Inertial Odometry)**
+
+Mengatasi tantangan signifikan dengan LIO di lingkungan outdoor terbuka (GPS tersedia) dengan menggabungkan koreksi RTK GPS ke dalam estimasi state LIO:
+- Koreksi drift selama traversal panjang
+- Transisi indoor/outdoor yang mulus
+- Performa andal di lingkungan gangguan elektromagnetik tinggi (gardu listrik)
+
+**Aplikasi Deteksi APD**
+
+Mengimplementasikan deteksi APD berbasis YOLOv8 untuk memverifikasi personel dilengkapi dengan benar sebelum memasuki zona berbahaya. Mendeteksi: helm keselamatan, rompi keselamatan, sepatu keselamatan.
+
+**Antarmuka GUI Kustom**
+
+Membangun GUI untuk operator berupa:
+- Feed video langsung (thermal + RGB)
+- Visualisasi state robot
+- Pemrograman misi waypoint
+- Pencatatan dan pelaporan anomali
+
+## 🛠 Tech Stack
+
+- **ROS2** — middleware robot
+- **Python + C++** — node navigasi dan persepsi
+- **YOLOv8** — deteksi objek real-time
+- **FLIR SDK** — integrasi kamera thermal
+- **Next.js** — dashboard monitoring web
+- **WebSocket** — streaming telemetri real-time
+
+## Publikasi
+
+Pekerjaan ini berkontribusi pada makalah:
+
+> *"Development of a Quadruped-Legged Robot for Position Estimation of Overheat Components in Electrical Substations Using a Thermal Camera"*
+
+Dipublikasikan sebagai bagian dari penelitian berkelanjutan di PT. Ezra Robotics Teknologi.

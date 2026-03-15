@@ -1,0 +1,82 @@
+# Hand Gesture Recognition for Collaborative Robots
+
+**Published Research** — A lightweight deep learning system enabling real-time hand gesture recognition for collaborative robot (cobot) control, without physical interfaces or wearables.
+
+## Publication
+
+> *"Hand Gesture Recognition for Collaborative Robots Using Lightweight Deep Learning in Real-Time Robotic Systems"*
+
+Published as part of robotics research at Institut Teknologi Sepuluh Nopember (ITS).
+
+## Motivation
+
+Traditional human-robot collaboration requires physical controllers, teach pendants, or complex setup. This research explores using natural hand gestures as an intuitive, zero-hardware-cost interface for controlling cobots in shared workspaces.
+
+## System Design
+
+### Gesture Recognition Pipeline
+
+```
+Camera Input (RGB)
+      ↓
+  MediaPipe Hands (landmark detection)
+      ↓
+  Feature Extraction (21 keypoints × 3D)
+      ↓
+  Lightweight CNN Classifier
+      ↓
+  Gesture Label (8 classes)
+      ↓
+  ROS Command Publisher
+      ↓
+  Cobot Motion Executor
+```
+
+### Why Lightweight?
+
+Industrial cobots have strict real-time requirements. The model was designed to run at >30 FPS on edge hardware (NVIDIA Jetson) with <50ms end-to-end latency:
+
+| Metric | Value |
+|--------|-------|
+| Inference latency | <20ms |
+| Full pipeline latency | <50ms |
+| Model size | ~2.3MB |
+| Accuracy (test set) | 97.4% |
+| FPS on Jetson Nano | 34 FPS |
+
+### Gesture Classes
+
+8 control gestures mapped to robot commands:
+
+1. ✊ Fist — Stop / Emergency halt
+2. ✋ Open palm — Pause current motion
+3. 👆 Point up — Move up
+4. 👇 Point down — Move down
+5. 👈 Point left — Move left
+6. 👉 Point right — Move right
+7. 👍 Thumbs up — Confirm/Execute
+8. 🤙 Hang loose — Return to home
+
+### ROS Integration
+
+```python
+class GestureController(Node):
+    def __init__(self):
+        super().__init__('gesture_controller')
+        self.cmd_pub = self.create_publisher(
+            JointTrajectory, '/cobot/joint_trajectory', 10
+        )
+    
+    def on_gesture(self, gesture: str):
+        cmd = self.gesture_to_trajectory(gesture)
+        self.cmd_pub.publish(cmd)
+```
+
+## 🛠 Tech Stack
+
+- **Python** — model training and inference pipeline
+- **MediaPipe** — real-time hand landmark detection
+- **TensorFlow Lite** — lightweight model deployment
+- **ROS2** — robot communication middleware
+- **OpenCV** — camera capture and preprocessing
+- **NVIDIA Jetson** — edge inference hardware

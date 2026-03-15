@@ -1,0 +1,73 @@
+# iCar ITS Web Monitoring System
+
+Real-time web monitoring and telemetry dashboard for the **iCar ITS** autonomous vehicle project at PT. ITS TEKNO SAINS. Provides live operational visibility, maintenance tracking, and remote control capabilities.
+
+## Overview
+
+iCar ITS is an autonomous electric vehicle developed at ITS Surabaya. This web system bridges the ROS-based vehicle software with human operators via a modern browser interface, eliminating the need for laptop-on-site monitoring.
+
+## Features
+
+### Real-time Telemetry
+- Live vehicle position on interactive map
+- Speed, heading, and odometry visualization
+- Sensor health status (LiDAR, camera, GPS)
+- LIO localization confidence indicator
+
+### Operational Control
+- Mission waypoint programming
+- Manual override toggle
+- Emergency stop button
+- Drive mode switching (autonomous / manual)
+
+### Maintenance Logging
+- Automated session recording (start time, route, distance)
+- Component fault logging with timestamp
+- Maintenance schedule tracking
+- Export to PDF/CSV reports
+
+## Technical Architecture
+
+```
+Vehicle (ROS Noetic) ←→ rosbridge (WebSocket)
+                              ↓
+                     Next.js API Routes
+                              ↓
+                    React Dashboard (SPA)
+                              ↓
+              PostgreSQL (maintenance history)
+```
+
+### ROS Integration
+
+Used `roslib.js` to subscribe to ROS topics directly in the browser:
+
+```typescript
+const ros = new ROSLIB.Ros({ url: 'ws://vehicle-ip:9090' });
+
+const odomSub = new ROSLIB.Topic({
+  ros,
+  name: '/odom',
+  messageType: 'nav_msgs/Odometry'
+});
+
+odomSub.subscribe((msg) => updateVehiclePosition(msg.pose));
+```
+
+### Navigation Improvements
+
+Beyond the dashboard, contributed to the core ROS navigation stack:
+- Tuned LiDAR-based obstacle avoidance PID parameters
+- Integrated Direct LiDAR–Inertial Odometry (DLIO)
+- Fused GPS for GPS-available zones, seamless fallback to pure LIO
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js 14, TypeScript, Tailwind CSS |
+| ROS Bridge | rosbridge_suite, roslib.js |
+| Database | PostgreSQL + Prisma |
+| Maps | Leaflet.js |
+| Charts | Recharts |
+| Deployment | Docker Compose |

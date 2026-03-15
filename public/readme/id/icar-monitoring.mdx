@@ -1,0 +1,73 @@
+# Sistem Web Monitoring iCar ITS
+
+Dashboard monitoring dan telemetri web real-time untuk proyek kendaraan otonom **iCar ITS** di PT. ITS TEKNO SAINS. Menyediakan visibilitas operasional langsung, pelacakan pemeliharaan, dan kemampuan kendali jarak jauh.
+
+## Gambaran Umum
+
+iCar ITS adalah kendaraan listrik otonom yang dikembangkan di ITS Surabaya. Sistem web ini menjembatani perangkat lunak kendaraan berbasis ROS dengan operator manusia via antarmuka browser modern, menghilangkan kebutuhan monitoring laptop di lokasi.
+
+## Fitur
+
+### Telemetri Real-time
+- Posisi kendaraan langsung pada peta interaktif
+- Visualisasi kecepatan, heading, dan odometri
+- Status kesehatan sensor (LiDAR, kamera, GPS)
+- Indikator kepercayaan lokalisasi LIO
+
+### Kontrol Operasional
+- Pemrograman waypoint misi
+- Toggle manual override
+- Tombol emergency stop
+- Pergantian mode mengemudi (otonom / manual)
+
+### Pencatatan Pemeliharaan
+- Perekaman sesi otomatis (waktu mulai, rute, jarak)
+- Pencatatan kesalahan komponen dengan timestamp
+- Pelacakan jadwal pemeliharaan
+- Ekspor ke laporan PDF/CSV
+
+## Arsitektur Teknis
+
+```
+Kendaraan (ROS Noetic) ←→ rosbridge (WebSocket)
+                                ↓
+                      Next.js API Routes
+                                ↓
+                     React Dashboard (SPA)
+                                ↓
+               PostgreSQL (riwayat pemeliharaan)
+```
+
+### Integrasi ROS
+
+Menggunakan `roslib.js` untuk berlangganan topik ROS langsung di browser:
+
+```typescript
+const ros = new ROSLIB.Ros({ url: 'ws://vehicle-ip:9090' });
+
+const odomSub = new ROSLIB.Topic({
+  ros,
+  name: '/odom',
+  messageType: 'nav_msgs/Odometry'
+});
+
+odomSub.subscribe((msg) => updateVehiclePosition(msg.pose));
+```
+
+### Peningkatan Navigasi
+
+Selain dashboard, berkontribusi pada stack navigasi ROS inti:
+- Tuning parameter PID penghindaran rintangan berbasis LiDAR
+- Mengintegrasikan Direct LiDAR–Inertial Odometry (DLIO)
+- Fusi GPS untuk zona GPS tersedia, fallback mulus ke pure LIO
+
+## 🛠 Tech Stack
+
+| Layer | Teknologi |
+|-------|-----------|
+| Frontend | Next.js 14, TypeScript, Tailwind CSS |
+| ROS Bridge | rosbridge_suite, roslib.js |
+| Database | PostgreSQL + Prisma |
+| Peta | Leaflet.js |
+| Chart | Recharts |
+| Deployment | Docker Compose |
