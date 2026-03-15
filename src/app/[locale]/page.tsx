@@ -8,6 +8,8 @@ import AboutWindow from "@/components/windows/content/about/AboutWindow";
 import ContactWindow from "@/components/windows/content/contact/ContactWindow";
 import ExperienceWindow from "@/components/windows/content/experience/ExperienceWindow";
 import ProjectsWindow from "@/components/windows/content/projects/ProjectsWindow";
+import type { ProjectMeta } from "@/components/windows/content/projects/projectsData";
+import ReadmeWindow from "@/components/windows/content/readme/ReadmeWindow";
 import ResumeWindow from "@/components/windows/content/resume/ResumeWindow";
 import TerminalWindow from "@/components/windows/content/terminal/TerminalWindow";
 import { WindowFrame } from "@/components/windows/frame/WindowFrame";
@@ -16,7 +18,18 @@ import { useWindowManager } from "@/hooks/window";
 import { useAppStore } from "@/store/useAppStore";
 import type { WindowState } from "@/types/app";
 
-function WindowContent({ win }: { win: WindowState }) {
+function WindowContent({
+	win,
+	onOpenReadme,
+}: {
+	win: WindowState;
+	onOpenReadme: (
+		project: ProjectMeta,
+		name: string,
+		desc: string,
+		readmeFile: string,
+	) => void;
+}) {
 	switch (win.appId) {
 		case "about":
 			return <AboutWindow />;
@@ -25,12 +38,29 @@ function WindowContent({ win }: { win: WindowState }) {
 		case "experience":
 			return <ExperienceWindow />;
 		case "projects":
-			return <ProjectsWindow />;
+			return <ProjectsWindow onOpenReadme={onOpenReadme} />;
 		case "terminal":
 			return <TerminalWindow />;
 		case "contact":
 			return <ContactWindow />;
 		default:
+			// README windows use appId prefixed with "readme-"
+			if (win.appId.startsWith("readme-") && win.data) {
+				const d = win.data as {
+					project: ProjectMeta;
+					name: string;
+					desc: string;
+					readmeFile: string;
+				};
+				return (
+					<ReadmeWindow
+						project={d.project}
+						name={d.name}
+						desc={d.desc}
+						readmeFile={d.readmeFile}
+					/>
+				);
+			}
 			return (
 				<div
 					className="h-full flex items-center justify-center text-sm"
@@ -60,6 +90,7 @@ export default function IndexPage() {
 		setActiveWindow,
 		bringToFront,
 		minimizeAllWindows,
+		openWindow,
 	} = useWindowManager(t);
 
 	useEffect(() => {
@@ -77,6 +108,17 @@ export default function IndexPage() {
 	useEffect(() => {
 		setActiveApp(activeWindow);
 	}, [activeWindow, setActiveApp]);
+
+	// Opens a dedicated README window for a project
+	const handleOpenReadme = (
+		project: ProjectMeta,
+		name: string,
+		desc: string,
+		readmeFile: string,
+	) => {
+		const appId = `readme-${project.id}`;
+		openWindow(appId, { project, name, desc, readmeFile });
+	};
 
 	return (
 		<main className="w-full h-screen bg-ubuntu-purple overflow-hidden select-none">
@@ -101,7 +143,7 @@ export default function IndexPage() {
 						onMinimize={() => minimizeWindow(win.id)}
 						onMaximize={() => toggleMaximize(win.id)}
 					>
-						<WindowContent win={win} />
+						<WindowContent win={win} onOpenReadme={handleOpenReadme} />
 					</WindowFrame>
 				))}
 			</div>
