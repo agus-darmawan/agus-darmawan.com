@@ -1,0 +1,52 @@
+{
+	"ProjectsWindow": {
+		"title": "Proyek",
+		"allProjects": "Semua",
+		"featured": "Unggulan",
+		"viewCode": "Kode",
+		"viewDemo": "Demo",
+		"readMore": "Selengkapnya",
+		"openProject": "Buka",
+		"backToProjects": "← Proyek",
+		"stars": "bintang",
+		"repos": "repo"
+	},
+	"Projects": {
+		"ubuntuPortfolio": {
+			"name": "Ubuntu Portfolio",
+			"desc": "Portofolio developer bertema OS interaktif dengan jendela yang bisa diseret, integrasi Spotify, i18n, dan mode gelap.",
+			"longDesc": "Simulasi desktop GNOME Ubuntu 22.04 yang sepenuhnya interaktif dibangun sebagai portofolio developer.",
+			"readmeFile": "ubuntu-portfolio"
+		},
+		"asvNavigation": {
+			"name": "Navigasi Otonom ASV",
+			"desc": "Sistem navigasi otonom berbasis ROS untuk Autonomous Surface Vehicle dengan fusi multi-sensor, meraih Grand Champion di IRC 2023.",
+			"longDesc": "Stack navigasi otonom lengkap untuk robot kompetisi maritim yang mengintegrasikan LiDAR, kamera, GPS, IMU, dan kompas untuk operasi sepenuhnya otonom.",
+			"readmeFile": "asv-navigation"
+		},
+		"quadrupedInspection": {
+			"name": "Robot Inspeksi Berkaki Empat",
+			"desc": "Sistem inspeksi berbasis ROS untuk gardu listrik menggunakan Deep Robotics X30, thermal imaging, dan LiDAR-Inertial Odometry.",
+			"longDesc": "Sistem robot inspeksi tingkat industri untuk gardu listrik PLN dan fasilitas minyak & gas Pertamina, dengan navigasi otonom dan deteksi APD.",
+			"readmeFile": "quadruped-inspection"
+		},
+		"icarMonitoring": {
+			"name": "iCar ITS Web Monitoring",
+			"desc": "Dashboard monitoring web real-time untuk telemetri kendaraan otonom, dibangun dengan Next.js + integrasi ROS bridge.",
+			"longDesc": "Sistem monitoring produksi untuk proyek kendaraan otonom iCar ITS, menyediakan telemetri langsung, pelacakan, dan pencatatan pemeliharaan.",
+			"readmeFile": "icar-monitoring"
+		},
+		"careerPlatform": {
+			"name": "Platform Manajemen Karir",
+			"desc": "Platform HR internal dengan Easy Apply, standarisasi CV otomatis, dan kontrol akses berbasis peran untuk PT Satkomindo.",
+			"longDesc": "Platform manajemen karir full-stack dengan dashboard kandidat, rekruter, dan admin dengan deployment terkontainerisasi Docker.",
+			"readmeFile": "career-platform"
+		},
+		"handGestureRobot": {
+			"name": "Robot Pengenalan Gestur Tangan",
+			"desc": "Sistem deep learning ringan untuk pengenalan gestur tangan real-time yang memungkinkan kontrol robot kolaboratif.",
+			"longDesc": "Penelitian yang dipublikasikan: sistem pengenalan gestur real-time menggunakan CNN ringan untuk kontrol robot kolaboratif (cobot) tanpa antarmuka fisik.",
+			"readmeFile": "hand-gesture-robot"
+		}
+	}
+}

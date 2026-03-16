@@ -1,0 +1,43 @@
+{
+	"AboutWindow": {
+		"title": "About Me",
+		"name": "I Wayan Agus Darmawan",
+		"role": "Full-Stack & Robotics Developer",
+		"location": "Denpasar, Bali, Indonesia",
+		"experience": "3+ years experience",
+		"bio": "Computer Engineering graduate (2025) from Institut Teknologi Sepuluh Nopember with experience in full-stack web development, completing over 20 freelance projects. Skilled in building responsive web applications, dashboards, and custom solutions using React and Express. Additionally experienced in robotics software, contributing to ROS-based autonomous robots and inspection systems — integrating software with hardware, implementing navigation and control systems, and ensuring reliable real-world performance.",
+		"skills": "Technical Skills",
+		"education": "Education",
+		"awards": "Awards & Honors",
+		"publications": "Publications",
+		"scrollHint": "Scroll to explore",
+
+		"skillsFrontend": "Frontend & Mobile",
+		"skillsBackend": "Backend",
+		"skillsRobotics": "Robotics & AI",
+
+		"educationIts": "Institut Teknologi Sepuluh Nopember (ITS)",
+		"educationItsDegree": "Bachelor's Degree, Computer Engineering",
+		"educationItsHighlight": "GPA Honors",
+		"educationItsAchievement1": "B401 Robotics Lab Assistant – led full-stack ROS autonomy systems",
+		"educationItsAchievement2": "Barunastra ITS Roboboat – Electrical & Programming Division Leader",
+		"educationItsAchievement3": "Grand Champion IRC 2023 & multiple national competition titles",
+
+		"educationApple": "Apple Developer Academy | Indonesia",
+		"educationAppleDegree": "iOS Developer",
+		"educationAppleHighlight": "Swift & SwiftUI",
+		"educationAppleAchievement1": "Building native iOS applications with Swift and SwiftUI",
+		"educationAppleAchievement2": "Challenge-based learning focused on real-world product development",
+
+		"international": "International",
+		"national": "National",
+
+		"publicationQuadruped": "Development of a Quadruped-Legged Robot for Position Estimation of Overheat Components in Electrical Substations Using a Thermal Camera",
+		"publicationQuadrupedAuthors": "Agus Darmawan et al.",
+		"publicationQuadrupedVenue": "PT. Ezra Robotics Teknologi / Research Journal",
+		"publicationGesture": "Hand Gesture Recognition for Collaborative Robots Using Lightweight Deep Learning in Real-Time Robotic Systems",
+		"publicationGestureAuthors": "Agus Darmawan et al.",
+		"publicationGestureVenue": "Institut Teknologi Sepuluh Nopember (ITS)",
+		"readPublication": "Read Paper"
+	}
+}

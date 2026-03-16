@@ -1,0 +1,23 @@
+{
+	"HomePage": {
+		"title": "Halo dunia!"
+	},
+	"Dock": {
+		"about": "Tentang Saya",
+		"terminal": "Terminal",
+		"resume": "Resume",
+		"experience": "Pengalaman",
+		"projects": "Proyek",
+		"contact": "Kontak",
+		"search": "Cari aplikasi…",
+		"noResults": "Tidak ada aplikasi ditemukan"
+	},
+	"Windows": {
+		"about": "Tentang Saya",
+		"terminal": "Terminal",
+		"resume": "Resume",
+		"experience": "Pengalaman",
+		"projects": "Proyek",
+		"contact": "Kontak"
+	}
+}

@@ -1,60 +1,4 @@
 {
-	"HomePage": {
-		"title": "Hello world!"
-	},
-	"TopBar": {
-		"activities": "Activities",
-		"darkMode": "Dark Mode",
-		"lightMode": "Light Mode",
-		"language": "Language",
-		"nowPlaying": "Now Playing",
-		"network": "Network",
-		"battery": "Battery",
-		"charging": "Charging",
-		"offline": "Offline",
-		"openApps": "Open Apps",
-		"noOpenApps": "No open apps"
-	},
-	"Dock": {
-		"about": "About Me",
-		"terminal": "Terminal",
-		"resume": "Resume",
-		"experience": "Experience",
-		"projects": "Projects",
-		"contact": "Contact",
-		"search": "Search applications…",
-		"noResults": "No applications found"
-	},
-	"Windows": {
-		"about": "About Me",
-		"terminal": "Terminal",
-		"resume": "Resume",
-		"experience": "Experience",
-		"projects": "Projects",
-		"contact": "Contact"
-	},
-	"AboutWindow": {
-		"title": "About Me",
-		"name": "I Wayan Agus Darmawan",
-		"role": "Full-Stack & Robotics Developer",
-		"location": "Denpasar, Bali, Indonesia",
-		"experience": "3+ years experience",
-		"bio": "Computer Engineering graduate (2025) from Institut Teknologi Sepuluh Nopember with experience in full-stack web development, completing over 20 freelance projects. Skilled in building responsive web applications, dashboards, and custom solutions using React and Express. Additionally experienced in robotics software, contributing to ROS-based autonomous robots and inspection systems — integrating software with hardware, implementing navigation and control systems, and ensuring reliable real-world performance.",
-		"skills": "Technical Skills",
-		"education": "Education",
-		"awards": "Awards & Honors",
-		"publications": "Publications",
-		"scrollHint": "Scroll to explore",
-		"educationItsHighlight": "GPA Honors",
-		"educationItsAchievement1": "B401 Robotics Laboratory Assistant – led full-stack ROS autonomy systems",
-		"educationItsAchievement2": "Barunastra ITS Roboboat – Electrical & Programming Division Leader",
-		"educationItsAchievement3": "Grand Champion IRC 2023 & multiple national competition titles",
-		"educationAppleHighlight": "Swift & SwiftUI",
-		"educationAppleAchievement1": "Building native iOS applications with Swift and SwiftUI",
-		"educationAppleAchievement2": "Challenge-based learning focused on real-world product development",
-		"readPublication": "Read Paper"
-	},
-
 	"ExperienceWindow": {
 		"title": "Work Experience",
 		"companies": "companies",
@@ -66,63 +10,6 @@
 		"techStack": "Tech Stack",
 		"logoAlt": "{company} logo",
 		"logoFallback": "{initial}"
-	},
-	"ProjectsWindow": {
-		"title": "Projects",
-		"allProjects": "All",
-		"featured": "Featured",
-		"viewCode": "Code",
-		"viewDemo": "Demo",
-		"readMore": "Read More",
-		"openProject": "Open",
-		"backToProjects": "← Projects",
-		"stars": "stars",
-		"repos": "repos"
-	},
-	"ResumeWindow": {
-		"title": "Resume",
-		"download": "Download PDF",
-		"loading": "Loading PDF…",
-		"errorLoad": "Failed to load PDF. Make sure the file exists in /public.",
-		"zoomIn": "Zoom in",
-		"zoomOut": "Zoom out",
-		"resetZoom": "Reset zoom",
-		"prevPage": "Previous page",
-		"nextPage": "Next page",
-		"pageOf": "of"
-	},
-	"TerminalWindow": {
-		"title": "Terminal",
-		"welcome": "Ubuntu 22.04.3 LTS — darm@wan — portfolio terminal",
-		"helpHint": "Type \"help\" for available commands.",
-		"placeholder": "Type a command...",
-		"hintTab": "Tab",
-		"hintTabDesc": "=autocomplete",
-		"hintArrows": "↑↓",
-		"hintArrowsDesc": "=history",
-		"hintClear": "Ctrl+L",
-		"hintClearDesc": "=clear",
-		"vimInsert": "i",
-		"vimInsertDesc": "=insert",
-		"vimEsc": "Esc",
-		"vimEscDesc": "=normal",
-		"vimSave": ":w",
-		"vimSaveDesc": "=save",
-		"vimQuit": ":q!",
-		"vimQuitDesc": "=quit",
-		"vimSaveQuit": ":wq",
-		"vimSaveQuitDesc": "=save & quit",
-		"sessionClosed": "Session closed. Goodbye!"
-	},
-	"ContactWindow": {
-		"title": "Contact",
-		"subtitle": "Let's build something together",
-		"sendMessage": "Send a Message",
-		"namePlaceholder": "Your name",
-		"emailPlaceholder": "your@email.com",
-		"messagePlaceholder": "Tell me about your project or idea…",
-		"send": "Send Message",
-		"sent": "Message sent!"
 	},
 	"Experience": {
 		"ezraRobotics": {
@@ -246,44 +133,6 @@
 					]
 				}
 			}
-		}
-	},
-	"Projects": {
-		"ubuntuPortfolio": {
-			"name": "Ubuntu Portfolio",
-			"desc": "Interactive OS-themed developer portfolio with draggable windows, Spotify integration, i18n, and dark mode.",
-			"longDesc": "A fully interactive Ubuntu 22.04 GNOME desktop simulation built as a developer portfolio.",
-			"readmeFile": "ubuntu-portfolio"
-		},
-		"asvNavigation": {
-			"name": "ASV Autonomous Navigation",
-			"desc": "ROS-based autonomous navigation system for Autonomous Surface Vehicle with multi-sensor fusion, winning Grand Champion at IRC 2023.",
-			"longDesc": "Full autonomous navigation stack for maritime competition robot integrating LiDAR, camera, GPS, IMU, and compass for fully autonomous operation.",
-			"readmeFile": "asv-navigation"
-		},
-		"quadrupedInspection": {
-			"name": "Quadruped Inspection Robot",
-			"desc": "ROS-based inspection system for electrical substations using Deep Robotics X30, thermal imaging, and LiDAR-Inertial Odometry.",
-			"longDesc": "Industrial-grade inspection robot system for PLN substations and Pertamina oil & gas facilities, featuring autonomous navigation and PPE detection.",
-			"readmeFile": "quadruped-inspection"
-		},
-		"icarMonitoring": {
-			"name": "iCar ITS Web Monitoring",
-			"desc": "Real-time web monitoring dashboard for autonomous vehicle telemetry, built with Next.js + ROS bridge integration.",
-			"longDesc": "Production monitoring system for the iCar ITS autonomous vehicle project, providing live telemetry, tracking, and maintenance logging.",
-			"readmeFile": "icar-monitoring"
-		},
-		"careerPlatform": {
-			"name": "Career Management Platform",
-			"desc": "Internal HR platform with Easy Apply, automated CV standardization, and role-based access control built for PT Satkomindo.",
-			"longDesc": "Full-stack career management platform featuring candidate, recruiter, and admin dashboards with Docker containerized deployment.",
-			"readmeFile": "career-platform"
-		},
-		"handGestureRobot": {
-			"name": "Hand Gesture Recognition Robot",
-			"desc": "Lightweight deep learning system for real-time hand gesture recognition enabling collaborative robot control.",
-			"longDesc": "Published research: real-time gesture recognition system using lightweight CNN for collaborative robot (cobot) control without physical interfaces.",
-			"readmeFile": "hand-gesture-robot"
 		}
 	}
 }

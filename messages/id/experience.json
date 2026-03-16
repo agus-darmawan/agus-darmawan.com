@@ -1,51 +1,4 @@
 {
-	"HomePage": {
-		"title": "Halo dunia!"
-	},
-	"TopBar": {
-		"activities": "Aktivitas",
-		"darkMode": "Mode Gelap",
-		"lightMode": "Mode Terang",
-		"language": "Bahasa",
-		"nowPlaying": "Sedang Diputar",
-		"network": "Jaringan",
-		"battery": "Baterai",
-		"charging": "Mengisi Daya",
-		"offline": "Offline",
-		"openApps": "Aplikasi Terbuka",
-		"noOpenApps": "Tidak ada aplikasi terbuka"
-	},
-	"Dock": {
-		"about": "Tentang Saya",
-		"terminal": "Terminal",
-		"resume": "Resume",
-		"experience": "Pengalaman",
-		"projects": "Proyek",
-		"contact": "Kontak",
-		"search": "Cari aplikasi…",
-		"noResults": "Tidak ada aplikasi ditemukan"
-	},
-	"Windows": {
-		"about": "Tentang Saya",
-		"terminal": "Terminal",
-		"resume": "Resume",
-		"experience": "Pengalaman",
-		"projects": "Proyek",
-		"contact": "Kontak"
-	},
-	"AboutWindow": {
-		"title": "Tentang Saya",
-		"name": "I Wayan Agus Darmawan",
-		"role": "Full-Stack & Robotics Developer",
-		"location": "Denpasar, Bali, Indonesia",
-		"experience": "3+ tahun pengalaman",
-		"bio": "Lulusan Teknik Komputer 2025 dari Institut Teknologi Sepuluh Nopember dengan pengalaman di pengembangan web full-stack, menyelesaikan lebih dari 20 proyek freelance. Ahli dalam membangun aplikasi web responsif, dashboard, dan solusi kustom menggunakan React dan Express. Selain itu, berpengalaman dalam perangkat lunak robotika, berkontribusi pada robot otonom berbasis ROS dan sistem inspeksi — mengintegrasikan perangkat lunak dengan perangkat keras, mengimplementasikan sistem navigasi dan kontrol, serta memastikan performa andal di lingkungan nyata.",
-		"skills": "Keahlian Teknis",
-		"education": "Pendidikan",
-		"awards": "Penghargaan",
-		"publications": "Publikasi",
-		"scrollHint": "Gulir untuk jelajahi"
-	},
 	"ExperienceWindow": {
 		"title": "Pengalaman Kerja",
 		"companies": "perusahaan",
@@ -57,63 +10,6 @@
 		"techStack": "Tech Stack",
 		"logoAlt": "Logo {company}",
 		"logoFallback": "{initial}"
-	},
-	"ProjectsWindow": {
-		"title": "Proyek",
-		"allProjects": "Semua",
-		"featured": "Unggulan",
-		"viewCode": "Kode",
-		"viewDemo": "Demo",
-		"readMore": "Selengkapnya",
-		"openProject": "Buka",
-		"backToProjects": "← Proyek",
-		"stars": "bintang",
-		"repos": "repo"
-	},
-	"ResumeWindow": {
-		"title": "Resume",
-		"download": "Unduh PDF",
-		"loading": "Memuat PDF…",
-		"errorLoad": "Gagal memuat PDF. Pastikan file ada di folder /public.",
-		"zoomIn": "Perbesar",
-		"zoomOut": "Perkecil",
-		"resetZoom": "Reset zoom",
-		"prevPage": "Halaman sebelumnya",
-		"nextPage": "Halaman berikutnya",
-		"pageOf": "dari"
-	},
-	"TerminalWindow": {
-		"title": "Terminal",
-		"welcome": "Ubuntu 22.04.3 LTS — darm@wan — terminal portofolio",
-		"helpHint": "Ketik \"help\" untuk melihat perintah yang tersedia.",
-		"placeholder": "Ketik perintah...",
-		"hintTab": "Tab",
-		"hintTabDesc": "=autocomplete",
-		"hintArrows": "↑↓",
-		"hintArrowsDesc": "=riwayat",
-		"hintClear": "Ctrl+L",
-		"hintClearDesc": "=bersihkan",
-		"vimInsert": "i",
-		"vimInsertDesc": "=masukkan",
-		"vimEsc": "Esc",
-		"vimEscDesc": "=normal",
-		"vimSave": ":w",
-		"vimSaveDesc": "=simpan",
-		"vimQuit": ":q!",
-		"vimQuitDesc": "=keluar",
-		"vimSaveQuit": ":wq",
-		"vimSaveQuitDesc": "=simpan & keluar",
-		"sessionClosed": "Sesi ditutup. Sampai jumpa!"
-	},
-	"ContactWindow": {
-		"title": "Kontak",
-		"subtitle": "Mari bangun sesuatu bersama",
-		"sendMessage": "Kirim Pesan",
-		"namePlaceholder": "Nama kamu",
-		"emailPlaceholder": "email@kamu.com",
-		"messagePlaceholder": "Ceritakan proyek atau ide kamu…",
-		"send": "Kirim Pesan",
-		"sent": "Pesan terkirim!"
 	},
 	"Experience": {
 		"ezraRobotics": {
@@ -237,44 +133,6 @@
 					]
 				}
 			}
-		}
-	},
-	"Projects": {
-		"ubuntuPortfolio": {
-			"name": "Ubuntu Portfolio",
-			"desc": "Portofolio developer bertema OS interaktif dengan jendela yang bisa diseret, integrasi Spotify, i18n, dan mode gelap.",
-			"longDesc": "Simulasi desktop GNOME Ubuntu 22.04 yang sepenuhnya interaktif dibangun sebagai portofolio developer.",
-			"readmeFile": "ubuntu-portfolio"
-		},
-		"asvNavigation": {
-			"name": "Navigasi Otonom ASV",
-			"desc": "Sistem navigasi otonom berbasis ROS untuk Autonomous Surface Vehicle dengan fusi multi-sensor, meraih Grand Champion di IRC 2023.",
-			"longDesc": "Stack navigasi otonom lengkap untuk robot kompetisi maritim yang mengintegrasikan LiDAR, kamera, GPS, IMU, dan kompas untuk operasi sepenuhnya otonom.",
-			"readmeFile": "asv-navigation"
-		},
-		"quadrupedInspection": {
-			"name": "Robot Inspeksi Berkaki Empat",
-			"desc": "Sistem inspeksi berbasis ROS untuk gardu listrik menggunakan Deep Robotics X30, thermal imaging, dan LiDAR-Inertial Odometry.",
-			"longDesc": "Sistem robot inspeksi tingkat industri untuk gardu listrik PLN dan fasilitas minyak & gas Pertamina, dengan navigasi otonom dan deteksi APD.",
-			"readmeFile": "quadruped-inspection"
-		},
-		"icarMonitoring": {
-			"name": "iCar ITS Web Monitoring",
-			"desc": "Dashboard monitoring web real-time untuk telemetri kendaraan otonom, dibangun dengan Next.js + integrasi ROS bridge.",
-			"longDesc": "Sistem monitoring produksi untuk proyek kendaraan otonom iCar ITS, menyediakan telemetri langsung, pelacakan, dan pencatatan pemeliharaan.",
-			"readmeFile": "icar-monitoring"
-		},
-		"careerPlatform": {
-			"name": "Platform Manajemen Karir",
-			"desc": "Platform HR internal dengan Easy Apply, standarisasi CV otomatis, dan kontrol akses berbasis peran untuk PT Satkomindo.",
-			"longDesc": "Platform manajemen karir full-stack dengan dashboard kandidat, rekruter, dan admin dengan deployment terkontainerisasi Docker.",
-			"readmeFile": "career-platform"
-		},
-		"handGestureRobot": {
-			"name": "Robot Pengenalan Gestur Tangan",
-			"desc": "Sistem deep learning ringan untuk pengenalan gestur tangan real-time yang memungkinkan kontrol robot kolaboratif.",
-			"longDesc": "Penelitian yang dipublikasikan: sistem pengenalan gestur real-time menggunakan CNN ringan untuk kontrol robot kolaboratif (cobot) tanpa antarmuka fisik.",
-			"readmeFile": "hand-gesture-robot"
 		}
 	}
 }

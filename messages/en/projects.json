@@ -1,0 +1,52 @@
+{
+	"ProjectsWindow": {
+		"title": "Projects",
+		"allProjects": "All",
+		"featured": "Featured",
+		"viewCode": "Code",
+		"viewDemo": "Demo",
+		"readMore": "Read More",
+		"openProject": "Open",
+		"backToProjects": "← Projects",
+		"stars": "stars",
+		"repos": "repos"
+	},
+	"Projects": {
+		"ubuntuPortfolio": {
+			"name": "Ubuntu Portfolio",
+			"desc": "Interactive OS-themed developer portfolio with draggable windows, Spotify integration, i18n, and dark mode.",
+			"longDesc": "A fully interactive Ubuntu 22.04 GNOME desktop simulation built as a developer portfolio.",
+			"readmeFile": "ubuntu-portfolio"
+		},
+		"asvNavigation": {
+			"name": "ASV Autonomous Navigation",
+			"desc": "ROS-based autonomous navigation system for Autonomous Surface Vehicle with multi-sensor fusion, winning Grand Champion at IRC 2023.",
+			"longDesc": "Full autonomous navigation stack for maritime competition robot integrating LiDAR, camera, GPS, IMU, and compass for fully autonomous operation.",
+			"readmeFile": "asv-navigation"
+		},
+		"quadrupedInspection": {
+			"name": "Quadruped Inspection Robot",
+			"desc": "ROS-based inspection system for electrical substations using Deep Robotics X30, thermal imaging, and LiDAR-Inertial Odometry.",
+			"longDesc": "Industrial-grade inspection robot system for PLN substations and Pertamina oil & gas facilities, featuring autonomous navigation and PPE detection.",
+			"readmeFile": "quadruped-inspection"
+		},
+		"icarMonitoring": {
+			"name": "iCar ITS Web Monitoring",
+			"desc": "Real-time web monitoring dashboard for autonomous vehicle telemetry, built with Next.js + ROS bridge integration.",
+			"longDesc": "Production monitoring system for the iCar ITS autonomous vehicle project, providing live telemetry, tracking, and maintenance logging.",
+			"readmeFile": "icar-monitoring"
+		},
+		"careerPlatform": {
+			"name": "Career Management Platform",
+			"desc": "Internal HR platform with Easy Apply, automated CV standardization, and role-based access control built for PT Satkomindo.",
+			"longDesc": "Full-stack career management platform featuring candidate, recruiter, and admin dashboards with Docker containerized deployment.",
+			"readmeFile": "career-platform"
+		},
+		"handGestureRobot": {
+			"name": "Hand Gesture Recognition Robot",
+			"desc": "Lightweight deep learning system for real-time hand gesture recognition enabling collaborative robot control.",
+			"longDesc": "Published research: real-time gesture recognition system using lightweight CNN for collaborative robot (cobot) control without physical interfaces.",
+			"readmeFile": "hand-gesture-robot"
+		}
+	}
+}

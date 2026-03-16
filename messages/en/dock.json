@@ -1,0 +1,23 @@
+{
+	"HomePage": {
+		"title": "Hello world!"
+	},
+	"Dock": {
+		"about": "About Me",
+		"terminal": "Terminal",
+		"resume": "Resume",
+		"experience": "Experience",
+		"projects": "Projects",
+		"contact": "Contact",
+		"search": "Search applications…",
+		"noResults": "No applications found"
+	},
+	"Windows": {
+		"about": "About Me",
+		"terminal": "Terminal",
+		"resume": "Resume",
+		"experience": "Experience",
+		"projects": "Projects",
+		"contact": "Contact"
+	}
+}

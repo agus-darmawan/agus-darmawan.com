@@ -1,0 +1,15 @@
+{
+	"TopBar": {
+		"activities": "Activities",
+		"darkMode": "Dark Mode",
+		"lightMode": "Light Mode",
+		"language": "Language",
+		"nowPlaying": "Now Playing",
+		"network": "Network",
+		"battery": "Battery",
+		"charging": "Charging",
+		"offline": "Offline",
+		"openApps": "Open Apps",
+		"noOpenApps": "No open apps"
+	}
+}
