@@ -1,6 +1,4 @@
 "use client";
-
-import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo } from "react";
 import { Dock } from "@/features/dock/Dock";
 import ReadmeWindow from "@/features/projects/readme/ReadmeWindow";
