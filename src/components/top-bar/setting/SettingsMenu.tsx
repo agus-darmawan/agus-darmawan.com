@@ -3,7 +3,7 @@
 import { Languages, Moon, Sun } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { usePing } from "@/hooks/top-bar/usePing";
 import { useSpotify } from "@/hooks/top-bar/useSpotify";
 import { useBattery } from "@/hooks/useBattery";
@@ -19,8 +19,6 @@ import { TogglePill } from "./TogglePill";
 export function SettingsMenu() {
 	const [open, setOpen] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null!);
-	const isInitialized = useRef(false);
-
 	const t = useTranslations("TopBar");
 	const locale = useLocale();
 	const router = useRouter();
@@ -31,24 +29,6 @@ export function SettingsMenu() {
 	const { track } = useSpotify();
 
 	const isDark = theme === "dark";
-
-	// Restore state from sessionStorage on mount
-	useEffect(() => {
-		if (!isInitialized.current) {
-			const saved = sessionStorage.getItem("settingsMenuOpen");
-			if (saved === "true") {
-				setOpen(true);
-			}
-			isInitialized.current = true;
-		}
-	}, []);
-
-	// Persist state to sessionStorage whenever it changes
-	useEffect(() => {
-		if (isInitialized.current) {
-			sessionStorage.setItem("settingsMenuOpen", open ? "true" : "false");
-		}
-	}, [open]);
 
 	useClickOutside({ ref: menuRef, onOutside: () => setOpen(false) });
 

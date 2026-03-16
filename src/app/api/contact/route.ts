@@ -8,6 +8,15 @@ interface ContactPayload {
 	message: string;
 }
 
+function escapeHtml(str: string): string {
+	return str
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#x27;");
+}
+
 export async function POST(req: Request) {
 	try {
 		const body: ContactPayload = await req.json();
@@ -39,17 +48,22 @@ export async function POST(req: Request) {
 			await transporter.sendMail({
 				from: `"Portfolio Contact" <${env.SMTP_USER}>`,
 				to: env.CONTACT_EMAIL,
-				replyTo: `"${body.name}" <${body.email}>`,
-				subject: `Portfolio contact from ${body.name}`,
+				replyTo: `"${escapeHtml(body.name)}" <${body.email}>`,
+				subject: `Portfolio contact from ${escapeHtml(body.name)}`,
 				text: `Name: ${body.name}\nEmail: ${body.email}\n\n${body.message}`,
 				html: `
 					<h2 style="font-family:sans-serif">New message from your portfolio</h2>
-					<p style="font-family:sans-serif"><strong>Name:</strong> ${body.name}</p>
-					<p style="font-family:sans-serif"><strong>Email:</strong>
-						<a href="mailto:${body.email}">${body.email}</a>
+					<p style="font-family:sans-serif">
+						<strong>Name:</strong> ${escapeHtml(body.name)}
+					</p>
+					<p style="font-family:sans-serif">
+						<strong>Email:</strong>
+						<a href="mailto:${escapeHtml(body.email)}">${escapeHtml(body.email)}</a>
 					</p>
 					<hr/>
-					<p style="font-family:sans-serif;white-space:pre-wrap">${body.message}</p>
+					<p style="font-family:sans-serif;white-space:pre-wrap">
+						${escapeHtml(body.message)}
+					</p>
 				`,
 			});
 		} else {

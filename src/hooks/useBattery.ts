@@ -40,13 +40,17 @@ export function useBattery(): BatteryState {
 				charging: battery.charging,
 			});
 		};
-
-		(navigator as NavigatorWithBattery).getBattery().then((b) => {
-			battery = b;
-			update();
-			b.addEventListener("levelchange", update);
-			b.addEventListener("chargingchange", update);
-		});
+		(navigator as NavigatorWithBattery)
+			.getBattery()
+			.then((bat) => {
+				battery = bat;
+				battery.addEventListener("levelchange", update);
+				battery.addEventListener("chargingchange", update);
+				update();
+			})
+			.catch(() => {
+				throw new Error("Failed to access Battery API");
+			});
 
 		return () => {
 			if (!battery) return;

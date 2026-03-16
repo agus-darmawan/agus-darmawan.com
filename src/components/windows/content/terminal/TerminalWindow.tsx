@@ -34,9 +34,10 @@ export default function TerminalWindow() {
 		sessionClosedMsg: t("sessionClosed"),
 	});
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: ref is mutable and should not trigger scroll
 	useEffect(() => {
 		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-	}, [bottomRef]);
+	}, [lines]);
 
 	useEffect(() => {
 		if (!vim.active) inputRef.current?.focus();

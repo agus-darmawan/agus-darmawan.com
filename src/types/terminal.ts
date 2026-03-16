@@ -1,14 +1,13 @@
 export interface TermLine {
-	id: number;
+	id: string;
 	type: "input" | "output" | "error" | "system";
 	text: string;
 }
 
 export type FSNode = Record<string, Record<string, string>>;
 
-let _lineId = 0;
 export const mkLine = (type: TermLine["type"], text: string): TermLine => ({
-	id: _lineId++,
+	id: crypto.randomUUID(),
 	type,
 	text,
 });

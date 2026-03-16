@@ -368,7 +368,7 @@ export function useCommandProcessor({
 						const isToday = d === now.getDate();
 						row += isToday
 							? `[${String(d).padStart(2)}]`
-							: String(d).padStart(3);
+							: ` ${String(d).padStart(2)} `;
 						if ((firstDay + d) % 7 === 0 || d === daysInMonth) {
 							cal += row + "\n";
 							row = "";

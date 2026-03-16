@@ -44,9 +44,17 @@
 		"education": "Education",
 		"awards": "Awards & Honors",
 		"publications": "Publications",
-		"currentlyDoing": "Currently",
-		"scrollHint": "Scroll to explore"
+		"scrollHint": "Scroll to explore",
+		"educationItsHighlight": "GPA Honors",
+		"educationItsAchievement1": "B401 Robotics Laboratory Assistant – led full-stack ROS autonomy systems",
+		"educationItsAchievement2": "Barunastra ITS Roboboat – Electrical & Programming Division Leader",
+		"educationItsAchievement3": "Grand Champion IRC 2023 & multiple national competition titles",
+		"educationAppleHighlight": "Swift & SwiftUI",
+		"educationAppleAchievement1": "Building native iOS applications with Swift and SwiftUI",
+		"educationAppleAchievement2": "Challenge-based learning focused on real-world product development",
+		"readPublication": "Read Paper"
 	},
+
 	"ExperienceWindow": {
 		"title": "Work Experience",
 		"companies": "companies",
