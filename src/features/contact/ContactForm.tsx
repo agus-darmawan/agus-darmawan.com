@@ -1,5 +1,6 @@
 "use client";
 
+import { Turnstile } from "@marsidev/react-turnstile";
 import { AlertCircle, CheckCircle2, Loader2, Send } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ContactInputField, ContactTextareaField } from "./ContactFormField";
@@ -17,6 +18,7 @@ export function ContactForm() {
 		setName,
 		setEmail,
 		setMessage,
+		setTurnstileToken,
 		submit,
 	} = useContactForm();
 
@@ -43,10 +45,10 @@ export function ContactForm() {
 			</div>
 
 			<div className="space-y-3">
+				{/* Name + Email row */}
 				<div className="grid grid-cols-2 gap-3">
 					<ContactInputField
 						id="contact-name"
-						label={t("namePlaceholder") ? undefined : "Name"}
 						placeholder={t("namePlaceholder")}
 						type="text"
 						value={name}
@@ -56,7 +58,6 @@ export function ContactForm() {
 					/>
 					<ContactInputField
 						id="contact-email"
-						label={t("emailPlaceholder") ? undefined : "Email"}
 						placeholder={t("emailPlaceholder")}
 						type="email"
 						value={email}
@@ -66,6 +67,7 @@ export function ContactForm() {
 					/>
 				</div>
 
+				{/* Message */}
 				<ContactTextareaField
 					id="contact-message"
 					placeholder={t("messagePlaceholder")}
@@ -74,6 +76,20 @@ export function ContactForm() {
 					rows={4}
 					disabled={status === "sending"}
 				/>
+
+				{/* Turnstile — invisible, jalan otomatis saat komponen mount */}
+				{process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+					<Turnstile
+						siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+						onSuccess={(token) => setTurnstileToken(token)}
+						onError={() => setTurnstileToken(null)}
+						onExpire={() => setTurnstileToken(null)}
+						options={{
+							theme: "auto",
+							size: "invisible",
+						}}
+					/>
+				)}
 
 				{/* Status feedback */}
 				{status === "error" && errorMsg && (
@@ -104,6 +120,7 @@ export function ContactForm() {
 					</div>
 				)}
 
+				{/* Submit button */}
 				<button
 					type="button"
 					onClick={submit}

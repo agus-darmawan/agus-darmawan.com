@@ -6,7 +6,10 @@ interface ContactPayload {
 	name: string;
 	email: string;
 	message: string;
+	turnstileToken?: string;
 }
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function escapeHtml(str: string): string {
 	return str
@@ -16,6 +19,28 @@ function escapeHtml(str: string): string {
 		.replace(/"/g, "&quot;")
 		.replace(/'/g, "&#x27;");
 }
+
+async function verifyTurnstile(
+	secret: string,
+	token: string,
+): Promise<boolean> {
+	const formData = new FormData();
+	formData.append("secret", secret); // ← sudah pasti string
+	formData.append("response", token);
+
+	try {
+		const res = await fetch(
+			"https://challenges.cloudflare.com/turnstile/v1/siteverify",
+			{ method: "POST", body: formData },
+		);
+		const data = (await res.json()) as { success: boolean };
+		return data.success;
+	} catch {
+		return true;
+	}
+}
+
+// ── Handler ───────────────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
 	try {
@@ -33,6 +58,20 @@ export async function POST(req: Request) {
 				{ success: false, data: null, error: "Invalid email address" },
 				{ status: 400 },
 			);
+		}
+
+		// Verify Turnstile — only if secret key is configured
+		if (env.TURNSTILE_SECRET_KEY && body.turnstileToken) {
+			const isHuman = await verifyTurnstile(
+				env.TURNSTILE_SECRET_KEY,
+				body.turnstileToken,
+			);
+			if (!isHuman) {
+				return NextResponse.json<ApiResponse<null>>(
+					{ success: false, data: null, error: "Bot verification failed" },
+					{ status: 400 },
+				);
+			}
 		}
 
 		if (env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS) {

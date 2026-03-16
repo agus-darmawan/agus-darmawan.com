@@ -15,6 +15,7 @@ export function useContactForm({ onSuccess }: UseContactFormOptions = {}) {
 	const [message, setMessage] = useState("");
 	const [status, setStatus] = useState<ContactStatus>("idle");
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
+	const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
 	const reset = () => {
 		setName("");
@@ -22,10 +23,12 @@ export function useContactForm({ onSuccess }: UseContactFormOptions = {}) {
 		setMessage("");
 		setStatus("idle");
 		setErrorMsg(null);
+		setTurnstileToken(null);
 	};
 
 	const submit = async () => {
 		if (!name.trim() || !email.trim() || !message.trim()) return;
+		if (!turnstileToken) return;
 		if (status === "sending" || status === "sent") return;
 
 		setStatus("sending");
@@ -35,7 +38,7 @@ export function useContactForm({ onSuccess }: UseContactFormOptions = {}) {
 			const res = await fetch("/api/contact", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ name, email, message }),
+				body: JSON.stringify({ name, email, message, turnstileToken }),
 			});
 
 			const data: ApiResponse<{ sent: boolean }> = await res.json();
@@ -45,8 +48,8 @@ export function useContactForm({ onSuccess }: UseContactFormOptions = {}) {
 				setName("");
 				setEmail("");
 				setMessage("");
+				setTurnstileToken(null);
 				onSuccess?.();
-				// Reset back to idle after 4s so user can send another message
 				setTimeout(() => setStatus("idle"), 4_000);
 			} else {
 				setStatus("error");
@@ -64,7 +67,8 @@ export function useContactForm({ onSuccess }: UseContactFormOptions = {}) {
 		name.trim().length > 0 &&
 		email.trim().length > 0 &&
 		message.trim().length > 0 &&
-		status === "idle";
+		status === "idle" &&
+		turnstileToken !== null;
 
 	return {
 		name,
@@ -73,9 +77,11 @@ export function useContactForm({ onSuccess }: UseContactFormOptions = {}) {
 		status,
 		errorMsg,
 		canSubmit,
+		turnstileToken,
 		setName,
 		setEmail,
 		setMessage,
+		setTurnstileToken,
 		submit,
 		reset,
 	};
