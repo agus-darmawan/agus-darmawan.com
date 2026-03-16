@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
+import { Ubuntu } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { Providers } from "@/components/providers/Providers";
@@ -9,6 +10,12 @@ type Props = {
 	children: React.ReactNode;
 	params: Promise<{ locale: string }>;
 };
+
+const ubuntu = Ubuntu({
+	weight: ["300", "400", "500", "700"],
+	subsets: ["latin"],
+	display: "swap",
+});
 
 export const metadata: Metadata = {
 	title: "Darmawan Portfolio",
@@ -39,15 +46,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
 	return (
 		<html lang={locale} suppressHydrationWarning>
-			<head>
-				<link rel="preconnect" href="https://fonts.googleapis.com" />
-				<link
-					rel="preconnect"
-					href="https://fonts.gstatic.com"
-					crossOrigin="anonymous"
-				/>
-			</head>
-			<body className="antialiased">
+			<body className={`${ubuntu.className} antialiased`}>
 				<NextIntlClientProvider>
 					<Providers>{children}</Providers>
 				</NextIntlClientProvider>
