@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import React, { type ReactNode, useEffect, useState } from "react";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import type { WindowState } from "@/types/app";
 import { WindowHeader } from "./WindowHeader";
 
@@ -32,11 +33,7 @@ function useIsMobile() {
 // ── Animation variants ────────────────────────────────────────────────────────
 
 const windowVariants = {
-	initial: {
-		opacity: 0,
-		scale: 0.94,
-		y: 8,
-	},
+	initial: { opacity: 0, scale: 0.94, y: 8 },
 	animate: {
 		opacity: 1,
 		scale: 1,
@@ -52,21 +49,16 @@ const windowVariants = {
 		opacity: 0,
 		scale: 0.94,
 		y: 8,
-		transition: {
-			duration: 0.15,
-			ease: "easeIn" as const,
-		},
+		transition: { duration: 0.15, ease: "easeIn" as const },
 	},
-	minimize: {
-		opacity: 0,
-		scale: 0.85,
-		y: 40,
-		transition: {
-			duration: 0.2,
-			ease: "easeIn" as const,
-		},
-	},
-} as const;
+};
+
+// Reduced motion — hanya fade, no scale/translate
+const reducedVariants = {
+	initial: { opacity: 0 },
+	animate: { opacity: 1, transition: { duration: 0.1 } },
+	exit: { opacity: 0, transition: { duration: 0.1 } },
+};
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -83,6 +75,7 @@ export function WindowFrame({
 	onMaximize,
 }: WindowFrameProps) {
 	const isMobile = useIsMobile();
+	const prefersReduced = useReducedMotion();
 
 	if (win.minimized) return null;
 
@@ -97,10 +90,13 @@ export function WindowFrame({
 				height: "clamp(400px, 80vh, 650px)",
 			};
 
+	// Use reducedVariants if user prefers reduced motion
+	const variants = prefersReduced ? reducedVariants : windowVariants;
+
 	return (
 		<motion.div
 			key={win.id}
-			variants={windowVariants}
+			variants={variants} // ← pakai variants variable, bukan hardcode
 			initial="initial"
 			animate="animate"
 			exit="exit"
@@ -118,7 +114,7 @@ export function WindowFrame({
 			}}
 			onClick={onClick}
 			onMouseDown={onMouseDown}
-			// Disable spring animation during drag for direct positional control
+			// Disable spring animation during drag — direct positional control
 			transition={isDragging ? { duration: 0 } : undefined}
 		>
 			<WindowHeader

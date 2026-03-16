@@ -9,6 +9,7 @@ import { Dock } from "@/features/dock/Dock";
 import ReadmeWindow from "@/features/projects/readme/ReadmeWindow";
 import TopBar from "@/features/top-bar/TopBar";
 import { useWindowDrag } from "@/features/window-manager/hooks/useWindowDrag";
+import { SnapPreview } from "@/features/window-manager/SnapPreview";
 import { WindowFrame } from "@/features/window-manager/WindowFrame";
 import { getWindowComponent } from "@/features/window-manager/window.registry";
 import { usePathname, useRouter } from "@/i18n/navigation";
@@ -78,7 +79,7 @@ export default function IndexPage() {
 	const minimizeAllWindows = useWindowStore((s) => s.minimizeAllWindows);
 	const getEffectiveZ = useWindowStore((s) => s.getEffectiveZ);
 
-	const { dragging, handleMouseDown } = useWindowDrag({
+	const { dragging, snapPreview, handleMouseDown } = useWindowDrag({
 		getWindows: () => useWindowStore.getState().windows,
 		onBringToFront: bringToFront,
 		onPositionChange: useWindowStore.getState().updatePosition,
@@ -192,6 +193,7 @@ export default function IndexPage() {
 			<TopBar />
 
 			<div className="relative h-[calc(100vh-4rem)] mt-8">
+				<SnapPreview snapPreview={snapPreview} />{" "}
 				<AnimatePresence>
 					{windows.map((win) => {
 						const closeLocked = win.appId === "projects" && hasOpenReadme;
