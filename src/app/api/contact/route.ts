@@ -6,7 +6,41 @@ interface ContactPayload {
 	name: string;
 	email: string;
 	message: string;
+	turnstileToken?: string;
 }
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function escapeHtml(str: string): string {
+	return str
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#x27;");
+}
+
+async function verifyTurnstile(
+	secret: string,
+	token: string,
+): Promise<boolean> {
+	const formData = new FormData();
+	formData.append("secret", secret); // ← sudah pasti string
+	formData.append("response", token);
+
+	try {
+		const res = await fetch(
+			"https://challenges.cloudflare.com/turnstile/v1/siteverify",
+			{ method: "POST", body: formData },
+		);
+		const data = (await res.json()) as { success: boolean };
+		return data.success;
+	} catch {
+		return true;
+	}
+}
+
+// ── Handler ───────────────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
 	try {
@@ -26,6 +60,20 @@ export async function POST(req: Request) {
 			);
 		}
 
+		// Verify Turnstile — only if secret key is configured
+		if (env.TURNSTILE_SECRET_KEY && body.turnstileToken) {
+			const isHuman = await verifyTurnstile(
+				env.TURNSTILE_SECRET_KEY,
+				body.turnstileToken,
+			);
+			if (!isHuman) {
+				return NextResponse.json<ApiResponse<null>>(
+					{ success: false, data: null, error: "Bot verification failed" },
+					{ status: 400 },
+				);
+			}
+		}
+
 		if (env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS) {
 			const nodemailer = await import("nodemailer");
 
@@ -39,17 +87,22 @@ export async function POST(req: Request) {
 			await transporter.sendMail({
 				from: `"Portfolio Contact" <${env.SMTP_USER}>`,
 				to: env.CONTACT_EMAIL,
-				replyTo: `"${body.name}" <${body.email}>`,
-				subject: `Portfolio contact from ${body.name}`,
+				replyTo: `"${escapeHtml(body.name)}" <${body.email}>`,
+				subject: `Portfolio contact from ${escapeHtml(body.name)}`,
 				text: `Name: ${body.name}\nEmail: ${body.email}\n\n${body.message}`,
 				html: `
 					<h2 style="font-family:sans-serif">New message from your portfolio</h2>
-					<p style="font-family:sans-serif"><strong>Name:</strong> ${body.name}</p>
-					<p style="font-family:sans-serif"><strong>Email:</strong>
-						<a href="mailto:${body.email}">${body.email}</a>
+					<p style="font-family:sans-serif">
+						<strong>Name:</strong> ${escapeHtml(body.name)}
+					</p>
+					<p style="font-family:sans-serif">
+						<strong>Email:</strong>
+						<a href="mailto:${escapeHtml(body.email)}">${escapeHtml(body.email)}</a>
 					</p>
 					<hr/>
-					<p style="font-family:sans-serif;white-space:pre-wrap">${body.message}</p>
+					<p style="font-family:sans-serif;white-space:pre-wrap">
+						${escapeHtml(body.message)}
+					</p>
 				`,
 			});
 		} else {

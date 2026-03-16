@@ -1,23 +1,29 @@
-const required = (key: string): string => {
-	const value = process.env[key];
-	if (!value) throw new Error(`Missing required environment variable: ${key}`);
-	return value;
-};
+import { z } from "zod";
 
-const optional = (key: string, fallback = ""): string =>
-	process.env[key] ?? fallback;
+const envSchema = z.object({
+	// ── Spotify (required) ────────────────────────────────────────────────────
+	SPOTIFY_CLIENT_ID: z.string().min(1),
+	SPOTIFY_CLIENT_SECRET: z.string().min(1),
+	SPOTIFY_REFRESH_TOKEN: z.string().min(1),
 
-export const env = {
-	// ── Spotify ───────────────────────────────────────────────────────────
-	SPOTIFY_CLIENT_ID: required("SPOTIFY_CLIENT_ID"),
-	SPOTIFY_CLIENT_SECRET: required("SPOTIFY_CLIENT_SECRET"),
-	SPOTIFY_REFRESH_TOKEN: required("SPOTIFY_REFRESH_TOKEN"),
+	// ── SMTP (optional — logs to console if not set) ──────────────────────────
+	SMTP_HOST: z.string().optional(),
+	SMTP_PORT: z.coerce.number().default(587),
+	SMTP_SECURE: z.coerce.boolean().default(false),
+	SMTP_USER: z.string().optional(),
+	SMTP_PASS: z.string().optional(),
+	CONTACT_EMAIL: z.string().email().default("darmawandeveloper@gmail.com"),
 
-	// ── SMTP (all optional — omitting them logs to console instead) ───────
-	SMTP_HOST: optional("SMTP_HOST"),
-	SMTP_PORT: Number(optional("SMTP_PORT", "587")),
-	SMTP_SECURE: optional("SMTP_SECURE", "false") === "true",
-	SMTP_USER: optional("SMTP_USER"),
-	SMTP_PASS: optional("SMTP_PASS"),
-	CONTACT_EMAIL: optional("CONTACT_EMAIL", "darmawandeveloper@gmail.com"),
-};
+	// ── Cloudflare Turnstile (optional — skips verification if not set) ───────
+	TURNSTILE_SECRET_KEY: z.string().optional(),
+});
+
+const parsed = envSchema.safeParse(process.env);
+
+if (!parsed.success) {
+	console.error("❌ Invalid environment variables:");
+	console.error(parsed.error.flatten().fieldErrors);
+	throw new Error("Invalid environment variables — check .env.example");
+}
+
+export const env = parsed.data;

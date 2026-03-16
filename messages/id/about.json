@@ -1,0 +1,43 @@
+{
+	"AboutWindow": {
+		"title": "Tentang Saya",
+		"name": "I Wayan Agus Darmawan",
+		"role": "Full-Stack & Robotics Developer",
+		"location": "Denpasar, Bali, Indonesia",
+		"experience": "3+ tahun pengalaman",
+		"bio": "Lulusan Teknik Komputer 2025 dari Institut Teknologi Sepuluh Nopember dengan pengalaman di pengembangan web full-stack, menyelesaikan lebih dari 20 proyek freelance. Ahli dalam membangun aplikasi web responsif, dashboard, dan solusi kustom menggunakan React dan Express. Selain itu, berpengalaman dalam perangkat lunak robotika, berkontribusi pada robot otonom berbasis ROS dan sistem inspeksi — mengintegrasikan perangkat lunak dengan perangkat keras, mengimplementasikan sistem navigasi dan kontrol, serta memastikan performa andal di lingkungan nyata.",
+		"skills": "Keahlian Teknis",
+		"education": "Pendidikan",
+		"awards": "Penghargaan",
+		"publications": "Publikasi",
+		"scrollHint": "Gulir untuk jelajahi",
+
+		"skillsFrontend": "Frontend & Mobile",
+		"skillsBackend": "Backend",
+		"skillsRobotics": "Robotika & AI",
+
+		"educationIts": "Institut Teknologi Sepuluh Nopember (ITS)",
+		"educationItsDegree": "Sarjana Teknik Komputer",
+		"educationItsHighlight": "IPK Pujian",
+		"educationItsAchievement1": "Asisten Lab Robotika B401 – memimpin sistem otonomi ROS full-stack",
+		"educationItsAchievement2": "Barunastra ITS Roboboat – Ketua Divisi Elektro-Programming",
+		"educationItsAchievement3": "Grand Champion IRC 2023 & beberapa gelar kompetisi nasional",
+
+		"educationApple": "Apple Developer Academy | Indonesia",
+		"educationAppleDegree": "iOS Developer",
+		"educationAppleHighlight": "Swift & SwiftUI",
+		"educationAppleAchievement1": "Membangun aplikasi iOS native dengan Swift dan SwiftUI",
+		"educationAppleAchievement2": "Challenge-based learning berfokus pada pengembangan produk nyata",
+
+		"international": "Internasional",
+		"national": "Nasional",
+
+		"publicationQuadruped": "Pengembangan Robot Berkaki Empat untuk Estimasi Posisi Komponen Overheat di Gardu Listrik Menggunakan Kamera Termal",
+		"publicationQuadrupedAuthors": "Agus Darmawan dkk.",
+		"publicationQuadrupedVenue": "PT. Ezra Robotics Teknologi / Jurnal Penelitian",
+		"publicationGesture": "Pengenalan Gestur Tangan untuk Robot Kolaboratif Menggunakan Deep Learning Ringan dalam Sistem Robotik Real-Time",
+		"publicationGestureAuthors": "Agus Darmawan dkk.",
+		"publicationGestureVenue": "Institut Teknologi Sepuluh Nopember (ITS)",
+		"readPublication": "Baca Paper"
+	}
+}

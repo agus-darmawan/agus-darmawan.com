@@ -40,3 +40,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Sentry Config File
+.env.sentry-build-plugin
+.sentryclirc
+
+
+.wrangler/
+# Workers
+workers/*/node_modules
+workers/*/.wrangler

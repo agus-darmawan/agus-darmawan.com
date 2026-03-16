@@ -1,5 +1,5 @@
 {
-	"name": "next-shadcn-starter",
+	"name": "agus-darmawan.com",
 	"version": "0.1.0",
 	"private": false,
 	"scripts": {
@@ -11,7 +11,8 @@
 		"format": "biome format --write"
 	},
 	"dependencies": {
-		"@tanstack/react-query": "^5.90.21",
+		"@marsidev/react-turnstile": "^1.4.2",
+		"@sentry/nextjs": "^10.43.0",
 		"axios": "^1.13.5",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
@@ -24,6 +25,7 @@
 		"react": "19.2.3",
 		"react-dom": "19.2.3",
 		"tailwind-merge": "^3.4.0",
+		"zod": "^4.3.6",
 		"zustand": "^5.0.11"
 	},
 	"devDependencies": {
@@ -31,6 +33,7 @@
 		"@commitlint/cli": "^20.4.1",
 		"@commitlint/config-conventional": "^20.4.1",
 		"@tailwindcss/postcss": "^4.1.18",
+		"@tanstack/react-query": "^5.90.21",
 		"@tanstack/react-query-devtools": "^5.91.3",
 		"@types/node": "^20.19.33",
 		"@types/nodemailer": "^7.0.11",
