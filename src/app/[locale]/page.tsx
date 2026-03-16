@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { BootScreen } from "@/features/boot/BootScreen";
@@ -191,28 +192,30 @@ export default function IndexPage() {
 			<TopBar />
 
 			<div className="relative h-[calc(100vh-4rem)] mt-8">
-				{windows.map((win) => {
-					const closeLocked = win.appId === "projects" && hasOpenReadme;
-					return (
-						<WindowFrame
-							key={win.id}
-							window={{ ...win, zIndex: getEffectiveZ(win) }}
-							isActive={activeWindowId === win.id}
-							isDragging={dragging === win.id}
-							onMouseDown={(e) => handleMouseDown(e, win.id)}
-							onClick={() => {
-								setActiveWindow(win.id);
-								bringToFront(win.id);
-							}}
-							onClose={() => handleClose(win)}
-							onMinimize={() => minimizeWindow(win.id)}
-							onMaximize={() => toggleMaximize(win.id)}
-							closeLocked={closeLocked}
-						>
-							<WindowContent win={win} />
-						</WindowFrame>
-					);
-				})}
+				<AnimatePresence>
+					{windows.map((win) => {
+						const closeLocked = win.appId === "projects" && hasOpenReadme;
+						return (
+							<WindowFrame
+								key={win.id}
+								window={{ ...win, zIndex: getEffectiveZ(win) }}
+								isActive={activeWindowId === win.id}
+								isDragging={dragging === win.id}
+								onMouseDown={(e) => handleMouseDown(e, win.id)}
+								onClick={() => {
+									setActiveWindow(win.id);
+									bringToFront(win.id);
+								}}
+								onClose={() => handleClose(win)}
+								onMinimize={() => minimizeWindow(win.id)}
+								onMaximize={() => toggleMaximize(win.id)}
+								closeLocked={closeLocked}
+							>
+								<WindowContent win={win} />
+							</WindowFrame>
+						);
+					})}
+				</AnimatePresence>
 			</div>
 
 			<Dock

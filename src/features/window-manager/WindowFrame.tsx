@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import React, { type ReactNode, useEffect, useState } from "react";
 import type { WindowState } from "@/types/app";
 import { WindowHeader } from "./WindowHeader";
@@ -9,7 +10,6 @@ interface WindowFrameProps {
 	isActive: boolean;
 	isDragging: boolean;
 	children: ReactNode;
-	/** When true the close button shakes and refuses to close */
 	closeLocked?: boolean;
 	onMouseDown: (e: React.MouseEvent) => void;
 	onClick: () => void;
@@ -20,16 +20,55 @@ interface WindowFrameProps {
 
 function useIsMobile() {
 	const [isMobile, setIsMobile] = useState(false);
-
 	useEffect(() => {
 		const check = () => setIsMobile(window.innerWidth < 768);
 		check();
 		window.addEventListener("resize", check);
 		return () => window.removeEventListener("resize", check);
 	}, []);
-
 	return isMobile;
 }
+
+// ── Animation variants ────────────────────────────────────────────────────────
+
+const windowVariants = {
+	initial: {
+		opacity: 0,
+		scale: 0.94,
+		y: 8,
+	},
+	animate: {
+		opacity: 1,
+		scale: 1,
+		y: 0,
+		transition: {
+			type: "spring" as const,
+			stiffness: 400,
+			damping: 30,
+			mass: 0.8,
+		},
+	},
+	exit: {
+		opacity: 0,
+		scale: 0.94,
+		y: 8,
+		transition: {
+			duration: 0.15,
+			ease: "easeIn" as const,
+		},
+	},
+	minimize: {
+		opacity: 0,
+		scale: 0.85,
+		y: 40,
+		transition: {
+			duration: 0.2,
+			ease: "easeIn" as const,
+		},
+	},
+} as const;
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export function WindowFrame({
 	window: win,
@@ -59,9 +98,14 @@ export function WindowFrame({
 			};
 
 	return (
-		<div
+		<motion.div
+			key={win.id}
+			variants={windowVariants}
+			initial="initial"
+			animate="animate"
+			exit="exit"
 			className={[
-				"absolute rounded-lg overflow-hidden flex flex-col transition-shadow duration-200",
+				"absolute rounded-lg overflow-hidden flex flex-col",
 				isMobile ? "rounded-none" : "",
 				isDragging && !isMobile ? "cursor-grabbing select-none" : "",
 				isActive ? "shadow-ubuntu-lg" : "shadow-ubuntu",
@@ -74,6 +118,8 @@ export function WindowFrame({
 			}}
 			onClick={onClick}
 			onMouseDown={onMouseDown}
+			// Disable spring animation during drag for direct positional control
+			transition={isDragging ? { duration: 0 } : undefined}
 		>
 			<WindowHeader
 				title={win.title}
@@ -95,6 +141,8 @@ export function WindowFrame({
 			>
 				{children}
 			</div>
-		</div>
+		</motion.div>
 	);
 }
+
+export { AnimatePresence };
