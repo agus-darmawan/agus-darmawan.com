@@ -7,7 +7,7 @@ import {
 	Github,
 	Star,
 } from "lucide-react";
-import type { ProjectMeta } from "./projectsData";
+import type { ProjectMeta } from "./projects.data";
 
 interface ProjectCardProps {
 	project: ProjectMeta;

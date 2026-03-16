@@ -2,17 +2,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { WindowState } from "@/types/app";
 
 interface UseWindowDragOptions {
-	windowsRef: React.MutableRefObject<WindowState[]>;
+	getWindows: () => WindowState[];
 	onBringToFront: (id: string) => void;
 	onPositionChange: (id: string, x: number, y: number) => void;
 }
 
 /**
  * Handles mouse-driven window dragging.
- * Reads windows from a ref (not state) to avoid stale closure issues.
+ * Uses getWindows() instead of a ref to avoid stale closure issues
+ * while staying compatible with Zustand store's getState().
  */
 export function useWindowDrag({
-	windowsRef,
+	getWindows,
 	onBringToFront,
 	onPositionChange,
 }: UseWindowDragOptions) {
@@ -21,7 +22,7 @@ export function useWindowDrag({
 
 	const handleMouseDown = useCallback(
 		(e: React.MouseEvent, id: string) => {
-			const win = windowsRef.current.find((w) => w.id === id);
+			const win = getWindows().find((w) => w.id === id);
 			if (!win || win.maximized) return;
 
 			const target = e.target as HTMLElement;
@@ -34,7 +35,7 @@ export function useWindowDrag({
 				y: e.clientY - win.position.y,
 			};
 		},
-		[windowsRef, onBringToFront],
+		[getWindows, onBringToFront],
 	);
 
 	useEffect(() => {
@@ -50,7 +51,7 @@ export function useWindowDrag({
 
 		const onUp = () => setDragging(null);
 
-		window.addEventListener("mousemove", onMove);
+		window.addEventListener("mousemove", onMove, { passive: true });
 		window.addEventListener("mouseup", onUp);
 		return () => {
 			window.removeEventListener("mousemove", onMove);

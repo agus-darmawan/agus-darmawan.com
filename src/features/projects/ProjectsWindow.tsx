@@ -7,7 +7,9 @@ import {
 	PROJECTS_META,
 	type ProjectCategory,
 	type ProjectMeta,
-} from "./projectsData";
+} from "./projects.data";
+
+// ── Constants ─────────────────────────────────────────────────────────────────
 
 const CATEGORY_LABELS: Record<ProjectCategory | "all", string> = {
 	all: "All",
@@ -16,16 +18,9 @@ const CATEGORY_LABELS: Record<ProjectCategory | "all", string> = {
 	research: "Research",
 };
 
-interface ProjectsWindowProps {
-	onOpenReadme?: (
-		project: ProjectMeta,
-		name: string,
-		desc: string,
-		readmeFile: string,
-	) => void;
-}
+// ── Component ─────────────────────────────────────────────────────────────────
 
-export default function ProjectsWindow({ onOpenReadme }: ProjectsWindowProps) {
+export default function ProjectsWindow() {
 	const t = useTranslations("ProjectsWindow");
 	const tProjects = useTranslations("Projects");
 	const [filter, setFilter] = useState<ProjectCategory | "all">("all");
@@ -38,19 +33,34 @@ export default function ProjectsWindow({ onOpenReadme }: ProjectsWindowProps) {
 		[filter],
 	);
 
-	const totalStars = PROJECTS_META.reduce((s, p) => s + p.stars, 0);
-	const featuredCount = PROJECTS_META.filter((p) => p.featured).length;
+	const totalStars = useMemo(
+		() => PROJECTS_META.reduce((s, p) => s + p.stars, 0),
+		[],
+	);
+
+	const featuredCount = useMemo(
+		() => PROJECTS_META.filter((p) => p.featured).length,
+		[],
+	);
+
 	const categories = Object.entries(CATEGORY_LABELS) as [
 		ProjectCategory | "all",
 		string,
 	][];
 
+	// Dispatch custom event instead of prop drilling onOpenReadme
+	// page.tsx listens to this event and calls openWindow
 	const handleCardClick = (project: ProjectMeta) => {
-		onOpenReadme?.(
-			project,
-			tProjects(`${project.i18nKey}.name`),
-			tProjects(`${project.i18nKey}.desc`),
-			tProjects(`${project.i18nKey}.readmeFile`),
+		window.dispatchEvent(
+			new CustomEvent("openReadme", {
+				detail: {
+					kind: "readme",
+					project,
+					name: tProjects(`${project.i18nKey}.name`),
+					desc: tProjects(`${project.i18nKey}.desc`),
+					readmeFile: tProjects(`${project.i18nKey}.readmeFile`),
+				},
+			}),
 		);
 	};
 
@@ -74,6 +84,7 @@ export default function ProjectsWindow({ onOpenReadme }: ProjectsWindowProps) {
 							{PROJECTS_META.length} projects · {featuredCount} featured
 						</p>
 					</div>
+
 					<div className="flex items-center gap-3">
 						<div className="text-center">
 							<p
@@ -89,10 +100,12 @@ export default function ProjectsWindow({ onOpenReadme }: ProjectsWindowProps) {
 								{t("stars")}
 							</p>
 						</div>
+
 						<div
 							className="w-px h-6 rounded-full"
 							style={{ background: "var(--border)" }}
 						/>
+
 						<div className="text-center">
 							<p
 								className="text-sm font-bold tabular-nums"
@@ -110,6 +123,7 @@ export default function ProjectsWindow({ onOpenReadme }: ProjectsWindowProps) {
 					</div>
 				</div>
 
+				{/* Category filters */}
 				<div className="flex gap-1.5 flex-wrap">
 					{categories.map(([key, label]) => {
 						const count =
@@ -117,6 +131,7 @@ export default function ProjectsWindow({ onOpenReadme }: ProjectsWindowProps) {
 								? PROJECTS_META.length
 								: PROJECTS_META.filter((p) => p.category === key).length;
 						const active = filter === key;
+
 						return (
 							<button
 								key={key}

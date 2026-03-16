@@ -3,7 +3,7 @@
 import { Github, Loader2 } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import type { ProjectMeta } from "../projectsData";
+import type { ProjectMeta } from "../projects.data";
 import { ReadmeRenderer } from "./ReadmeRenderer";
 
 interface ReadmeWindowProps {

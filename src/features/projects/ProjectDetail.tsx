@@ -2,7 +2,7 @@
 
 import { ExternalLink, Github, Star, X } from "lucide-react";
 import { useEffect, useRef } from "react";
-import type { ProjectMeta } from "./projectsData";
+import type { ProjectMeta } from "./projects.data";
 import { ReadmeRenderer } from "./readme/ReadmeRenderer";
 
 interface ProjectDetailProps {

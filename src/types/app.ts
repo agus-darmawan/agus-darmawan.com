@@ -1,4 +1,5 @@
 import { type LucideIcon } from "lucide-react";
+import type { ProjectMeta } from "@/features/projects/projects.data";
 
 export interface OpenApp {
 	id: string;
@@ -16,7 +17,15 @@ export interface AppConfig {
 	category?: string;
 }
 
-export type WindowPayload = Record<string, unknown> | undefined;
+export type WindowPayload =
+	| {
+			kind: "readme";
+			project: ProjectMeta;
+			name: string;
+			desc: string;
+			readmeFile: string;
+	  }
+	| undefined;
 
 export interface WindowState {
 	id: string;

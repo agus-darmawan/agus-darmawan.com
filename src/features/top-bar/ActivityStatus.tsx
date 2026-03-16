@@ -1,15 +1,18 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useAppStore } from "@/store/useAppStore";
+import { useWindowStore } from "@/store/useWindowStore";
 
 export function ActivityStatus() {
 	const t = useTranslations("TopBar");
-	const openApps = useAppStore((s) => s.openApps);
-	const getActiveApp = useAppStore((s) => s.getActiveApp);
 
-	const hasApps = openApps.length > 0;
-	const activeApp = getActiveApp();
+	// Ambil langsung dari state — reactive
+	const windows = useWindowStore((s) => s.windows);
+	const activeWindowId = useWindowStore((s) => s.activeWindowId);
+
+	// Derive di komponen — bukan di store selector
+	const hasApps = windows.length > 0;
+	const activeApp = windows.find((w) => w.id === activeWindowId) ?? null;
 
 	return (
 		<div
@@ -22,12 +25,7 @@ export function ActivityStatus() {
 					className="hidden md:inline text-xs max-w-24 truncate"
 					style={{ color: "var(--panel-text-muted)" }}
 				>
-					{activeApp.icon && (
-						<span className="mr-0.5" aria-hidden>
-							{activeApp.icon}
-						</span>
-					)}
-					{activeApp.name}
+					{activeApp.title}
 				</span>
 			)}
 		</div>
