@@ -1,8 +1,8 @@
 "use client";
 
-import { useSpotify } from "@/hooks/top-bar/useSpotify";
 import { ActivityStatus } from "./ActivityStatus";
 import { ClockDisplay } from "./ClockDisplay";
+import { useSpotify } from "./hooks/useSpotify";
 import { SystemStatus } from "./SystemStatus";
 import { SettingsMenu } from "./setting/SettingsMenu";
 import { SpotifyBadge } from "./spotify/SpotifyBadge";

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { useRefreshProgress } from "@/hooks/useRefreshProgress";
 import type { ApiResponse } from "@/types/api";
-import { useRefreshProgress } from "../useRefreshProgress";
 
 const REFETCH_INTERVAL = 10_000;
 

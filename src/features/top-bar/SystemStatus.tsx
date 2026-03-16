@@ -1,8 +1,8 @@
 "use client";
 
 import { Battery, BatteryCharging, Wifi } from "lucide-react";
-import { usePing } from "@/hooks/top-bar/usePing";
 import { useBattery } from "@/hooks/useBattery";
+import { usePing } from "./hooks/usePing";
 import { RefreshIndicator } from "./RefreshIndicator";
 
 /**

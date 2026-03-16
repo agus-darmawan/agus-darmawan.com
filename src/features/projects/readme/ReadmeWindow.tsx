@@ -3,8 +3,8 @@
 import { Github, Loader2 } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import type { ProjectMeta } from "@/components/windows/content/projects/projectsData";
-import { ReadmeRenderer } from "@/components/windows/content/projects/readme/ReadmeRenderer";
+import type { ProjectMeta } from "../projectsData";
+import { ReadmeRenderer } from "./ReadmeRenderer";
 
 interface ReadmeWindowProps {
 	project: ProjectMeta;

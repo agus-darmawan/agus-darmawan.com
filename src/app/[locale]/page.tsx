@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect } from "react";
-import { WindowFrame } from "@/components/windows/frame/WindowFrame";
 import AboutWindow from "@/features/about/AboutWindow";
 import ContactWindow from "@/features/contact/ContactWindow";
 import { Dock } from "@/features/dock/Dock";
@@ -13,7 +12,8 @@ import ReadmeWindow from "@/features/projects/readme/ReadmeWindow";
 import ResumeWindow from "@/features/resume/ResumeWindow";
 import TerminalWindow from "@/features/terminal/TerminalWindow";
 import TopBar from "@/features/top-bar/TopBar";
-import { useWindowManager } from "@/hooks/window";
+import { useWindowManager } from "@/features/window-manager/hooks/useWindowManager";
+import { WindowFrame } from "@/features/window-manager/WindowFrame";
 import { useAppStore } from "@/store/useAppStore";
 import type { WindowState } from "@/types/app";
 

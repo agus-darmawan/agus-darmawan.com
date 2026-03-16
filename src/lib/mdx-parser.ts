@@ -1,4 +1,8 @@
-import type { InlineNode, TocEntry, Token } from "@/types/project";
+import type {
+	InlineNode,
+	TocEntry,
+	Token,
+} from "@/features/projects/types/project.types";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

@@ -1,6 +1,6 @@
 "use client";
 
-import type { TocEntry } from "@/types/project";
+import type { TocEntry } from "../types/project.types";
 
 interface TocProps {
 	entries: TocEntry[];
