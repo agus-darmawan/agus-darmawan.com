@@ -13,6 +13,7 @@ interface ProjectCardProps {
 	project: ProjectMeta;
 	name: string;
 	desc: string;
+	stars: number; // passed from ProjectsWindow — live from GitHub or fallback
 	onClick: (project: ProjectMeta) => void;
 }
 
@@ -20,8 +21,12 @@ export function ProjectCard({
 	project,
 	name,
 	desc,
+	stars,
 	onClick,
 }: ProjectCardProps) {
+	// Rough fork estimate — only shown as decoration, not critical data
+	const forks = Math.floor(stars * 0.3);
+
 	return (
 		<div
 			onClick={() => onClick(project)}
@@ -105,7 +110,7 @@ export function ProjectCard({
 						</div>
 					</div>
 
-					{/* Arrow — appears on hover, no text */}
+					{/* Arrow on hover */}
 					<div
 						className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
 						style={{ background: `${project.color}18`, color: project.color }}
@@ -147,7 +152,7 @@ export function ProjectCard({
 					)}
 				</div>
 
-				{/* Footer: stats + GitHub/Demo links */}
+				{/* Footer: stats + links */}
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
 						<span
@@ -155,14 +160,14 @@ export function ProjectCard({
 							style={{ color: "var(--text-muted)" }}
 						>
 							<Star size={11} />
-							{project.stars}
+							{stars}
 						</span>
 						<span
 							className="flex items-center gap-1 text-[11px]"
 							style={{ color: "var(--text-muted)" }}
 						>
 							<GitFork size={11} />
-							{Math.floor(project.stars * 0.4)}
+							{forks}
 						</span>
 					</div>
 

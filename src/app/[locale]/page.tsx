@@ -1,13 +1,16 @@
 "use client";
 
+import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { BootScreen } from "@/features/boot/BootScreen";
+import { CommandPalette } from "@/features/command-palette/CommandPalette";
 import { Dock } from "@/features/dock/Dock";
 import ReadmeWindow from "@/features/projects/readme/ReadmeWindow";
 import TopBar from "@/features/top-bar/TopBar";
 import { useWindowDrag } from "@/features/window-manager/hooks/useWindowDrag";
 import { WindowFrame } from "@/features/window-manager/WindowFrame";
 import { getWindowComponent } from "@/features/window-manager/window.registry";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { useWindowStore } from "@/store/useWindowStore";
 import type { WindowState } from "@/types/app";
 
@@ -44,11 +47,16 @@ function WindowContent({ win }: { win: WindowState }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function IndexPage() {
-	// Boot screen — skip if already visited this session
-	const [booting, setBooting] = useState(() => {
-		if (typeof window === "undefined") return true;
-		return !sessionStorage.getItem("hasBooted");
-	});
+	// ── Boot screen ──────────────────────────────────────────────────────────
+	// Start as null (unknown) to avoid SSR/client mismatch
+	// useEffect runs only on client — safe to read sessionStorage there
+	const [booting, setBooting] = useState<boolean | null>(null);
+
+	useEffect(() => {
+		// Only runs on client — no SSR mismatch
+		const hasBooted = sessionStorage.getItem("hasBooted");
+		setBooting(!hasBooted);
+	}, []);
 
 	const handleBootDone = useCallback(() => {
 		sessionStorage.setItem("hasBooted", "1");
@@ -75,16 +83,20 @@ export default function IndexPage() {
 		onPositionChange: useWindowStore.getState().updatePosition,
 	});
 
-	// ── Events ──────────────────────────────────────────────────────────────
+	// ── Theme & locale for terminal commands ─────────────────────────────────
 
-	// Minimize all (triggered by dock launcher)
+	const { setTheme } = useTheme();
+	const router = useRouter();
+	const pathname = usePathname();
+
+	// ── Events ───────────────────────────────────────────────────────────────
+
 	useEffect(() => {
 		const handler = () => minimizeAllWindows();
 		window.addEventListener("minimizeAllWindows", handler);
 		return () => window.removeEventListener("minimizeAllWindows", handler);
 	}, [minimizeAllWindows]);
 
-	// Open README (dispatched by ProjectsWindow)
 	useEffect(() => {
 		const handler = (e: CustomEvent) => {
 			const { project, name, desc, readmeFile } = e.detail;
@@ -101,7 +113,7 @@ export default function IndexPage() {
 			window.removeEventListener("openReadme", handler as EventListener);
 	}, [openWindow]);
 
-	// Terminal → UI: open app by appId
+	// Terminal → open app
 	useEffect(() => {
 		const handler = (e: CustomEvent) => openWindow(e.detail.appId);
 		window.addEventListener("openApp", handler as EventListener);
@@ -109,23 +121,44 @@ export default function IndexPage() {
 			window.removeEventListener("openApp", handler as EventListener);
 	}, [openWindow]);
 
-	// Terminal → UI: close active window
+	// Terminal → close active window
+	// Use getState() to avoid re-registering on every focus change
 	useEffect(() => {
 		const handler = () => {
-			if (activeWindowId) closeWindow(activeWindowId);
+			const id = useWindowStore.getState().activeWindowId;
+			if (id) useWindowStore.getState().closeWindow(id);
 		};
 		window.addEventListener("closeActiveWindow", handler);
 		return () => window.removeEventListener("closeActiveWindow", handler);
-	}, [activeWindowId, closeWindow]);
+	}, []);
 
-	// ── Derived ─────────────────────────────────────────────────────────────
+	// Terminal → switch theme
+	useEffect(() => {
+		const handler = (e: CustomEvent) => setTheme(e.detail);
+		window.addEventListener("setTheme", handler as EventListener);
+		return () =>
+			window.removeEventListener("setTheme", handler as EventListener);
+	}, [setTheme]);
+
+	// Terminal → switch locale
+	// router and pathname are stable refs from next-intl — no need to add locale
+	useEffect(() => {
+		const handler = (e: CustomEvent) => {
+			router.push(pathname, { locale: e.detail });
+		};
+		window.addEventListener("setLocale", handler as EventListener);
+		return () =>
+			window.removeEventListener("setLocale", handler as EventListener);
+	}, [router, pathname]);
+
+	// ── Derived ──────────────────────────────────────────────────────────────
 
 	const hasOpenReadme = useMemo(
 		() => windows.some((w) => w.appId.startsWith("readme-") && !w.minimized),
 		[windows],
 	);
 
-	// ── Handlers ────────────────────────────────────────────────────────────
+	// ── Handlers ─────────────────────────────────────────────────────────────
 
 	const handleClose = useCallback(
 		(win: WindowState) => {
@@ -141,14 +174,20 @@ export default function IndexPage() {
 		[hasOpenReadme, windows, bringToFront, closeWindow],
 	);
 
-	// ── Render ───────────────────────────────────────────────────────────────
+	// ── Render ────────────────────────────────────────────────────────────────
 
+	// null = unknown (SSR / first paint) → render nothing to avoid flash
+	if (booting === null) return null;
+
+	// true = first visit this session → show boot screen
 	if (booting) {
 		return <BootScreen onDone={handleBootDone} />;
 	}
 
+	// false = already booted → show portfolio
 	return (
 		<main className="w-full h-screen bg-ubuntu-purple overflow-hidden select-none">
+			<CommandPalette />
 			<TopBar />
 
 			<div className="relative h-[calc(100vh-4rem)] mt-8">

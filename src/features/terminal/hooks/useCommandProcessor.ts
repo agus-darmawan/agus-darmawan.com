@@ -1,5 +1,65 @@
 import { useCallback } from "react";
+import {
+	COWSAY_DEFAULT,
+	MAN_PAGE,
+	NEOFETCH_OUTPUT,
+	RM_RF_RESPONSE,
+	SUDO_RESPONSES,
+} from "../terminal.easter-eggs";
 import { type FSNode, mkLine, type TermLine } from "../types/terminal.types";
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+
+const HELP_TEXT = `
+╔══════════════════════════════════════════╗
+║           Available Commands             ║
+╠══════════════════════════════════════════╣
+║  ls  [path]    list directory            ║
+║  cd  <dir>     change directory          ║
+║  pwd           working directory         ║
+║  cat <file>    show file contents        ║
+║  touch <file>  create empty file         ║
+║  mkdir <dir>   create directory          ║
+║  rm  <file>    remove file               ║
+║  echo <text>   print text                ║
+║  vim <file>    open vim editor           ║
+║  git status/log/branch                   ║
+║  neofetch      system info               ║
+║  cowsay <msg>  talking cow               ║
+║  fortune       random quote              ║
+║  cal           calendar                  ║
+║  history       command history           ║
+║  clear         clear terminal            ║
+║  whoami / date / uname -a / uptime       ║
+╠══════════════════════════════════════════╣
+║  Portfolio Commands                      ║
+║  man agus      developer manual          ║
+║  open <app>    open a window             ║
+║  close         close active window       ║
+║  theme <dark|light>  switch theme        ║
+║  lang <en|id>  switch language           ║
+╚══════════════════════════════════════════╝`.trim();
+
+const VALID_APPS = [
+	"about",
+	"terminal",
+	"resume",
+	"experience",
+	"projects",
+	"contact",
+];
+
+const FORTUNES = [
+	'"Talk is cheap. Show me the code." — Linus Torvalds',
+	'"First, solve the problem. Then, write the code." — John Johnson',
+	'"Code is like humor. When you have to explain it, it\'s bad." — Cory House',
+	'"Programs must be written for people to read." — Harold Abelson',
+	'"Any fool can write code a computer understands. Good programmers write code humans understand." — M. Fowler',
+	'"The best error message is the one that never shows up." — Thomas Fuchs',
+	'"Fix the cause, not the symptom." — Steve Maguire',
+];
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 interface UseCommandProcessorOptions {
 	cwd: string;
@@ -15,36 +75,7 @@ interface UseCommandProcessorOptions {
 	sessionClosedMsg: string;
 }
 
-const HELP_TEXT = `
-╔══════════════════════════════════════╗
-║         Available Commands           ║
-╠══════════════════════════════════════╣
-║  ls  [path]    list directory        ║
-║  cd  <dir>     change directory      ║
-║  pwd           working directory     ║
-║  cat <file>    show file             ║
-║  touch <file>  create file           ║
-║  mkdir <dir>   create directory      ║
-║  rm  <file>    remove file           ║
-║  echo <text>   print text            ║
-║  vim <file>    open vim editor       ║
-║  git status/log/branch               ║
-║  neofetch      system info           ║
-║  cowsay <msg>  talking cow           ║
-║  fortune       random quote          ║
-║  cal           calendar              ║
-║  history       command history       ║
-║  clear         clear terminal        ║
-║  whoami/date/uname -a/uptime         ║
-╚══════════════════════════════════════╝`.trim();
-
-const FORTUNES = [
-	'"Talk is cheap. Show me the code." — Linus Torvalds',
-	'"First, solve the problem. Then, write the code." — John Johnson',
-	'"Code is like humor. When you have to explain it, it\'s bad." — Cory House',
-	'"Programs must be written for people to read." — Harold Abelson',
-	'"Any fool can write code a computer understands. Good programmers write code humans understand." — M. Fowler',
-];
+// ── Hook ──────────────────────────────────────────────────────────────────────
 
 export function useCommandProcessor({
 	cwd,
@@ -74,6 +105,7 @@ export function useCommandProcessor({
 			const args = parts.slice(1);
 
 			switch (cmd) {
+				// ── Help ───────────────────────────────────────────────────────
 				case "help":
 					addLines(mkLine("output", HELP_TEXT));
 					break;
@@ -82,6 +114,7 @@ export function useCommandProcessor({
 					clearTerminal();
 					break;
 
+				// ── System info ───────────────────────────────────────────────
 				case "pwd":
 					addLines(mkLine("output", cwd.replace("~", "/home/agus")));
 					break;
@@ -94,19 +127,16 @@ export function useCommandProcessor({
 					addLines(mkLine("output", new Date().toString()));
 					break;
 
-				case "uname": {
-					if (args[0] === "-a") {
-						addLines(
-							mkLine(
-								"output",
-								"Linux ubuntu 5.15.0-91-generic #101-Ubuntu SMP x86_64 GNU/Linux",
-							),
-						);
-					} else {
-						addLines(mkLine("output", "Linux"));
-					}
+				case "uname":
+					addLines(
+						mkLine(
+							"output",
+							args[0] === "-a"
+								? "Linux ubuntu 5.15.0-91-generic #101-Ubuntu SMP x86_64 GNU/Linux"
+								: "Linux",
+						),
+					);
 					break;
-				}
 
 				case "uptime": {
 					const h = Math.floor(Math.random() * 24) + 1;
@@ -120,12 +150,13 @@ export function useCommandProcessor({
 					break;
 				}
 
+				// ── File system ───────────────────────────────────────────────
 				case "ls": {
-					const rawLsArg = args[0] ? args[0].replace(/\/+$/, "") : "";
-					const target = rawLsArg
-						? rawLsArg.startsWith("~") || rawLsArg.startsWith("/")
-							? rawLsArg
-							: `${cwd}/${rawLsArg}`
+					const rawArg = args[0] ? args[0].replace(/\/+$/, "") : "";
+					const target = rawArg
+						? rawArg.startsWith("~") || rawArg.startsWith("/")
+							? rawArg
+							: `${cwd}/${rawArg}`
 						: cwd;
 					const normalTarget = target.replace("/home/agus", "~");
 					const dir = fs[normalTarget];
@@ -139,9 +170,8 @@ export function useCommandProcessor({
 						);
 					} else {
 						const entries = Object.keys(dir);
-						if (entries.length > 0) {
+						if (entries.length > 0)
 							addLines(mkLine("output", entries.join("  ")));
-						}
 					}
 
 					const subdirs = Object.keys(fs).filter(
@@ -158,7 +188,6 @@ export function useCommandProcessor({
 				}
 
 				case "cd": {
-					// Strip trailing slash so "cd downloads/" works the same as "cd downloads"
 					const rawTarget = args[0] ?? "~";
 					const target =
 						rawTarget.endsWith("/") && rawTarget !== "/"
@@ -224,6 +253,14 @@ export function useCommandProcessor({
 					break;
 
 				case "rm": {
+					// Easter egg: sudo rm -rf /
+					if (
+						args.includes("-rf") &&
+						(args.includes("/") || args.includes("~"))
+					) {
+						addLines(mkLine("error", RM_RF_RESPONSE));
+						break;
+					}
 					if (!args[0]) {
 						addLines(mkLine("error", "rm: missing operand"));
 						break;
@@ -269,8 +306,7 @@ export function useCommandProcessor({
 						addLines(mkLine("error", `${cmd}: missing filename`));
 						break;
 					}
-					const existing = fs[cwd]?.[fname] ?? "";
-					openVim(fname, existing);
+					openVim(fname, fs[cwd]?.[fname] ?? "");
 					break;
 				}
 
@@ -285,20 +321,21 @@ export function useCommandProcessor({
 					});
 					break;
 
+				// ── Git ───────────────────────────────────────────────────────
 				case "git": {
 					const sub = args[0];
 					if (sub === "status") {
 						addLines(
 							mkLine(
 								"output",
-								"On branch main\nYour branch is up to date with 'origin/main'.\n\nChanges not staged:\n        modified:   src/components/windows/content/TerminalWindow.tsx",
+								"On branch main\nYour branch is up to date with 'origin/main'.\n\nnothing to commit, working tree clean",
 							),
 						);
 					} else if (sub === "log") {
 						addLines(
 							mkLine(
 								"output",
-								"commit a1b2c3d (HEAD -> main)\nAuthor: Agus Darmawan <agus@example.com>\nDate:   Mon Feb 24 10:00:00 2026 +0700\n\n    feat: add modular terminal with vim",
+								"commit a1b2c3d (HEAD -> main)\nAuthor: Agus Darmawan <darmawandeveloper@gmail.com>\nDate:   Mon Mar 16 10:00:00 2026 +0700\n\n    feat: add modular terminal with vim and easter eggs",
 							),
 						);
 					} else if (sub === "branch") {
@@ -314,20 +351,9 @@ export function useCommandProcessor({
 					break;
 				}
 
+				// ── Fun commands ──────────────────────────────────────────────
 				case "neofetch":
-					addLines(
-						mkLine(
-							"output",
-							`            .-/+oossssoo+/-.               agus@ubuntu
-        \`:+ssssssssssssssssss+:\`           OS: Ubuntu 22.04.3 LTS x86_64
-      -+ssssssssssssssssssyyssss+-         Kernel: 5.15.0-91-generic
-    .ossssssssssssssssssdMMMNysssso.       Shell: bash 5.1.16
-   /ssssssssssshdmmNNmmyNMMMMhssssss/      Terminal: Portfolio Term
-  +ssssssssshmydMMMMMMMNddddyssssssss+     CPU: Intel i7-12700K @ 5GHz
-                                           Languages: TypeScript Go Python
-                                           Frameworks: Next.js React Gin`,
-						),
-					);
+					addLines(mkLine("output", NEOFETCH_OUTPUT));
 					break;
 
 				case "cowsay": {
@@ -366,6 +392,7 @@ export function useCommandProcessor({
 					let row = "   ".repeat(firstDay);
 					for (let d = 1; d <= daysInMonth; d++) {
 						const isToday = d === now.getDate();
+						// Fix: konsisten 4 chars untuk semua tanggal
 						row += isToday
 							? `[${String(d).padStart(2)}]`
 							: ` ${String(d).padStart(2)} `;
@@ -378,6 +405,89 @@ export function useCommandProcessor({
 					break;
 				}
 
+				// ── Easter eggs ───────────────────────────────────────────────
+				case "sudo": {
+					const response =
+						SUDO_RESPONSES[Math.floor(Math.random() * SUDO_RESPONSES.length)];
+					addLines(mkLine("error", response));
+					break;
+				}
+
+				// ── Developer manual ──────────────────────────────────────────
+				case "man": {
+					const subject = args[0];
+					if (subject === "agus" || subject === "agus-darmawan") {
+						addLines(mkLine("output", MAN_PAGE));
+					} else if (!subject) {
+						addLines(
+							mkLine("error", "What manual page do you want?\nTry: man agus"),
+						);
+					} else {
+						addLines(
+							mkLine("error", `No manual entry for ${subject}\nTry: man agus`),
+						);
+					}
+					break;
+				}
+
+				// ── Portfolio UI commands ──────────────────────────────────────
+				case "open": {
+					const appId = args[0];
+					if (!appId) {
+						addLines(
+							mkLine(
+								"error",
+								`open: missing app name\nUsage: open <${VALID_APPS.join("|")}>`,
+							),
+						);
+						break;
+					}
+					if (!VALID_APPS.includes(appId)) {
+						addLines(
+							mkLine(
+								"error",
+								`open: unknown app '${appId}'\nAvailable: ${VALID_APPS.join(", ")}`,
+							),
+						);
+						break;
+					}
+					window.dispatchEvent(
+						new CustomEvent("openApp", { detail: { appId } }),
+					);
+					addLines(mkLine("output", `Opening ${appId}...`));
+					break;
+				}
+
+				case "close": {
+					window.dispatchEvent(new CustomEvent("closeActiveWindow"));
+					addLines(mkLine("output", "Closed active window."));
+					break;
+				}
+
+				case "theme": {
+					const mode = args[0];
+					if (mode !== "dark" && mode !== "light") {
+						addLines(mkLine("error", "Usage: theme <dark|light>"));
+						break;
+					}
+					window.dispatchEvent(new CustomEvent("setTheme", { detail: mode }));
+					addLines(mkLine("output", `Theme set to ${mode}.`));
+					break;
+				}
+
+				case "lang": {
+					const locale = args[0];
+					if (locale !== "en" && locale !== "id") {
+						addLines(mkLine("error", "Usage: lang <en|id>"));
+						break;
+					}
+					window.dispatchEvent(
+						new CustomEvent("setLocale", { detail: locale }),
+					);
+					addLines(mkLine("output", `Language set to ${locale}.`));
+					break;
+				}
+
 				case "exit":
 					addLines(mkLine("system", sessionClosedMsg));
 					break;
@@ -386,7 +496,7 @@ export function useCommandProcessor({
 					addLines(
 						mkLine(
 							"error",
-							`${cmd}: command not found. Type 'help' for available commands.`,
+							`${cmd}: command not found\nType 'help' for available commands.`,
 						),
 					);
 			}
