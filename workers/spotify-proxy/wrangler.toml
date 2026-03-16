@@ -1,0 +1,10 @@
+name = "spotify-proxy"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+ALLOWED_ORIGIN = "https://agus-darmawan.com"
+
+[[routes]]
+pattern = "api.agus-darmawan.com/spotify"
+zone_name = "agus-darmawan.com"

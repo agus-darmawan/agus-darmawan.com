@@ -45,4 +45,8 @@ next-env.d.ts
 .env.sentry-build-plugin
 .sentryclirc
 
+
 .wrangler/
+# Workers
+workers/*/node_modules
+workers/*/.wrangler

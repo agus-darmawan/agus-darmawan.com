@@ -7,7 +7,10 @@ import type { SpotifyTrack } from "../types/spotify.types";
 const REFETCH_INTERVAL = 10_000;
 
 async function fetchNowPlaying(): Promise<SpotifyTrack | null> {
-	const res = await axios.get<ApiResponse<SpotifyTrack>>("/api/spotify");
+	const SPOTIFY_URL =
+		process.env.NEXT_PUBLIC_SPOTIFY_WORKER_URL ?? "/api/spotify";
+
+	const res = await axios.get<ApiResponse<SpotifyTrack>>(SPOTIFY_URL);
 	return res.data?.success ? (res.data.data ?? null) : null;
 }
 
