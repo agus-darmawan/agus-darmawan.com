@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { type FSNode, mkLine, type TermLine } from "@/types/terminal";
+import { type FSNode, mkLine, type TermLine } from "../types/terminal.types";
 
 interface UseCommandProcessorOptions {
 	cwd: string;

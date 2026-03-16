@@ -11,8 +11,8 @@ import ProjectsWindow from "@/components/windows/content/projects/ProjectsWindow
 import type { ProjectMeta } from "@/components/windows/content/projects/projectsData";
 import ReadmeWindow from "@/components/windows/content/projects/readme/ReadmeWindow";
 import ResumeWindow from "@/components/windows/content/resume/ResumeWindow";
-import TerminalWindow from "@/components/windows/content/terminal/TerminalWindow";
 import { WindowFrame } from "@/components/windows/frame/WindowFrame";
+import TerminalWindow from "@/features/terminal/TerminalWindow";
 import { useWindowManager } from "@/hooks/window";
 import { useAppStore } from "@/store/useAppStore";
 import type { WindowState } from "@/types/app";

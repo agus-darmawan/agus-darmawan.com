@@ -1,7 +1,7 @@
 "use client";
 
 import { type RefObject, useCallback } from "react";
-import type { FSNode } from "@/types/terminal";
+import type { FSNode } from "./types/terminal.types";
 
 interface TerminalInputLineProps {
 	inputRef: RefObject<HTMLInputElement | null>;

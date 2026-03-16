@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
-import { useTerminalState } from "@/hooks/terminal/useTerminalState";
+import { useTerminalState } from "./hooks/useTerminalState";
 import { TerminalHintsBar } from "./TerminalHintsBar";
 import { TerminalInputLine } from "./TerminalInputLine";
 import { TerminalOutput } from "./TerminalOutput";

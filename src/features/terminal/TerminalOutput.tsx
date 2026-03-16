@@ -1,6 +1,6 @@
 "use client";
 
-import type { TermLine } from "@/types/terminal";
+import type { TermLine } from "./types/terminal.types";
 
 interface TerminalOutputProps {
 	lines: TermLine[];

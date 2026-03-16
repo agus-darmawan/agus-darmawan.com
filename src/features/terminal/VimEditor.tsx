@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import { type FSNode, type VimState } from "@/types/terminal";
+import { type FSNode, type VimState } from "./types/terminal.types";
 
 interface VimEditorProps {
 	vim: VimState;

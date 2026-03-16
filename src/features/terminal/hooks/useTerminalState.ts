@@ -6,7 +6,7 @@ import {
 	mkLine,
 	type TermLine,
 	type VimState,
-} from "@/types/terminal";
+} from "../types/terminal.types";
 import { useCommandProcessor } from "./useCommandProcessor";
 
 interface UseTerminalStateOptions {
