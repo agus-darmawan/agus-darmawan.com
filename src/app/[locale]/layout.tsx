@@ -3,8 +3,8 @@ import "@/styles/globals.css";
 import { Ubuntu } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { Providers } from "@/components/providers/Providers";
 import { routing } from "@/i18n/routing";
+import { Providers } from "./providers";
 
 type Props = {
 	children: React.ReactNode;

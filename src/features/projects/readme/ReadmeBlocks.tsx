@@ -1,6 +1,6 @@
 "use client";
 
-import type { Token } from "@/types/project";
+import type { Token } from "../types/project.types";
 import { CodeBlock } from "./CodeBlock";
 import { ImageBlock } from "./ImageBlock";
 import { Inline } from "./Inline";

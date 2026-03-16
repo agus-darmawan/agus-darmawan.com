@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { useRefreshProgress } from "@/hooks/useRefreshProgress";
 import type { ApiResponse } from "@/types/api";
-import type { SpotifyTrack } from "@/types/spotify";
-import { useRefreshProgress } from "../useRefreshProgress";
+import type { SpotifyTrack } from "../types/spotify.types";
 
 const REFETCH_INTERVAL = 10_000;
 

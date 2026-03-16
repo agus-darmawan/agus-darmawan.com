@@ -2,17 +2,17 @@
 
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect } from "react";
-import { Dock } from "@/components/dock/Dock";
-import TopBar from "@/components/top-bar/TopBar";
 import { WindowFrame } from "@/components/windows/frame/WindowFrame";
 import AboutWindow from "@/features/about/AboutWindow";
 import ContactWindow from "@/features/contact/ContactWindow";
+import { Dock } from "@/features/dock/Dock";
 import ExperienceWindow from "@/features/experience/ExperienceWindow";
 import ProjectsWindow from "@/features/projects/ProjectsWindow";
 import type { ProjectMeta } from "@/features/projects/projectsData";
 import ReadmeWindow from "@/features/projects/readme/ReadmeWindow";
 import ResumeWindow from "@/features/resume/ResumeWindow";
 import TerminalWindow from "@/features/terminal/TerminalWindow";
+import TopBar from "@/features/top-bar/TopBar";
 import { useWindowManager } from "@/hooks/window";
 import { useAppStore } from "@/store/useAppStore";
 import type { WindowState } from "@/types/app";

@@ -10,7 +10,9 @@
 		"projects": "Projects",
 		"contact": "Contact",
 		"search": "Search applications…",
-		"noResults": "No applications found"
+		"noResults": "No applications found",
+		"launcherClose": "Close",
+		"launcherOpen": "Show Apps"
 	},
 	"Windows": {
 		"about": "About Me",

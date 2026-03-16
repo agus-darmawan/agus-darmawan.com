@@ -1,5 +1,5 @@
 import { type RefObject, useCallback, useEffect, useState } from "react";
-import type { TocEntry } from "@/types/project";
+import type { TocEntry } from "../types/project.types";
 
 export function useReadmeScroll(
 	containerRef: RefObject<HTMLDivElement | null>,

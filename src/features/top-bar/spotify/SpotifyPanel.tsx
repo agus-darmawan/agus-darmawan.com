@@ -4,7 +4,7 @@ import { Music } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { formatMs } from "@/lib/utils";
-import type { SpotifyTrack } from "@/types/spotify";
+import type { SpotifyTrack } from "../types/spotify.types";
 
 interface SpotifyPanelProps {
 	track: SpotifyTrack;

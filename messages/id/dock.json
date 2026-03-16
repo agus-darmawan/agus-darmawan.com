@@ -10,7 +10,9 @@
 		"projects": "Proyek",
 		"contact": "Kontak",
 		"search": "Cari aplikasi…",
-		"noResults": "Tidak ada aplikasi ditemukan"
+		"noResults": "Tidak ada aplikasi ditemukan",
+		"launcherClose": "Tutup",
+		"launcherOpen": "Tampilkan Aplikasi"
 	},
 	"Windows": {
 		"about": "Tentang Saya",

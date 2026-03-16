@@ -1,6 +1,7 @@
 "use client";
 
 import { Grip, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface DockLauncherProps {
 	isOpen: boolean;
@@ -12,6 +13,8 @@ interface DockLauncherProps {
  * Sits at the left end of the dock.
  */
 export function DockLauncher({ isOpen, onClick }: DockLauncherProps) {
+	const t = useTranslations("Dock");
+
 	return (
 		<button
 			type="button"
@@ -40,7 +43,7 @@ export function DockLauncher({ isOpen, onClick }: DockLauncherProps) {
 
 			{/* Tooltip */}
 			<span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded text-xs whitespace-nowrap bg-black text-white border border-white/10 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
-				{isOpen ? "Close" : "Show Apps"}
+				{isOpen ? t("launcherClose") : t("launcherOpen")}
 			</span>
 		</button>
 	);

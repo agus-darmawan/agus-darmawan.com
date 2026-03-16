@@ -1,6 +1,6 @@
 import { Music } from "lucide-react";
-import type { SpotifyTrack } from "@/types/spotify";
 import { RefreshIndicator } from "../RefreshIndicator";
+import type { SpotifyTrack } from "../types/spotify.types";
 
 interface SpotifyBadgeProps {
 	track: SpotifyTrack;
@@ -25,7 +25,7 @@ export function SpotifyBadge({ track, refreshProgress }: SpotifyBadgeProps) {
 			}}
 		>
 			<Music className="w-3.5 h-3.5 text-green-400 shrink-0" />
-			<span className="text-xs max-w-[7.5rem] truncate leading-none">
+			<span className="text-xs max-w-30 truncate leading-none">
 				{track.name}
 			</span>
 			<RefreshIndicator progress={refreshProgress} className="text-green-400" />
