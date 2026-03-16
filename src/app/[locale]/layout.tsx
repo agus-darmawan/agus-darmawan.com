@@ -42,6 +42,7 @@ export const metadata: Metadata = {
 	],
 	creator: "agus-darmawan",
 	metadataBase: new URL("https://agus-darmawan.com"),
+	manifest: "/manifest.json",
 	openGraph: {
 		title: "Agus Darmawan — Full-Stack & Robotics Developer",
 		description:
@@ -54,14 +55,10 @@ export const metadata: Metadata = {
 	twitter: {
 		card: "summary_large_image",
 		title: "Agus Darmawan — Full-Stack & Robotics Developer",
-		description:
-			"Interactive Ubuntu 22.04 themed portfolio. Full-Stack & Robotics Developer from Bali.",
+		description: "Interactive Ubuntu 22.04 themed portfolio.",
 		creator: "@agusdarmawnn",
 	},
-	robots: {
-		index: true,
-		follow: true,
-	},
+	robots: { index: true, follow: true },
 };
 
 export default async function LocaleLayout({ children, params }: Props) {

@@ -41,80 +41,66 @@ export function WindowHeader({
 	};
 
 	return (
-		<>
-			{/* Inject shake keyframes once */}
-			<style>{`
-				@keyframes wm-shake {
-					0%,100% { transform: translateX(0); }
-					20%      { transform: translateX(-3px); }
-					40%      { transform: translateX(3px); }
-					60%      { transform: translateX(-2px); }
-					80%      { transform: translateX(2px); }
-				}
-				.wm-shake { animation: wm-shake 0.45s ease; }
-			`}</style>
-
-			<div
-				className={[
-					"window-titlebar h-9 flex items-center justify-between px-3 select-none shrink-0",
-					draggable ? "cursor-grab active:cursor-grabbing" : "",
-					shaking ? "wm-shake" : "",
-				]
-					.filter(Boolean)
-					.join(" ")}
-				style={{
-					background: isActive
-						? "var(--window-header-active)"
-						: "var(--window-header)",
-					borderBottom: "1px solid var(--border)",
-				}}
-			>
-				<div className="flex items-center gap-2">
-					<div className="flex gap-2">
-						{/* Close */}
-						<TrafficButton
-							color={closeLocked ? "#888888" : "#f46067"}
-							hoverColor={closeLocked ? "#aaaaaa" : "#f68086"}
-							label={closeLocked ? "Close (close README first)" : "Close"}
-							onClick={handleClose}
-							icon={<X size={10} />}
-							dimmed={closeLocked}
-						/>
-						{/* Minimize */}
-						<TrafficButton
-							color="#f6a847"
-							hoverColor="#f8b867"
-							label="Minimize"
-							onClick={(e) => {
-								e.stopPropagation();
-								onMinimize();
-							}}
-							icon={<Minimize2 size={8} />}
-							disabled={isMobile}
-						/>
-						{/* Maximize */}
-						<TrafficButton
-							color="#64c550"
-							hoverColor="#84d570"
-							label={isMaximized ? "Restore" : "Maximize"}
-							onClick={(e) => {
-								e.stopPropagation();
-								onMaximize();
-							}}
-							icon={<Maximize2 size={8} />}
-							disabled={isMobile}
-						/>
-					</div>
-
-					<span
-						className="text-sm font-medium ml-2 truncate max-w-48"
-						style={{ color: "var(--text-primary)" }}
-					>
-						{title}
-					</span>
+		<div
+			className={[
+				"window-titlebar h-9 flex items-center justify-between px-3 select-none shrink-0",
+				draggable ? "cursor-grab active:cursor-grabbing" : "",
+				shaking ? "wm-shake" : "",
+			]
+				.filter(Boolean)
+				.join(" ")}
+			style={{
+				background: isActive
+					? "var(--window-header-active)"
+					: "var(--window-header)",
+				borderBottom: "1px solid var(--border)",
+			}}
+		>
+			<div className="flex items-center gap-2">
+				<div className="flex gap-2">
+					{/* Close */}
+					<TrafficButton
+						color={closeLocked ? "#888888" : "#f46067"}
+						hoverColor={closeLocked ? "#aaaaaa" : "#f68086"}
+						label={closeLocked ? "Close (close README first)" : "Close"}
+						onClick={handleClose}
+						icon={<X size={10} />}
+						dimmed={closeLocked}
+					/>
+					{/* Minimize */}
+					<TrafficButton
+						color="#f6a847"
+						hoverColor="#f8b867"
+						label="Minimize"
+						onClick={(e) => {
+							e.stopPropagation();
+							onMinimize();
+						}}
+						icon={<Minimize2 size={8} />}
+						disabled={isMobile}
+					/>
+					{/* Maximize */}
+					<TrafficButton
+						color="#64c550"
+						hoverColor="#84d570"
+						label={isMaximized ? "Restore" : "Maximize"}
+						onClick={(e) => {
+							e.stopPropagation();
+							onMaximize();
+						}}
+						icon={<Maximize2 size={8} />}
+						disabled={isMobile}
+					/>
 				</div>
+
+				<span
+					className="text-sm font-medium ml-2 truncate max-w-48"
+					style={{ color: "var(--text-primary)" }}
+				>
+					{title}
+				</span>
 			</div>
-		</>
+		</div>
 	);
 }
 

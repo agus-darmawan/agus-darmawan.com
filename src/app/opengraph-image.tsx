@@ -1,7 +1,4 @@
 // src/app/opengraph-image.tsx
-// Next.js akan otomatis serve ini sebagai /opengraph-image
-// Docs: https://nextjs.org/docs/app/api-reference/file-conventions/opengraph-image
-
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
@@ -13,8 +10,8 @@ export default function OGImage() {
 	return new ImageResponse(
 		<div
 			style={{
-				width: "100%",
-				height: "100%",
+				width: "1200px",
+				height: "630px",
 				display: "flex",
 				flexDirection: "column",
 				background: "#0d0010",
@@ -27,20 +24,21 @@ export default function OGImage() {
 			<div
 				style={{
 					position: "absolute",
-					inset: 0,
+					inset: "0",
+					display: "flex",
 					background:
-						"radial-gradient(ellipse at 20% 50%, #77216f40 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, #e9542020 0%, transparent 50%)",
+						"radial-gradient(ellipse at 20% 50%, rgba(119,33,111,0.35) 0%, transparent 60%)",
 				}}
 			/>
 
-			{/* Grid lines decoration */}
+			{/* Orange accent gradient */}
 			<div
 				style={{
 					position: "absolute",
-					inset: 0,
-					backgroundImage:
-						"linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
-					backgroundSize: "60px 60px",
+					inset: "0",
+					display: "flex",
+					background:
+						"radial-gradient(ellipse at 80% 20%, rgba(233,84,32,0.15) 0%, transparent 50%)",
 				}}
 			/>
 
@@ -48,10 +46,10 @@ export default function OGImage() {
 			<div
 				style={{
 					position: "absolute",
-					top: 0,
-					left: 0,
-					right: 0,
-					height: 36,
+					top: "0",
+					left: "0",
+					right: "0",
+					height: "36px",
 					background: "rgba(18,8,16,0.95)",
 					display: "flex",
 					alignItems: "center",
@@ -59,19 +57,39 @@ export default function OGImage() {
 					justifyContent: "space-between",
 				}}
 			>
-				<span style={{ color: "rgba(255,255,255,0.7)", fontSize: 13 }}>
+				<span
+					style={{
+						color: "rgba(255,255,255,0.6)",
+						fontSize: "13px",
+						display: "flex",
+					}}
+				>
 					Activities
 				</span>
-				<span style={{ color: "rgba(255,255,255,0.7)", fontSize: 13 }}>
+				<span
+					style={{
+						color: "rgba(255,255,255,0.6)",
+						fontSize: "13px",
+						display: "flex",
+					}}
+				>
 					Mon Mar 16 · 19:00
 				</span>
-				<span style={{ color: "rgba(255,255,255,0.7)", fontSize: 13 }}>▾</span>
+				<span
+					style={{
+						color: "rgba(255,255,255,0.6)",
+						fontSize: "13px",
+						display: "flex",
+					}}
+				>
+					EN
+				</span>
 			</div>
 
 			{/* Main content */}
 			<div
 				style={{
-					flex: 1,
+					flex: "1",
 					display: "flex",
 					flexDirection: "column",
 					justifyContent: "center",
@@ -79,22 +97,22 @@ export default function OGImage() {
 					paddingTop: "96px",
 				}}
 			>
-				{/* Ubuntu logo dots */}
+				{/* Header row — logo + label */}
 				<div
 					style={{
 						display: "flex",
 						alignItems: "center",
-						gap: 16,
-						marginBottom: 32,
+						gap: "16px",
+						marginBottom: "32px",
 					}}
 				>
+					{/* Ubuntu circle logo */}
 					<div
 						style={{
-							width: 48,
-							height: 48,
+							width: "48px",
+							height: "48px",
 							borderRadius: "50%",
 							border: "3px solid #e95420",
-							position: "relative",
 							display: "flex",
 							alignItems: "center",
 							justifyContent: "center",
@@ -102,19 +120,22 @@ export default function OGImage() {
 					>
 						<div
 							style={{
-								width: 10,
-								height: 10,
+								width: "10px",
+								height: "10px",
 								borderRadius: "50%",
 								background: "#e95420",
+								display: "flex",
 							}}
 						/>
 					</div>
+
 					<span
 						style={{
 							color: "#e95420",
-							fontSize: 16,
+							fontSize: "15px",
 							letterSpacing: "0.2em",
 							textTransform: "uppercase",
+							display: "flex",
 						}}
 					>
 						Ubuntu Portfolio
@@ -124,31 +145,49 @@ export default function OGImage() {
 				{/* Name */}
 				<div
 					style={{
-						fontSize: 72,
-						fontWeight: 700,
-						color: "white",
-						lineHeight: 1.1,
-						marginBottom: 16,
+						display: "flex",
+						flexDirection: "column",
+						marginBottom: "16px",
 					}}
 				>
-					I Wayan Agus
-					<br />
-					<span style={{ color: "#e95420" }}>Darmawan</span>
+					<span
+						style={{
+							fontSize: "72px",
+							fontWeight: 700,
+							color: "white",
+							lineHeight: "1.1",
+							display: "flex",
+						}}
+					>
+						I Wayan Agus
+					</span>
+					<span
+						style={{
+							fontSize: "72px",
+							fontWeight: 700,
+							color: "#e95420",
+							lineHeight: "1.1",
+							display: "flex",
+						}}
+					>
+						Darmawan
+					</span>
 				</div>
 
 				{/* Role */}
 				<div
 					style={{
-						fontSize: 24,
-						color: "rgba(255,255,255,0.6)",
-						marginBottom: 48,
+						fontSize: "24px",
+						color: "rgba(255,255,255,0.55)",
+						marginBottom: "48px",
+						display: "flex",
 					}}
 				>
-					Full-Stack & Robotics Developer · Denpasar, Bali
+					Full-Stack &amp; Robotics Developer · Denpasar, Bali
 				</div>
 
 				{/* Tech tags */}
-				<div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+				<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
 					{[
 						"Next.js",
 						"TypeScript",
@@ -161,12 +200,13 @@ export default function OGImage() {
 							key={tag}
 							style={{
 								padding: "6px 16px",
-								borderRadius: 999,
+								borderRadius: "999px",
 								background: "rgba(233,84,32,0.15)",
 								border: "1px solid rgba(233,84,32,0.3)",
 								color: "#e95420",
-								fontSize: 14,
+								fontSize: "14px",
 								fontWeight: 500,
+								display: "flex",
 							}}
 						>
 							{tag}
@@ -185,10 +225,22 @@ export default function OGImage() {
 					borderTop: "1px solid rgba(255,255,255,0.06)",
 				}}
 			>
-				<span style={{ color: "rgba(255,255,255,0.35)", fontSize: 14 }}>
+				<span
+					style={{
+						color: "rgba(255,255,255,0.3)",
+						fontSize: "14px",
+						display: "flex",
+					}}
+				>
 					agus-darmawan.com
 				</span>
-				<span style={{ color: "rgba(255,255,255,0.35)", fontSize: 14 }}>
+				<span
+					style={{
+						color: "rgba(255,255,255,0.3)",
+						fontSize: "14px",
+						display: "flex",
+					}}
+				>
 					github.com/agus-darmawan
 				</span>
 			</div>
