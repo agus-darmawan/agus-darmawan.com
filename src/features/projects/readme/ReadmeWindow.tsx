@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import type { ProjectMeta } from "../projects.data";
 import { ReadmeRenderer } from "./ReadmeRenderer";
 
+const CONTENT_URL = process.env.NEXT_PUBLIC_CONTENT_URL ?? "";
+
 interface ReadmeWindowProps {
 	project: ProjectMeta;
 	name: string;
@@ -25,11 +27,25 @@ export default function ReadmeWindow({
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		fetch(`/readme/${locale}/${readmeFile}.mdx`)
+		const controller = new AbortController();
+		setLoading(true);
+		setReadmeContent(null);
+
+		fetch(`${CONTENT_URL}/readme/${locale}/${readmeFile}.mdx`, {
+			signal: controller.signal,
+		})
 			.then((r) => (r.ok ? r.text() : Promise.reject(new Error("not found"))))
 			.then((text) => setReadmeContent(text))
-			.catch(() => setReadmeContent(`# ${name}\n\n${desc}`))
+			.catch((err) => {
+				// Ignore AbortError — component unmount sebelum fetch selesai
+				if (err.name !== "AbortError") {
+					setReadmeContent(`# ${name}\n\n${desc}`);
+				}
+			})
 			.finally(() => setLoading(false));
+
+		// Cancel request kalau locale/file berubah atau component unmount
+		return () => controller.abort();
 	}, [locale, readmeFile, name, desc]);
 
 	return (
@@ -51,6 +67,7 @@ export default function ReadmeWindow({
 				>
 					{project.emoji}
 				</div>
+
 				<div className="flex-1 min-w-0">
 					<h2
 						className="text-sm font-bold truncate"
@@ -65,6 +82,7 @@ export default function ReadmeWindow({
 						{desc}
 					</p>
 				</div>
+
 				<a
 					href={project.github}
 					target="_blank"

@@ -18,8 +18,8 @@ interface ResumeViewerClientProps {
 export default function ResumeViewerClient({ t }: ResumeViewerClientProps) {
 	const params = useParams();
 	const locale = (params?.locale as string) ?? "en";
-	const pdfPath = `/resume/resume_${locale}.pdf`;
-
+	const contentUrl = process.env.NEXT_PUBLIC_CONTENT_URL ?? "";
+	const pdfPath = `${contentUrl}/resume/resume_${locale}.pdf`;
 	const { zoom, zoomIn, zoomOut, resetZoom } = usePdfZoom();
 	const { pdf, numPages, isLoading, error } = usePdfLoader(pdfPath);
 
