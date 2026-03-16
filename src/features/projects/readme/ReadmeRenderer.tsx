@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useRef } from "react";
-import { useReadmeScroll } from "@/hooks/project/useReadmeScroll";
 import { parseMdx } from "@/lib/mdx-parser";
+import { useReadmeScroll } from "../hooks/useReadmeScroll";
 import { ReadmeBlocks } from "./ReadmeBlocks";
 import { TableOfContents } from "./TableOfContents";
 
