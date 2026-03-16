@@ -2,8 +2,8 @@
 
 import { AlertCircle, CheckCircle2, Loader2, Send } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useContactForm } from "@/hooks/contact/useContactForm";
 import { ContactInputField, ContactTextareaField } from "./ContactFormField";
+import { useContactForm } from "./hooks/useContactForm";
 
 export function ContactForm() {
 	const t = useTranslations("ContactWindow");
