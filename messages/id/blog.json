@@ -2,10 +2,15 @@
 	"BlogWindow": {
 		"title": "Blog",
 		"subtitle": "{count} tulisan",
+		"published": "dipublikasikan",
+		"filterHint": "Filter berdasarkan topik",
+		"headerDesc": "Catatan tentang full-stack development, robotika, dan membangun sesuatu yang benar-benar bekerja — dari Bali.",
 		"latestPosts": "Tulisan Terbaru",
-		"backToBlog": "← Semua tulisan",
+		"backToBlog": "Semua tulisan",
 		"readTime": "{min} menit baca",
-		"comingSoon": "Konten segera hadir."
+		"comingSoon": "Konten segera hadir.",
+		"searchPlaceholder": "Cari tulisan…",
+		"noResults": "Tidak ada tulisan ditemukan."
 	},
 	"Blog": {
 		"buildingUbuntuPortfolio": {

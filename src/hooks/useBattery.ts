@@ -1,6 +1,3 @@
-// src/hooks/useBattery.ts
-// Fix #5 — hapus re-throw di catch, Battery API tidak tersedia di banyak browser
-
 import { useEffect, useState } from "react";
 
 interface BatteryState {

@@ -2,10 +2,15 @@
 	"BlogWindow": {
 		"title": "Blog",
 		"subtitle": "{count} posts",
+		"published": "published",
+		"filterHint": "Filter by topic",
+		"headerDesc": "Thoughts on full-stack development, robotics, and building things that actually work — from Bali.",
 		"latestPosts": "Latest Posts",
-		"backToBlog": "← All posts",
+		"backToBlog": "All posts",
 		"readTime": "{min} min read",
-		"comingSoon": "Content coming soon."
+		"comingSoon": "Content coming soon.",
+		"searchPlaceholder": "Search posts…",
+		"noResults": "No posts found."
 	},
 	"Blog": {
 		"buildingUbuntuPortfolio": {
