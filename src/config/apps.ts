@@ -1,4 +1,6 @@
+// src/config/apps.ts
 import {
+	BookOpen,
 	Briefcase,
 	FileText,
 	Folder,
@@ -19,6 +21,7 @@ export const APPS: AppConfig[] = [
 		color: "bg-blue-600",
 	},
 	{ id: "projects", name: "projects", icon: Folder, color: "bg-teal-500" },
+	{ id: "blog", name: "blog", icon: BookOpen, color: "bg-violet-500" },
 	{ id: "contact", name: "contact", icon: Mail, color: "bg-purple-600" },
 ];
 

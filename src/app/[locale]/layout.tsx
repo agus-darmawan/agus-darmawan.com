@@ -18,8 +18,12 @@ const ubuntu = Ubuntu({
 });
 
 export const metadata: Metadata = {
-	title: "Darmawan Portfolio",
-	description: "Interactive Ubuntu 22.04 themed portfolio",
+	title: {
+		default: "Agus Darmawan — Portfolio",
+		template: "%s · Agus Darmawan",
+	},
+	description:
+		"Full-Stack & Robotics Developer. Building web apps and autonomous robots from Bali, Indonesia.",
 	keywords: [
 		"portfolio",
 		"ubuntu",
@@ -27,14 +31,34 @@ export const metadata: Metadata = {
 		"web development",
 		"react",
 		"next.js",
+		"robotics",
+		"ROS",
+		"full-stack",
+		"Bali",
+		"Indonesia",
 	],
-	authors: [{ name: "I Wayan Agus Darmawan" }],
+	authors: [
+		{ name: "I Wayan Agus Darmawan", url: "https://agus-darmawan.com" },
+	],
 	creator: "agus-darmawan",
+	metadataBase: new URL("https://agus-darmawan.com"),
+	manifest: "/manifest.json",
 	openGraph: {
-		title: "Ubuntu Portfolio - Agus Darmawan",
-		description: "Interactive Ubuntu 22.04 themed portfolio",
+		title: "Agus Darmawan — Full-Stack & Robotics Developer",
+		description:
+			"Interactive Ubuntu 22.04 themed portfolio. Full-Stack & Robotics Developer from Bali.",
+		url: "https://agus-darmawan.com",
+		siteName: "Agus Darmawan Portfolio",
 		type: "website",
+		locale: "en_US",
 	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Agus Darmawan — Full-Stack & Robotics Developer",
+		description: "Interactive Ubuntu 22.04 themed portfolio.",
+		creator: "@agusdarmawnn",
+	},
+	robots: { index: true, follow: true },
 };
 
 export default async function LocaleLayout({ children, params }: Props) {

@@ -1,18 +1,25 @@
 "use client";
-import { useCallback, useEffect, useMemo } from "react";
+
+import { AnimatePresence } from "framer-motion";
+import { useTheme } from "next-themes";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { BootScreen } from "@/features/boot/BootScreen";
+import { CommandPalette } from "@/features/command-palette/CommandPalette";
 import { Dock } from "@/features/dock/Dock";
 import ReadmeWindow from "@/features/projects/readme/ReadmeWindow";
+import { Screensaver } from "@/features/screensaver/Screensaver";
 import TopBar from "@/features/top-bar/TopBar";
 import { useWindowDrag } from "@/features/window-manager/hooks/useWindowDrag";
+import { SnapPreview } from "@/features/window-manager/SnapPreview";
 import { WindowFrame } from "@/features/window-manager/WindowFrame";
 import { getWindowComponent } from "@/features/window-manager/window.registry";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { useWindowStore } from "@/store/useWindowStore";
 import type { WindowState } from "@/types/app";
 
 // ── Window Content ────────────────────────────────────────────────────────────
 
 function WindowContent({ win }: { win: WindowState }) {
-	// README windows carry typed data
 	if (win.appId.startsWith("readme-") && win.data?.kind === "readme") {
 		return (
 			<ReadmeWindow
@@ -24,7 +31,6 @@ function WindowContent({ win }: { win: WindowState }) {
 		);
 	}
 
-	// All other windows via registry — lazy loaded
 	const Component = getWindowComponent(win.appId);
 
 	if (!Component) {
@@ -44,7 +50,24 @@ function WindowContent({ win }: { win: WindowState }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function IndexPage() {
-	// Single store — no more manual sync between useAppStore + useWindowManager
+	// ── Boot screen ──────────────────────────────────────────────────────────
+	// Start as null (unknown) to avoid SSR/client mismatch
+	// useEffect runs only on client — safe to read sessionStorage there
+	const [booting, setBooting] = useState<boolean | null>(null);
+
+	useEffect(() => {
+		// Only runs on client — no SSR mismatch
+		const hasBooted = sessionStorage.getItem("hasBooted");
+		setBooting(!hasBooted);
+	}, []);
+
+	const handleBootDone = useCallback(() => {
+		sessionStorage.setItem("hasBooted", "1");
+		setBooting(false);
+	}, []);
+
+	// ── Store ────────────────────────────────────────────────────────────────
+
 	const windows = useWindowStore((s) => s.windows);
 	const activeWindowId = useWindowStore((s) => s.activeWindowId);
 	const openWindow = useWindowStore((s) => s.openWindow);
@@ -57,24 +80,26 @@ export default function IndexPage() {
 	const minimizeAllWindows = useWindowStore((s) => s.minimizeAllWindows);
 	const getEffectiveZ = useWindowStore((s) => s.getEffectiveZ);
 
-	// Drag — stays as hook because it needs mouse event listeners
-	const { dragging, handleMouseDown } = useWindowDrag({
+	const { dragging, snapPreview, handleMouseDown } = useWindowDrag({
 		getWindows: () => useWindowStore.getState().windows,
 		onBringToFront: bringToFront,
 		onPositionChange: useWindowStore.getState().updatePosition,
 	});
 
-	// ── Events ──────────────────────────────────────────────────────────────
+	// ── Theme & locale for terminal commands ─────────────────────────────────
 
-	// Minimize all windows (triggered by dock launcher)
+	const { setTheme } = useTheme();
+	const router = useRouter();
+	const pathname = usePathname();
+
+	// ── Events ───────────────────────────────────────────────────────────────
+
 	useEffect(() => {
 		const handler = () => minimizeAllWindows();
 		window.addEventListener("minimizeAllWindows", handler);
 		return () => window.removeEventListener("minimizeAllWindows", handler);
 	}, [minimizeAllWindows]);
 
-	// Open README window — dispatched by ProjectsWindow via custom event
-	// This decouples ProjectsWindow from page.tsx (no more prop drilling onOpenReadme)
 	useEffect(() => {
 		const handler = (e: CustomEvent) => {
 			const { project, name, desc, readmeFile } = e.detail;
@@ -86,70 +111,115 @@ export default function IndexPage() {
 				readmeFile,
 			});
 		};
-
 		window.addEventListener("openReadme", handler as EventListener);
 		return () =>
 			window.removeEventListener("openReadme", handler as EventListener);
 	}, [openWindow]);
 
-	// ── Derived ─────────────────────────────────────────────────────────────
+	// Terminal → open app
+	useEffect(() => {
+		const handler = (e: CustomEvent) => openWindow(e.detail.appId);
+		window.addEventListener("openApp", handler as EventListener);
+		return () =>
+			window.removeEventListener("openApp", handler as EventListener);
+	}, [openWindow]);
 
-	// True when at least one non-minimized README is open
+	// Terminal → close active window
+	// Use getState() to avoid re-registering on every focus change
+	useEffect(() => {
+		const handler = () => {
+			const id = useWindowStore.getState().activeWindowId;
+			if (id) useWindowStore.getState().closeWindow(id);
+		};
+		window.addEventListener("closeActiveWindow", handler);
+		return () => window.removeEventListener("closeActiveWindow", handler);
+	}, []);
+
+	// Terminal → switch theme
+	useEffect(() => {
+		const handler = (e: CustomEvent) => setTheme(e.detail);
+		window.addEventListener("setTheme", handler as EventListener);
+		return () =>
+			window.removeEventListener("setTheme", handler as EventListener);
+	}, [setTheme]);
+
+	// Terminal → switch locale
+	// router and pathname are stable refs from next-intl — no need to add locale
+	useEffect(() => {
+		const handler = (e: CustomEvent) => {
+			router.push(pathname, { locale: e.detail });
+		};
+		window.addEventListener("setLocale", handler as EventListener);
+		return () =>
+			window.removeEventListener("setLocale", handler as EventListener);
+	}, [router, pathname]);
+
+	// ── Derived ──────────────────────────────────────────────────────────────
+
 	const hasOpenReadme = useMemo(
 		() => windows.some((w) => w.appId.startsWith("readme-") && !w.minimized),
 		[windows],
 	);
 
-	// ── Handlers ────────────────────────────────────────────────────────────
+	// ── Handlers ─────────────────────────────────────────────────────────────
 
 	const handleClose = useCallback(
 		(win: WindowState) => {
-			// Projects window is locked while any README is open
 			const closeLocked = win.appId === "projects" && hasOpenReadme;
-
 			if (closeLocked) {
-				// Flash all open README windows to hint the user
 				windows
 					.filter((w) => w.appId.startsWith("readme-") && !w.minimized)
 					.forEach((w) => bringToFront(w.id));
 				return;
 			}
-
 			closeWindow(win.id);
 		},
 		[hasOpenReadme, windows, bringToFront, closeWindow],
 	);
 
-	// ── Render ───────────────────────────────────────────────────────────────
+	// ── Render ────────────────────────────────────────────────────────────────
 
+	// null = unknown (SSR / first paint) → render nothing to avoid flash
+	if (booting === null) return null;
+
+	// true = first visit this session → show boot screen
+	if (booting) {
+		return <BootScreen onDone={handleBootDone} />;
+	}
+
+	// false = already booted → show portfolio
 	return (
 		<main className="w-full h-screen bg-ubuntu-purple overflow-hidden select-none">
+			<CommandPalette />
+			<Screensaver />
 			<TopBar />
 
 			<div className="relative h-[calc(100vh-4rem)] mt-8">
-				{windows.map((win) => {
-					const closeLocked = win.appId === "projects" && hasOpenReadme;
-
-					return (
-						<WindowFrame
-							key={win.id}
-							window={{ ...win, zIndex: getEffectiveZ(win) }}
-							isActive={activeWindowId === win.id}
-							isDragging={dragging === win.id}
-							onMouseDown={(e) => handleMouseDown(e, win.id)}
-							onClick={() => {
-								setActiveWindow(win.id);
-								bringToFront(win.id);
-							}}
-							onClose={() => handleClose(win)}
-							onMinimize={() => minimizeWindow(win.id)}
-							onMaximize={() => toggleMaximize(win.id)}
-							closeLocked={closeLocked}
-						>
-							<WindowContent win={win} />
-						</WindowFrame>
-					);
-				})}
+				<SnapPreview snapPreview={snapPreview} />{" "}
+				<AnimatePresence>
+					{windows.map((win) => {
+						const closeLocked = win.appId === "projects" && hasOpenReadme;
+						return (
+							<WindowFrame
+								key={win.id}
+								window={{ ...win, zIndex: getEffectiveZ(win) }}
+								isActive={activeWindowId === win.id}
+								isDragging={dragging === win.id}
+								onMouseDown={(e) => handleMouseDown(e, win.id)}
+								onClick={() => {
+									setActiveWindow(win.id);
+									bringToFront(win.id);
+								}}
+								onClose={() => handleClose(win)}
+								onMinimize={() => minimizeWindow(win.id)}
+								onMaximize={() => toggleMaximize(win.id)}
+								closeLocked={closeLocked}
+							>
+								<WindowContent win={win} />
+							</WindowFrame>
+						);
+					})}
+				</AnimatePresence>
 			</div>
 
 			<Dock

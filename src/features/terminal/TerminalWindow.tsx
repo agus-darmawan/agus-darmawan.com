@@ -72,10 +72,17 @@ export default function TerminalWindow() {
 
 	return (
 		<div
+			role="application"
+			aria-label="Terminal"
 			className="h-full flex flex-col bg-neutral-950 text-zinc-200 font-mono text-sm"
 			onClick={() => inputRef.current?.focus()}
 		>
-			<div className="flex-1 overflow-y-auto p-3 space-y-0.5">
+			<div
+				role="log"
+				aria-live="polite"
+				aria-label="Terminal output"
+				className="flex-1 overflow-y-auto p-3 space-y-0.5"
+			>
 				<TerminalOutput lines={lines} />
 
 				<TerminalInputLine

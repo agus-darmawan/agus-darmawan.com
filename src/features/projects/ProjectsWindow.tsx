@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
+import { useGitHubStars } from "./hooks/useGitHubStars";
 import { ProjectCard } from "./ProjectCard";
 import {
 	PROJECTS_META,
@@ -25,6 +26,9 @@ export default function ProjectsWindow() {
 	const tProjects = useTranslations("Projects");
 	const [filter, setFilter] = useState<ProjectCategory | "all">("all");
 
+	// Live star counts from GitHub API — falls back to hardcoded if unavailable
+	const { getStars } = useGitHubStars();
+
 	const filtered = useMemo(
 		() =>
 			filter === "all"
@@ -33,9 +37,11 @@ export default function ProjectsWindow() {
 		[filter],
 	);
 
+	// Total stars — live from GitHub
 	const totalStars = useMemo(
-		() => PROJECTS_META.reduce((s, p) => s + p.stars, 0),
-		[],
+		() =>
+			PROJECTS_META.reduce((s, p) => s + getStars(p.githubRepo, p.stars), 0),
+		[getStars],
 	);
 
 	const featuredCount = useMemo(
@@ -48,8 +54,6 @@ export default function ProjectsWindow() {
 		string,
 	][];
 
-	// Dispatch custom event instead of prop drilling onOpenReadme
-	// page.tsx listens to this event and calls openWindow
 	const handleCardClick = (project: ProjectMeta) => {
 		window.dispatchEvent(
 			new CustomEvent("openReadme", {
@@ -198,6 +202,7 @@ export default function ProjectsWindow() {
 								project={project}
 								name={tProjects(`${project.i18nKey}.name`)}
 								desc={tProjects(`${project.i18nKey}.desc`)}
+								stars={getStars(project.githubRepo, project.stars)}
 								onClick={handleCardClick}
 							/>
 						))}

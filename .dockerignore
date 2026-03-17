@@ -1,0 +1,39 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build output
+.next
+out
+
+# Environment files — never bake secrets into image
+.env
+.env.local
+.env.*.local
+.env.sentry-build-plugin
+.sentryclirc
+
+# Dev files
+.git
+.gitignore
+README.md
+*.md
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+coverage
+*.test.ts
+*.test.tsx
+vitest.config.ts
+
+# CI
+.github

@@ -8,11 +8,12 @@
 		"resume": "Resume",
 		"experience": "Experience",
 		"projects": "Projects",
+		"blog": "Blog",
 		"contact": "Contact",
 		"search": "Search applications…",
 		"noResults": "No applications found",
-		"launcherClose": "Close",
-		"launcherOpen": "Show Apps"
+		"launcherOpen": "Show Apps",
+		"launcherClose": "Close"
 	},
 	"Windows": {
 		"about": "About Me",
@@ -20,6 +21,7 @@
 		"resume": "Resume",
 		"experience": "Experience",
 		"projects": "Projects",
+		"blog": "Blog",
 		"contact": "Contact"
 	}
 }

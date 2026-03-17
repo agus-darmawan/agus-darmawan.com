@@ -8,11 +8,12 @@
 		"resume": "Resume",
 		"experience": "Pengalaman",
 		"projects": "Proyek",
+		"blog": "Blog",
 		"contact": "Kontak",
 		"search": "Cari aplikasi…",
 		"noResults": "Tidak ada aplikasi ditemukan",
-		"launcherClose": "Tutup",
-		"launcherOpen": "Tampilkan Aplikasi"
+		"launcherOpen": "Tampilkan Aplikasi",
+		"launcherClose": "Tutup"
 	},
 	"Windows": {
 		"about": "Tentang Saya",
@@ -20,6 +21,7 @@
 		"resume": "Resume",
 		"experience": "Pengalaman",
 		"projects": "Proyek",
+		"blog": "Blog",
 		"contact": "Kontak"
 	}
 }
