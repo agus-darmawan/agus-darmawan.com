@@ -4,218 +4,133 @@
 
 [![CI](https://github.com/agus-darmawan/ubuntu-portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/agus-darmawan/ubuntu-portfolio/actions)
 [![Deploy](https://img.shields.io/badge/deployed-vercel-black)](https://agus-darmawan.com)
-[![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
-
-![Portfolio Preview](./public/og-preview.png)
 
 ---
 
-## ✨ Features
+## Stack
 
-- 🪟 **Draggable windows** — resize, minimize, maximize, z-index management
-- 🎵 **Spotify integration** — live now-playing in the top bar
-- 🌐 **Bilingual** — English and Bahasa Indonesia (next-intl)
-- 🌙 **Dark / Light mode** — persisted across sessions
-- 💻 **Functional terminal** — with vim editor, file system simulation, and easter eggs
-- 📄 **PDF resume viewer** — with zoom and page navigation
-- 📬 **Contact form** — with email delivery via SMTP
-- ⚡ **Edge-ready** — Cloudflare CDN, Workers, and R2 for static content
+Next.js 16 · TypeScript · Tailwind CSS v4 · Zustand · TanStack Query · Framer Motion · next-intl · Cloudflare
 
 ---
 
-## 🛠️ Tech Stack
+## Features
 
-| Category | Technology |
-|---|---|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS v4 |
-| State | Zustand + TanStack Query |
-| i18n | next-intl |
-| Linting | Biome |
-| Email | Nodemailer |
-| PDF | pdfjs-dist |
-| Infra | Vercel + Cloudflare |
+- 🪟 Draggable windows with snap-to-edge
+- ⌨️ Functional terminal with `man agus`, easter eggs, and UI commands
+- ⌘ Command palette (`Ctrl+K`)
+- 🌙 Screensaver after 60s idle
+- 🎵 Live Spotify now-playing
+- 🌐 EN / ID bilingual
+- 📬 Contact form with Cloudflare Turnstile
+- 🚀 OG image, web manifest, Sentry error tracking
 
 ---
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js 20+
-- npm or pnpm
-
-### 1. Clone the repo
+## Quick Start
 
 ```bash
 git clone https://github.com/agus-darmawan/ubuntu-portfolio.git
 cd ubuntu-portfolio
-```
-
-### 2. Install dependencies
-
-```bash
-npm install
-```
-
-### 3. Setup environment variables
-
-```bash
+pnpm install
 cp .env.example .env.local
+# Fill in .env.local, then:
+pnpm dev
 ```
 
-Open `.env.local` and fill in the required values.
+---
 
-**Required:**
-- `SPOTIFY_CLIENT_ID`
-- `SPOTIFY_CLIENT_SECRET`
-- `SPOTIFY_REFRESH_TOKEN`
+## Environment Variables
 
-See [Getting Spotify credentials](#getting-spotify-credentials) below.
+Copy `.env.example` to `.env.local` and fill in the values.
 
-**Optional (contact form):**
-- SMTP variables — if not set, form submissions are logged to console
+| Variable | Required | Description |
+|---|---|---|
+| `SPOTIFY_CLIENT_ID` | ✅ | Spotify app client ID |
+| `SPOTIFY_CLIENT_SECRET` | ✅ | Spotify app client secret |
+| `SPOTIFY_REFRESH_TOKEN` | ✅ | Spotify refresh token |
+| `SMTP_*` | — | Email delivery for contact form |
+| `CONTACT_EMAIL` | — | Where contact form sends to |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | — | Cloudflare Turnstile (bot protection) |
+| `TURNSTILE_SECRET_KEY` | — | Cloudflare Turnstile secret |
+| `NEXT_PUBLIC_SENTRY_DSN` | — | Sentry error tracking |
+| `SENTRY_AUTH_TOKEN` | — | Sentry source map upload |
+| `NEXT_PUBLIC_CONTENT_URL` | — | Cloudflare R2 CDN for MDX/PDF |
+| `NEXT_PUBLIC_APP_URL` | — | Base URL for OG images |
+| `NEXT_PUBLIC_SPOTIFY_WORKER_URL` | — | Cloudflare Worker for Spotify |
+| `CF_ACCOUNT_ID` | — | Cloudflare account (visitor counter) |
+| `CF_SITE_TAG` | — | Cloudflare Analytics site tag |
+| `CF_API_TOKEN` | — | Cloudflare API token |
+| `GITHUB_TOKEN` | — | GitHub API (higher rate limit) |
 
-### 4. Run development server
+### Getting Spotify credentials
+
+1. Create app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard)
+2. Set redirect URI to `http://localhost:3000`
+3. Copy **Client ID** and **Client Secret**
+4. Get refresh token: [spotify-refresh-token](https://github.com/aleccool213/get-spotify-refresh-token) — scopes: `user-read-currently-playing`
+
+---
+
+## Scripts
 
 ```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
----
-
-## 🎵 Getting Spotify Credentials
-
-1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. Create a new app
-3. Set **Redirect URI** to `http://localhost:3000`
-4. Copy **Client ID** and **Client Secret**
-5. Get your **Refresh Token** using one of these methods:
-   - [spotify-refresh-token](https://github.com/aleccool213/get-spotify-refresh-token) — easiest CLI tool
-   - [Spotify Auth Flow guide](https://developer.spotify.com/documentation/web-api/tutorials/code-flow)
-6. Required scopes: `user-read-currently-playing user-read-playback-state`
-
----
-
-## 📧 Setting Up Contact Form
-
-The contact form works without SMTP configured — submissions are logged to server console.
-
-To enable email delivery, set SMTP variables in `.env.local`.
-
-**Recommended: [Resend](https://resend.com)** (free tier: 3000 emails/month)
-
-```env
-SMTP_HOST=smtp.resend.com
-SMTP_PORT=465
-SMTP_SECURE=true
-SMTP_USER=resend
-SMTP_PASS=re_your_api_key
-CONTACT_EMAIL=your@email.com
+pnpm dev          # Development server
+pnpm build        # Production build
+pnpm analyze      # Bundle analyzer
+pnpm test:run     # Run tests once
+pnpm type-check   # TypeScript check
+pnpm lint         # Biome lint
+pnpm lint:fix     # Auto-fix lint issues
 ```
 
 ---
 
-## 📁 Project Structure
+## Docker
+
+```bash
+docker build \
+  --build-arg SPOTIFY_CLIENT_ID=xxx \
+  --build-arg SPOTIFY_CLIENT_SECRET=xxx \
+  --build-arg SPOTIFY_REFRESH_TOKEN=xxx \
+  -t ubuntu-portfolio .
+
+docker run -p 3000:3000 ubuntu-portfolio
+```
+
+---
+
+## Project Structure
 
 ```
 src/
-  app/                    # Next.js App Router
-    [locale]/             # i18n routing
-    api/                  # API routes
-  features/               # Feature-based components
+  app/              Next.js App Router + API routes
+  features/         Feature-based components
     about/
+    blog/
     contact/
     dock/
     experience/
     projects/
     resume/
+    screensaver/
     terminal/
     top-bar/
     window-manager/
-  hooks/                  # Shared hooks (used by 2+ features)
-  lib/                    # Utilities (no React)
-  store/                  # Zustand stores
-  types/                  # Shared TypeScript types
-  i18n/                   # next-intl config
-  config/                 # App-wide constants
+    command-palette/
+    boot/
+  hooks/            Shared hooks
+  store/            Zustand stores
+  lib/              Utilities (no React)
+  types/            Shared TypeScript types
 
-messages/
-  en/                     # English translations
-  id/                     # Indonesian translations
-
-public/
-  avatar.png
-  companies/              # Company logos
-  resume/                 # PDF resume files
+content/
+  readme/en|id/     Project README files (MDX)
+  blog/en|id/       Blog posts (MDX)
+  resume/           PDF resume files
 ```
 
 ---
 
-## 🌍 Adding a New Language
+## License
 
-1. Create `messages/{locale}/` directory
-2. Copy all files from `messages/en/`
-3. Translate the values
-4. Add locale to `src/i18n/routing.ts`:
-
-```ts
-export const routing = defineRouting({
-  locales: ["en", "id", "your-new-locale"],
-  defaultLocale: "en",
-})
-```
-
----
-
-## 📜 Available Scripts
-
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run Biome linter
-npm run lint:fix     # Auto-fix lint issues
-npm run format       # Format code with Biome
-npm run type-check   # TypeScript type checking
-```
-
----
-
-## 🚢 Deployment
-
-### Vercel (Recommended)
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/agus-darmawan/ubuntu-portfolio)
-
-1. Click the button above or import repo manually at [vercel.com](https://vercel.com)
-2. Add environment variables in Vercel dashboard
-3. Deploy
-
-### Docker
-
-```bash
-docker build -t ubuntu-portfolio .
-docker run -p 3000:3000 --env-file .env.local ubuntu-portfolio
-```
-
----
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome.
-
-1. Fork the repo
-2. Create a branch: `git checkout -b feat/your-feature`
-3. Commit using conventional commits: `git commit -m "feat: add something"`
-4. Push and open a PR
-
----
-
-## 🙏 Inspiration
-
-- [Ubuntu GNOME](https://ubuntu.com/) — for the desktop aesthetic
-- [Dustin Brett's daedalOS](https://github.com/DustinBrett/daedalOS) — OS-in-browser concept
+MIT © [I Wayan Agus Darmawan](https://agus-darmawan.com)
