@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { BLOG_POSTS } from "./blog.data";
 import { BlogDetail } from "./BlogDetail";
 import { BlogHeader } from "./BlogHeader";
 import { BlogList } from "./BlogList";
+import { BLOG_POSTS } from "./blog.data";
 import type { BlogPost } from "./types/blog.types";
 
 export default function BlogWindow() {

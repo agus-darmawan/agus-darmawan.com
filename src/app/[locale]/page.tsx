@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { BootScreen } from "@/features/boot/BootScreen";
 import { CommandPalette } from "@/features/command-palette/CommandPalette";
+import { DesktopBackground } from "@/features/desktop/DesktopBackground";
 import { Dock } from "@/features/dock/Dock";
 import ReadmeWindow from "@/features/projects/readme/ReadmeWindow";
 import { Screensaver } from "@/features/screensaver/Screensaver";
@@ -189,7 +190,11 @@ export default function IndexPage() {
 
 	// false = already booted → show portfolio
 	return (
-		<main className="w-full h-screen bg-ubuntu-purple overflow-hidden select-none">
+		<main
+			className="w-full h-screen overflow-hidden select-none"
+			style={{ background: "#0d0010" }}
+		>
+			<DesktopBackground />
 			<CommandPalette />
 			<Screensaver />
 			<TopBar />
