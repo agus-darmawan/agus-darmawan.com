@@ -1,6 +1,7 @@
 {
 	"ExperienceWindow": {
 		"title": "Pengalaman Kerja",
+		"headerDesc": "Dari membangun kapal otonom yang menang kompetisi internasional hingga inspeksi gardu listrik dengan robot berkaki empat — 3+ tahun membangun sistem nyata.",
 		"companies": "perusahaan",
 		"roles": "posisi",
 		"years": "tahun",

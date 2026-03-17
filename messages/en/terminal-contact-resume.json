@@ -37,6 +37,8 @@
 	"ContactWindow": {
 		"title": "Contact",
 		"subtitle": "Let's build something together",
+		"headerDesc": "Have a project idea, a robot to build, or just want to say hi? I'm always open to interesting conversations.",
+		"findMe": "Find me on",
 		"sendMessage": "Send a Message",
 		"namePlaceholder": "Your name",
 		"emailPlaceholder": "your@email.com",

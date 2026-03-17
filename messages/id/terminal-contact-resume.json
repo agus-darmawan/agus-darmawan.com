@@ -37,6 +37,8 @@
 	"ContactWindow": {
 		"title": "Kontak",
 		"subtitle": "Mari bangun sesuatu bersama",
+		"headerDesc": "Punya ide proyek, robot yang ingin dibangun, atau sekadar ingin ngobrol? Selalu terbuka untuk diskusi yang menarik.",
+		"findMe": "Temukan saya di",
 		"sendMessage": "Kirim Pesan",
 		"namePlaceholder": "Nama kamu",
 		"emailPlaceholder": "email@kamu.com",

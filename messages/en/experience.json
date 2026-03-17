@@ -1,6 +1,7 @@
 {
 	"ExperienceWindow": {
 		"title": "Work Experience",
+		"headerDesc": "From building autonomous boats that win international competitions to inspecting power substations with quadruped robots — 3+ years of shipping real systems.",
 		"companies": "companies",
 		"roles": "roles",
 		"years": "years",

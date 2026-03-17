@@ -51,12 +51,6 @@ export function AboutHeader({ t }: AboutHeaderProps) {
 			<p className="relative mt-4 text-sm leading-relaxed text-(--text-secondary)">
 				{t("bio")}
 			</p>
-
-			{/* Scroll hint */}
-			<div className="flex items-center justify-center mt-4 gap-1.5 text-[10px] text-(--text-muted) animate-bounce">
-				<ChevronDown size={12} />
-				<span>{t("scrollHint")}</span>
-			</div>
 		</div>
 	);
 }
