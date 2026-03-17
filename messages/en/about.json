@@ -2,7 +2,7 @@
 	"AboutWindow": {
 		"title": "About Me",
 		"name": "I Wayan Agus Darmawan",
-		"role": "Full-Stack & Robotics Developer",
+		"role": "Web & Robotics Developer",
 		"location": "Denpasar, Bali, Indonesia",
 		"experience": "3+ years experience",
 		"bio": "Computer Engineering graduate (2025) from Institut Teknologi Sepuluh Nopember with experience in full-stack web development, completing over 20 freelance projects. Skilled in building responsive web applications, dashboards, and custom solutions using React and Express. Additionally experienced in robotics software, contributing to ROS-based autonomous robots and inspection systems — integrating software with hardware, implementing navigation and control systems, and ensuring reliable real-world performance.",
