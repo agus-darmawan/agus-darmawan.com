@@ -1,4 +1,3 @@
-// src/app/opengraph-image.tsx
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
@@ -20,7 +19,6 @@ export default function OGImage() {
 				fontFamily: "sans-serif",
 			}}
 		>
-			{/* Ubuntu purple gradient background */}
 			<div
 				style={{
 					position: "absolute",
@@ -30,8 +28,6 @@ export default function OGImage() {
 						"radial-gradient(ellipse at 20% 50%, rgba(119,33,111,0.35) 0%, transparent 60%)",
 				}}
 			/>
-
-			{/* Orange accent gradient */}
 			<div
 				style={{
 					position: "absolute",
@@ -41,8 +37,6 @@ export default function OGImage() {
 						"radial-gradient(ellipse at 80% 20%, rgba(233,84,32,0.15) 0%, transparent 50%)",
 				}}
 			/>
-
-			{/* Top bar simulation */}
 			<div
 				style={{
 					position: "absolute",
@@ -85,8 +79,6 @@ export default function OGImage() {
 					EN
 				</span>
 			</div>
-
-			{/* Main content */}
 			<div
 				style={{
 					flex: "1",
@@ -97,7 +89,6 @@ export default function OGImage() {
 					paddingTop: "96px",
 				}}
 			>
-				{/* Header row — logo + label */}
 				<div
 					style={{
 						display: "flex",
@@ -106,7 +97,6 @@ export default function OGImage() {
 						marginBottom: "32px",
 					}}
 				>
-					{/* Ubuntu circle logo */}
 					<div
 						style={{
 							width: "48px",
@@ -128,7 +118,6 @@ export default function OGImage() {
 							}}
 						/>
 					</div>
-
 					<span
 						style={{
 							color: "#e95420",
@@ -141,8 +130,6 @@ export default function OGImage() {
 						Ubuntu Portfolio
 					</span>
 				</div>
-
-				{/* Name */}
 				<div
 					style={{
 						display: "flex",
@@ -173,8 +160,6 @@ export default function OGImage() {
 						Darmawan
 					</span>
 				</div>
-
-				{/* Role */}
 				<div
 					style={{
 						fontSize: "24px",
@@ -185,8 +170,6 @@ export default function OGImage() {
 				>
 					Full-Stack &amp; Robotics Developer · Denpasar, Bali
 				</div>
-
-				{/* Tech tags */}
 				<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
 					{[
 						"Next.js",
@@ -214,8 +197,6 @@ export default function OGImage() {
 					))}
 				</div>
 			</div>
-
-			{/* Bottom bar */}
 			<div
 				style={{
 					padding: "20px 80px",
