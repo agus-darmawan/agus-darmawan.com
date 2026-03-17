@@ -1,0 +1,16 @@
+{
+	"BlogWindow": {
+		"title": "Blog",
+		"subtitle": "{count} tulisan",
+		"latestPosts": "Tulisan Terbaru",
+		"backToBlog": "← Semua tulisan",
+		"readTime": "{min} menit baca",
+		"comingSoon": "Konten segera hadir."
+	},
+	"Blog": {
+		"buildingUbuntuPortfolio": {
+			"title": "Membangun Portfolio Bertema Ubuntu dengan Next.js",
+			"description": "Bagaimana saya membangun simulasi desktop Ubuntu 22.04 GNOME yang sepenuhnya interaktif sebagai portfolio developer — windows, terminal, Spotify, dan semuanya."
+		}
+	}
+}

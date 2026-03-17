@@ -1,0 +1,16 @@
+{
+	"BlogWindow": {
+		"title": "Blog",
+		"subtitle": "{count} posts",
+		"latestPosts": "Latest Posts",
+		"backToBlog": "← All posts",
+		"readTime": "{min} min read",
+		"comingSoon": "Content coming soon."
+	},
+	"Blog": {
+		"buildingUbuntuPortfolio": {
+			"title": "Building an Ubuntu-themed Portfolio with Next.js",
+			"description": "How I built a fully interactive Ubuntu 22.04 GNOME desktop simulation as a developer portfolio — windows, terminal, Spotify, and all."
+		}
+	}
+}

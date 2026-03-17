@@ -46,6 +46,7 @@ const VALID_APPS = [
 	"resume",
 	"experience",
 	"projects",
+	"blog",
 	"contact",
 ];
 

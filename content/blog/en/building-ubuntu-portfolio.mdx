@@ -1,0 +1,82 @@
+# Building an Ubuntu-themed Portfolio with Next.js
+
+When I decided to rebuild my portfolio, I wanted something that would genuinely stand out. Not another card layout, not another parallax scroll. While staring at my Ubuntu desktop one night, the idea hit: what if the portfolio *was* the desktop?
+
+## The Concept
+
+The goal was to simulate a fully functional Ubuntu 22.04 GNOME desktop environment in the browser. Every window draggable. Dock that works. A terminal that actually runs commands. Spotify showing what I'm listening to right now.
+
+Most importantly — it had to feel *real*. Not like a mockup.
+
+## Architecture Decisions
+
+### Window Management
+
+The trickiest part was the window manager. Each window needs z-index management, drag behavior, minimize/maximize/close, and snap-to-edge. My first instinct was local component state — which immediately created two source-of-truth problems.
+
+The fix was a single **Zustand store** for all window state:
+
+```ts
+const useWindowStore = create<WindowStore>((set, get) => ({
+  windows: [],
+  activeWindowId: null,
+  openWindow: (appId, data) => { ... },
+  bringToFront: (id) => { ... },
+  getEffectiveZ: (win) =>
+    win.appId.startsWith("readme-") ? win.zIndex + 500 : win.zIndex,
+}));
+```
+
+The `getEffectiveZ` function was a fun one — README windows always need to sit above the Projects window that spawned them. Adding +500 to their z-index was the simplest solution that actually worked.
+
+### Terminal → UI Integration
+
+The terminal dispatches custom events that the page translates into window operations:
+
+```ts
+// In terminal command processor
+window.dispatchEvent(new CustomEvent("openApp", { detail: { appId } }));
+
+// In page.tsx
+window.addEventListener("openApp", (e) => openWindow(e.detail.appId));
+```
+
+This keeps the terminal completely decoupled from the window manager. The terminal doesn't import anything from the window system — it just dispatches events and forgets.
+
+### Custom MDX Parser
+
+Rather than adding a heavy markdown library, I wrote a custom MDX parser from scratch. It handles headings, code blocks, tables, blockquotes, inline formatting, YouTube embeds, and generates a table of contents automatically.
+
+```ts
+export function parseMdx(raw: string): { tokens: Token[]; toc: TocEntry[] }
+```
+
+The parser is ~250 lines, zero dependencies, and tested with 35 Vitest cases.
+
+## Infrastructure
+
+The portfolio runs on **Vercel** with **Cloudflare** in front:
+
+- **Cloudflare DNS + CDN** — static assets cached at edge globally
+- **Cloudflare R2** — MDX content (README files, blog posts) served from R2 bucket
+- **Cloudflare Workers** — Spotify proxy with edge caching (10s TTL)
+- **Cloudflare Turnstile** — invisible bot protection on contact form
+- **Sentry** — error tracking in production
+
+Content updates (new blog posts, updated README files) auto-sync to R2 via GitHub Actions whenever `content/**` changes — no redeploy needed.
+
+## What I'd Do Differently
+
+**State architecture first.** I started with local component state and had to migrate to Zustand mid-development. Starting with a proper store from day one would have saved a full day of refactoring.
+
+**Feature folders from the start.** I started with a `components/` + `hooks/` structure and migrated to feature-based folders halfway through. The migration was worth it — but painful.
+
+## Result
+
+The portfolio became a demonstration of engineering decisions, not just a list of projects. Every choice in the codebase is itself a sample of how I think about problems.
+
+That's the point. The best portfolio doesn't just *show* your work — it *is* your work.
+
+---
+
+Source code: [github.com/agus-darmawan/ubuntu-portfolio](https://github.com/agus-darmawan/ubuntu-portfolio)

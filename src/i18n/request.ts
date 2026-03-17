@@ -2,8 +2,6 @@ import { hasLocale } from "next-intl";
 import { getRequestConfig } from "next-intl/server";
 import { routing } from "./routing";
 
-// Each locale has its messages split across multiple files.
-// Add new files here as the project grows.
 const MESSAGE_FILES = [
 	"topbar",
 	"dock",
@@ -11,6 +9,7 @@ const MESSAGE_FILES = [
 	"experience",
 	"projects",
 	"terminal-contact-resume",
+	"blog", // ← tambah ini
 ] as const;
 
 async function loadMessages(locale: string) {
@@ -19,8 +18,6 @@ async function loadMessages(locale: string) {
 			import(`../../messages/${locale}/${file}.json`).then((m) => m.default),
 		),
 	);
-	// Deep-merge: all top-level namespace keys are unique across files,
-	// so a shallow Object.assign is sufficient.
 	return Object.assign({}, ...chunks);
 }
 

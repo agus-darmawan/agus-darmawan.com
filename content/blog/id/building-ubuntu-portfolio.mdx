@@ -1,0 +1,82 @@
+# Membangun Portfolio Bertema Ubuntu dengan Next.js
+
+Ketika saya memutuskan untuk membangun ulang portfolio, saya ingin sesuatu yang benar-benar berbeda. Bukan card layout biasa, bukan parallax scroll lagi. Suatu malam sambil menatap desktop Ubuntu, idenya muncul: bagaimana kalau portfolio *itu sendiri* adalah desktopnya?
+
+## Konsep
+
+Tujuannya adalah mensimulasikan lingkungan desktop Ubuntu 22.04 GNOME yang sepenuhnya fungsional di browser. Setiap window bisa di-drag. Dock yang berfungsi. Terminal yang benar-benar menjalankan perintah. Spotify menampilkan lagu yang sedang diputar sekarang.
+
+Yang paling penting — harus terasa *nyata*. Bukan seperti mockup.
+
+## Keputusan Arsitektur
+
+### Window Management
+
+Bagian paling rumit adalah window manager. Setiap window butuh manajemen z-index, perilaku drag, minimize/maximize/close, dan snap-to-edge. Insting pertama saya adalah local component state — yang langsung menciptakan masalah dua sumber kebenaran.
+
+Solusinya adalah satu **Zustand store** untuk semua state window:
+
+```ts
+const useWindowStore = create<WindowStore>((set, get) => ({
+  windows: [],
+  activeWindowId: null,
+  openWindow: (appId, data) => { ... },
+  bringToFront: (id) => { ... },
+  getEffectiveZ: (win) =>
+    win.appId.startsWith("readme-") ? win.zIndex + 500 : win.zIndex,
+}));
+```
+
+Fungsi `getEffectiveZ` adalah yang menarik — window README selalu harus berada di atas window Projects yang memanggilnya. Menambahkan +500 ke z-index-nya adalah solusi paling sederhana yang benar-benar berhasil.
+
+### Integrasi Terminal → UI
+
+Terminal mendispatch custom event yang diterjemahkan halaman menjadi operasi window:
+
+```ts
+// Di command processor terminal
+window.dispatchEvent(new CustomEvent("openApp", { detail: { appId } }));
+
+// Di page.tsx
+window.addEventListener("openApp", (e) => openWindow(e.detail.appId));
+```
+
+Ini membuat terminal sepenuhnya terpisah dari window manager. Terminal tidak mengimpor apapun dari sistem window — hanya dispatch event dan selesai.
+
+### Custom MDX Parser
+
+Daripada menambahkan library markdown yang berat, saya menulis custom MDX parser dari scratch. Parser ini menangani heading, code block, tabel, blockquote, format inline, embed YouTube, dan menghasilkan daftar isi secara otomatis.
+
+```ts
+export function parseMdx(raw: string): { tokens: Token[]; toc: TocEntry[] }
+```
+
+Parser ini ~250 baris, tanpa dependensi, dan diuji dengan 35 test case Vitest.
+
+## Infrastruktur
+
+Portfolio berjalan di **Vercel** dengan **Cloudflare** di depannya:
+
+- **Cloudflare DNS + CDN** — static assets di-cache di edge secara global
+- **Cloudflare R2** — konten MDX (file README, post blog) diserve dari bucket R2
+- **Cloudflare Workers** — proxy Spotify dengan edge caching (TTL 10 detik)
+- **Cloudflare Turnstile** — bot protection invisible di contact form
+- **Sentry** — error tracking di production
+
+Update konten (post blog baru, file README yang diupdate) otomatis sinkron ke R2 via GitHub Actions setiap kali ada perubahan di `content/**` — tidak perlu redeploy.
+
+## Yang Akan Saya Lakukan Berbeda
+
+**Arsitektur state dulu.** Saya memulai dengan local component state dan harus migrasi ke Zustand di tengah pengembangan. Memulai dengan store yang proper dari awal akan menghemat satu hari penuh refactoring.
+
+**Feature folder dari awal.** Saya mulai dengan struktur `components/` + `hooks/` dan migrasi ke folder berbasis fitur di tengah jalan. Migrasinya sepadan — tapi menyakitkan.
+
+## Hasil
+
+Portfolio menjadi demonstrasi keputusan engineering, bukan sekadar daftar proyek. Setiap pilihan dalam codebase adalah contoh dari cara saya memikirkan masalah.
+
+Itulah intinya. Portfolio terbaik tidak hanya *menampilkan* pekerjaan Anda — portfolio terbaik *adalah* pekerjaan Anda.
+
+---
+
+Kode sumber: [github.com/agus-darmawan/ubuntu-portfolio](https://github.com/agus-darmawan/ubuntu-portfolio)

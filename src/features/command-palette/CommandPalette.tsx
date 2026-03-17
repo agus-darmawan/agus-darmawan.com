@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	BookOpen,
 	Briefcase,
 	FileText,
 	Folder,
@@ -18,8 +19,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useWindowStore } from "@/store/useWindowStore";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 interface Command {
 	id: string;
 	label: string;
@@ -29,15 +28,11 @@ interface Command {
 	keywords?: string[];
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
-
 export function CommandPalette() {
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState("");
 	const [selectedIdx, setSelectedIdx] = useState(0);
 	const inputRef = useRef<HTMLInputElement>(null);
-
-	// Refs to avoid stale closures in handleKeyDown without adding to deps
 	const filteredRef = useRef<Command[]>([]);
 	const selectedIdxRef = useRef(0);
 
@@ -83,6 +78,14 @@ export function CommandPalette() {
 				icon: <FileText size={14} />,
 				action: () => openWindow("resume"),
 				keywords: ["resume", "cv", "pdf"],
+			},
+			{
+				id: "open-blog",
+				label: tDock("blog"),
+				sublabel: "Open window",
+				icon: <BookOpen size={14} />,
+				action: () => openWindow("blog"),
+				keywords: ["blog", "writing", "posts", "articles"],
 			},
 			{
 				id: "open-contact",
@@ -140,7 +143,6 @@ export function CommandPalette() {
 		setSelectedIdx(0);
 	}, []);
 
-	// Open / close with Ctrl+K or Cmd+K
 	useEffect(() => {
 		const handler = (e: KeyboardEvent) => {
 			if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -152,7 +154,6 @@ export function CommandPalette() {
 		return () => window.removeEventListener("keydown", handler);
 	}, []);
 
-	// Focus input whenever palette opens
 	useEffect(() => {
 		if (open) {
 			const id = requestAnimationFrame(() => inputRef.current?.focus());
@@ -174,7 +175,6 @@ export function CommandPalette() {
 		[close],
 	);
 
-	// Reads from refs — stable deps, no stale closure, no re-creation on keystroke
 	const handleKeyDown = useCallback(
 		(e: React.KeyboardEvent) => {
 			if (e.key === "Escape") {
@@ -230,7 +230,6 @@ export function CommandPalette() {
 							d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
 						/>
 					</svg>
-
 					<input
 						ref={inputRef}
 						type="text"
@@ -241,7 +240,6 @@ export function CommandPalette() {
 						className="flex-1 bg-transparent outline-none text-sm"
 						style={{ color: "var(--panel-text)" }}
 					/>
-
 					<button
 						title="Close"
 						type="button"
@@ -276,7 +274,6 @@ export function CommandPalette() {
 									color: "var(--panel-text)",
 								}}
 							>
-								{/* Icon */}
 								<div
 									className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
 									style={{
@@ -290,8 +287,6 @@ export function CommandPalette() {
 								>
 									{cmd.icon}
 								</div>
-
-								{/* Labels */}
 								<div className="flex-1 min-w-0">
 									<p className="text-sm font-medium truncate">{cmd.label}</p>
 									{cmd.sublabel && (
@@ -303,8 +298,6 @@ export function CommandPalette() {
 										</p>
 									)}
 								</div>
-
-								{/* Enter hint on selected */}
 								{i === selectedIdx && (
 									<kbd
 										className="shrink-0 text-[10px] px-1.5 py-0.5 rounded font-mono"
@@ -322,7 +315,7 @@ export function CommandPalette() {
 					)}
 				</div>
 
-				{/* Footer hint */}
+				{/* Footer */}
 				<div
 					className="flex items-center gap-3 px-4 py-2 border-t text-[10px]"
 					style={{
