@@ -139,14 +139,35 @@ export function useCommandProcessor({
 					break;
 
 				case "uptime": {
-					const h = Math.floor(Math.random() * 24) + 1;
-					const m = Math.floor(Math.random() * 60);
-					addLines(
-						mkLine(
-							"output",
-							`up ${h}:${String(m).padStart(2, "0")}, 1 user, load average: 0.42, 0.38, 0.35`,
-						),
-					);
+					addLines(mkLine("output", "Fetching stats..."));
+
+					fetch("/api/visitors")
+						.then((r) => r.json())
+						.then(
+							(data: { success: boolean; data: { count: number } | null }) => {
+								const h = Math.floor(Math.random() * 24) + 1;
+								const m = Math.floor(Math.random() * 60);
+								const visitors = data?.data?.count ?? 0;
+
+								// Replace the "Fetching stats..." line dengan real data
+								addLines(
+									mkLine(
+										"output",
+										`up ${h}:${String(m).padStart(2, "0")}, ${visitors.toLocaleString()} visitors, load average: 0.42, 0.38, 0.35`,
+									),
+								);
+							},
+						)
+						.catch(() => {
+							const h = Math.floor(Math.random() * 24) + 1;
+							const m = Math.floor(Math.random() * 60);
+							addLines(
+								mkLine(
+									"output",
+									`up ${h}:${String(m).padStart(2, "0")}, 1 user, load average: 0.42, 0.38, 0.35`,
+								),
+							);
+						});
 					break;
 				}
 
