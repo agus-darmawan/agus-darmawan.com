@@ -10,8 +10,6 @@ import {
 	type ProjectMeta,
 } from "./projects.data";
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-
 const CATEGORY_LABELS: Record<ProjectCategory | "all", string> = {
 	all: "All",
 	web: "Web",
@@ -19,15 +17,12 @@ const CATEGORY_LABELS: Record<ProjectCategory | "all", string> = {
 	research: "Research",
 };
 
-// ── Component ─────────────────────────────────────────────────────────────────
-
 export default function ProjectsWindow() {
 	const t = useTranslations("ProjectsWindow");
 	const tProjects = useTranslations("Projects");
 	const [filter, setFilter] = useState<ProjectCategory | "all">("all");
 
-	// Live star counts from GitHub API — falls back to hardcoded if unavailable
-	const { getStars } = useGitHubStars();
+	const { getStars, getForks } = useGitHubStars();
 
 	const filtered = useMemo(
 		() =>
@@ -37,7 +32,6 @@ export default function ProjectsWindow() {
 		[filter],
 	);
 
-	// Total stars — live from GitHub
 	const totalStars = useMemo(
 		() =>
 			PROJECTS_META.reduce((s, p) => s + getStars(p.githubRepo, p.stars), 0),
@@ -203,6 +197,7 @@ export default function ProjectsWindow() {
 								name={tProjects(`${project.i18nKey}.name`)}
 								desc={tProjects(`${project.i18nKey}.desc`)}
 								stars={getStars(project.githubRepo, project.stars)}
+								forks={getForks(project.githubRepo)}
 								onClick={handleCardClick}
 							/>
 						))}

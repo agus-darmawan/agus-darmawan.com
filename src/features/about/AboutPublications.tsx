@@ -1,6 +1,9 @@
+// src/features/about/AboutPublications.tsx
+// Fix #7 — hapus DOI link palsu, ganti dengan tombol yang hidden sampai DOI asli tersedia
+
 "use client";
 
-import { BookOpen, ExternalLink } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 const PUBLICATIONS = [
 	{
@@ -9,7 +12,7 @@ const PUBLICATIONS = [
 		venueKey: "publicationQuadrupedVenue",
 		year: "2025",
 		color: "#10b981",
-		link: "https://doi.org/10.1109/example-quadruped",
+		link: "https://ieeexplore.ieee.org/document/11137561/",
 	},
 	{
 		titleKey: "publicationGesture",
@@ -17,7 +20,7 @@ const PUBLICATIONS = [
 		venueKey: "publicationGestureVenue",
 		year: "2024",
 		color: "#8b5cf6",
-		link: "https://doi.org/10.1109/example-gesture",
+		link: "https://repository.its.ac.id/123032/",
 	},
 ];
 
@@ -96,20 +99,22 @@ export function AboutPublications({ t }: AboutPublicationsProps) {
 											{pub.year}
 										</span>
 
-										<a
-											href={pub.link}
-											target="_blank"
-											rel="noreferrer"
-											className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium transition-opacity hover:opacity-80"
-											style={{
-												background: `${pub.color}18`,
-												color: pub.color,
-												border: `1px solid ${pub.color}30`,
-											}}
-										>
-											<ExternalLink size={9} />
-											{t("readPublication")}
-										</a>
+										{/* Hanya tampil kalau DOI asli sudah diisi */}
+										{pub.link && (
+											<a
+												href={pub.link}
+												target="_blank"
+												rel="noreferrer"
+												className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium transition-opacity hover:opacity-80"
+												style={{
+													background: `${pub.color}18`,
+													color: pub.color,
+													border: `1px solid ${pub.color}30`,
+												}}
+											>
+												{t("readPublication")}
+											</a>
+										)}
 									</div>
 								</div>
 							</div>

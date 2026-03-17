@@ -1,27 +1,27 @@
-name: Sync content to R2
+name: Lint and Format Code
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "content/**" 
+  workflow_call:
 
 jobs:
-  sync:
+  lint:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
-      - name: Install Wrangler
-        run: npm install -g wrangler
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
-      - name: Upload to R2
-        run: node scripts/upload-content.mjs
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run Biome
+        run: pnpm lint

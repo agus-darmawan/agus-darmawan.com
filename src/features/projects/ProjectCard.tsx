@@ -13,7 +13,8 @@ interface ProjectCardProps {
 	project: ProjectMeta;
 	name: string;
 	desc: string;
-	stars: number; // passed from ProjectsWindow — live from GitHub or fallback
+	stars: number;
+	forks: number; // ← tambah prop forks, data asli dari API
 	onClick: (project: ProjectMeta) => void;
 }
 
@@ -22,11 +23,9 @@ export function ProjectCard({
 	name,
 	desc,
 	stars,
+	forks,
 	onClick,
 }: ProjectCardProps) {
-	// Rough fork estimate — only shown as decoration, not critical data
-	const forks = Math.floor(stars * 0.3);
-
 	return (
 		<div
 			onClick={() => onClick(project)}
@@ -110,7 +109,6 @@ export function ProjectCard({
 						</div>
 					</div>
 
-					{/* Arrow on hover */}
 					<div
 						className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
 						style={{ background: `${project.color}18`, color: project.color }}

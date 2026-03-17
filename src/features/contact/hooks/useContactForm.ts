@@ -68,7 +68,7 @@ export function useContactForm({ onSuccess }: UseContactFormOptions = {}) {
 		email.trim().length > 0 &&
 		message.trim().length > 0 &&
 		status === "idle" &&
-		turnstileToken !== null;
+		(!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || turnstileToken !== null);
 
 	return {
 		name,

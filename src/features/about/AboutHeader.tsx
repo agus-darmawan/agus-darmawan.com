@@ -20,8 +20,9 @@ export function AboutHeader({ t }: AboutHeaderProps) {
 						width={80}
 						height={80}
 						priority
+						className="rounded-full"
 					/>
-					<span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-(--window-bg) bg-green-500 flex items-center justify-center text-[9px]">
+					<span className="absolute bottom-1 right-1 w-5 h-5 rounded-full border-2 border-(--window-bg) bg-green-500 flex items-center justify-center text-[9px]">
 						✓
 					</span>
 				</div>

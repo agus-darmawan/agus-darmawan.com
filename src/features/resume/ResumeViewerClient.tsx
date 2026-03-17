@@ -20,7 +20,6 @@ export default function ResumeViewerClient({ t }: ResumeViewerClientProps) {
 	const locale = (params?.locale as string) ?? "en";
 	const contentUrl = process.env.NEXT_PUBLIC_CONTENT_URL ?? "";
 	const pdfPath = `${contentUrl}/resume/resume_${locale}.pdf`;
-	console.log("Loading resume PDF from:", pdfPath);
 	const { zoom, zoomIn, zoomOut, resetZoom } = usePdfZoom();
 	const { pdf, numPages, isLoading, error } = usePdfLoader(pdfPath);
 

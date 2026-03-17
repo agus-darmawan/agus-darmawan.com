@@ -137,6 +137,16 @@ export function parseMdx(raw: string): { tokens: Token[]; toc: TocEntry[] } {
 	const lines = raw.split("\n");
 	const tokens: Token[] = [];
 	const toc: TocEntry[] = [];
+
+	// Fix #10 — track slug usage untuk generate unique IDs
+	const slugCount: Record<string, number> = {};
+
+	function uniqueSlug(text: string): string {
+		const base = slugify(text);
+		slugCount[base] = (slugCount[base] ?? 0) + 1;
+		return slugCount[base] === 1 ? base : `${base}-${slugCount[base]}`;
+	}
+
 	let i = 0;
 
 	while (i < lines.length) {
@@ -178,7 +188,7 @@ export function parseMdx(raw: string): { tokens: Token[]; toc: TocEntry[] } {
 					.map((c) => parseInline(c));
 
 			const headers = parseRow(line);
-			i += 2; // skip header + separator
+			i += 2;
 			const rows: InlineNode[][][] = [];
 			while (i < lines.length && lines[i].includes("|")) {
 				rows.push(parseRow(lines[i]));
@@ -194,7 +204,7 @@ export function parseMdx(raw: string): { tokens: Token[]; toc: TocEntry[] } {
 			const level = hMatch[1].length as 1 | 2 | 3;
 			const children = parseInline(hMatch[2]);
 			const text = extractText(children);
-			const id = slugify(text);
+			const id = uniqueSlug(text); // ← pakai uniqueSlug, bukan slugify langsung
 			if (level === 1) tokens.push({ type: "h1", id, children });
 			else if (level === 2) tokens.push({ type: "h2", id, children });
 			else tokens.push({ type: "h3", id, children });
@@ -245,8 +255,6 @@ export function parseMdx(raw: string): { tokens: Token[]; toc: TocEntry[] } {
 		);
 		if (imgMatch) {
 			const [, alt, src, title] = imgMatch;
-
-			// Check if it's a YouTube link
 			const ytId = extractYoutubeId(src);
 			if (ytId) {
 				tokens.push({ type: "youtube", videoId: ytId, title: alt || title });

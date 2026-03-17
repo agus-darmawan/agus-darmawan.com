@@ -1,3 +1,6 @@
+// src/hooks/useBattery.ts
+// Fix #5 — hapus re-throw di catch, Battery API tidak tersedia di banyak browser
+
 import { useEffect, useState } from "react";
 
 interface BatteryState {
@@ -40,6 +43,7 @@ export function useBattery(): BatteryState {
 				charging: battery.charging,
 			});
 		};
+
 		(navigator as NavigatorWithBattery)
 			.getBattery()
 			.then((bat) => {
@@ -49,7 +53,8 @@ export function useBattery(): BatteryState {
 				update();
 			})
 			.catch(() => {
-				throw new Error("Failed to access Battery API");
+				// Battery API tidak tersedia (Firefox, Safari, semua iOS) — biarkan saja
+				// state tetap { level: null, charging: false }, komponen tidak render battery
 			});
 
 		return () => {

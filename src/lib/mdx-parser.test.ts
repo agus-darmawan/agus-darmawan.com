@@ -1,4 +1,3 @@
-// src/lib/mdx-parser.test.ts
 import { describe, expect, it } from "vitest";
 import { parseInline, parseMdx } from "./mdx-parser";
 
@@ -199,13 +198,20 @@ describe("parseMdx — TOC", () => {
 		expect(toc).toHaveLength(0);
 	});
 
+	// Fix #10 — duplicate headings sekarang generate unique IDs
 	it("handles duplicate heading text with unique IDs", () => {
-		// Two headings with same text should ideally have different IDs
-		// Current implementation: same slug — this documents current behavior
 		const { toc } = parseMdx("## Setup\n## Setup");
 		expect(toc).toHaveLength(2);
-		// Both have same id — known limitation, documented via test
-		expect(toc[0].id).toBe(toc[1].id);
+		expect(toc[0].id).toBe("setup");
+		expect(toc[1].id).toBe("setup-2"); // ← tidak lagi sama
+		expect(toc[0].id).not.toBe(toc[1].id);
+	});
+
+	it("handles triplicate headings with sequential unique IDs", () => {
+		const { toc } = parseMdx("## Intro\n## Intro\n## Intro");
+		expect(toc[0].id).toBe("intro");
+		expect(toc[1].id).toBe("intro-2");
+		expect(toc[2].id).toBe("intro-3");
 	});
 });
 
@@ -214,8 +220,6 @@ describe("parseMdx — TOC", () => {
 describe("parseMdx — edge cases", () => {
 	it("handles empty string", () => {
 		const { tokens, toc } = parseMdx("");
-		// "".split("\n") returns [""] — one empty string element
-		// Parser converts empty line to blank token
 		expect(tokens).toHaveLength(1);
 		expect(tokens[0].type).toBe("blank");
 		expect(toc).toHaveLength(0);
@@ -223,7 +227,6 @@ describe("parseMdx — edge cases", () => {
 
 	it("handles string with only whitespace", () => {
 		const { tokens } = parseMdx("   \n   \n   ");
-		// Whitespace-only lines should be blank tokens
 		tokens.forEach((t) => expect(t.type).toBe("blank"));
 	});
 
@@ -234,7 +237,6 @@ describe("parseMdx — edge cases", () => {
 	});
 
 	it("handles unclosed code block gracefully", () => {
-		// Should not throw — consume remaining lines as code
 		expect(() => parseMdx("```ts\nconst x = 1;")).not.toThrow();
 	});
 

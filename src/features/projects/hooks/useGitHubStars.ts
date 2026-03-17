@@ -1,4 +1,3 @@
-// src/features/projects/useGitHubStars.ts
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
@@ -15,20 +14,24 @@ export function useGitHubStars() {
 	const { data: repos = [] } = useQuery({
 		queryKey: ["github", "repos"],
 		queryFn: fetchGitHubRepos,
-		// Refresh every hour — matches server cache TTL
 		staleTime: 60 * 60 * 1000,
 		retry: false,
 	});
 
-	// Map repo name → star count
 	const starMap = repos.reduce<Record<string, number>>((acc, repo) => {
 		acc[repo.name] = repo.stargazers_count;
 		return acc;
 	}, {});
 
-	const getStars = (repoName: string, fallback: number): number => {
-		return starMap[repoName] ?? fallback;
-	};
+	const forkMap = repos.reduce<Record<string, number>>((acc, repo) => {
+		acc[repo.name] = repo.forks_count;
+		return acc;
+	}, {});
 
-	return { getStars, repos };
+	const getStars = (repoName: string, fallback: number): number =>
+		starMap[repoName] ?? fallback;
+
+	const getForks = (repoName: string): number => forkMap[repoName] ?? 0;
+
+	return { getStars, getForks, repos };
 }
