@@ -1,6 +1,7 @@
 {
 	"ProjectsWindow": {
 		"title": "Projects",
+		"headerDesc": "A mix of web apps, autonomous robots, and research — things I've built and shipped.",
 		"allProjects": "All",
 		"featured": "Featured",
 		"viewCode": "Code",

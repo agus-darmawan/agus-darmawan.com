@@ -1,51 +1,52 @@
 {
 	"ProjectsWindow": {
-		"title": "Proyek",
-		"allProjects": "Semua",
-		"featured": "Unggulan",
-		"viewCode": "Kode",
+		"title": "Projects",
+		"headerDesc": "A mix of web apps, autonomous robots, and research — things I've built and shipped.",
+		"allProjects": "All",
+		"featured": "Featured",
+		"viewCode": "Code",
 		"viewDemo": "Demo",
-		"readMore": "Selengkapnya",
-		"openProject": "Buka",
-		"backToProjects": "← Proyek",
-		"stars": "bintang",
-		"repos": "repo"
+		"readMore": "Read More",
+		"openProject": "Open",
+		"backToProjects": "← Projects",
+		"stars": "stars",
+		"repos": "repos"
 	},
 	"Projects": {
 		"ubuntuPortfolio": {
 			"name": "Ubuntu Portfolio",
-			"desc": "Portofolio developer bertema OS interaktif dengan jendela yang bisa diseret, integrasi Spotify, i18n, dan mode gelap.",
-			"longDesc": "Simulasi desktop GNOME Ubuntu 22.04 yang sepenuhnya interaktif dibangun sebagai portofolio developer.",
+			"desc": "Interactive OS-themed developer portfolio with draggable windows, Spotify integration, i18n, and dark mode.",
+			"longDesc": "A fully interactive Ubuntu 22.04 GNOME desktop simulation built as a developer portfolio.",
 			"readmeFile": "ubuntu-portfolio"
 		},
 		"asvNavigation": {
-			"name": "Navigasi Otonom ASV",
-			"desc": "Sistem navigasi otonom berbasis ROS untuk Autonomous Surface Vehicle dengan fusi multi-sensor, meraih Grand Champion di IRC 2023.",
-			"longDesc": "Stack navigasi otonom lengkap untuk robot kompetisi maritim yang mengintegrasikan LiDAR, kamera, GPS, IMU, dan kompas untuk operasi sepenuhnya otonom.",
+			"name": "ASV Autonomous Navigation",
+			"desc": "ROS-based autonomous navigation system for Autonomous Surface Vehicle with multi-sensor fusion, winning Grand Champion at IRC 2023.",
+			"longDesc": "Full autonomous navigation stack for maritime competition robot integrating LiDAR, camera, GPS, IMU, and compass for fully autonomous operation.",
 			"readmeFile": "asv-navigation"
 		},
 		"quadrupedInspection": {
-			"name": "Robot Inspeksi Berkaki Empat",
-			"desc": "Sistem inspeksi berbasis ROS untuk gardu listrik menggunakan Deep Robotics X30, thermal imaging, dan LiDAR-Inertial Odometry.",
-			"longDesc": "Sistem robot inspeksi tingkat industri untuk gardu listrik PLN dan fasilitas minyak & gas Pertamina, dengan navigasi otonom dan deteksi APD.",
+			"name": "Quadruped Inspection Robot",
+			"desc": "ROS-based inspection system for electrical substations using Deep Robotics X30, thermal imaging, and LiDAR-Inertial Odometry.",
+			"longDesc": "Industrial-grade inspection robot system for PLN substations and Pertamina oil & gas facilities, featuring autonomous navigation and PPE detection.",
 			"readmeFile": "quadruped-inspection"
 		},
 		"icarMonitoring": {
 			"name": "iCar ITS Web Monitoring",
-			"desc": "Dashboard monitoring web real-time untuk telemetri kendaraan otonom, dibangun dengan Next.js + integrasi ROS bridge.",
-			"longDesc": "Sistem monitoring produksi untuk proyek kendaraan otonom iCar ITS, menyediakan telemetri langsung, pelacakan, dan pencatatan pemeliharaan.",
+			"desc": "Real-time web monitoring dashboard for autonomous vehicle telemetry, built with Next.js + ROS bridge integration.",
+			"longDesc": "Production monitoring system for the iCar ITS autonomous vehicle project, providing live telemetry, tracking, and maintenance logging.",
 			"readmeFile": "icar-monitoring"
 		},
 		"careerPlatform": {
-			"name": "Platform Manajemen Karir",
-			"desc": "Platform HR internal dengan Easy Apply, standarisasi CV otomatis, dan kontrol akses berbasis peran untuk PT Satkomindo.",
-			"longDesc": "Platform manajemen karir full-stack dengan dashboard kandidat, rekruter, dan admin dengan deployment terkontainerisasi Docker.",
+			"name": "Career Management Platform",
+			"desc": "Internal HR platform with Easy Apply, automated CV standardization, and role-based access control built for PT Satkomindo.",
+			"longDesc": "Full-stack career management platform featuring candidate, recruiter, and admin dashboards with Docker containerized deployment.",
 			"readmeFile": "career-platform"
 		},
 		"handGestureRobot": {
-			"name": "Robot Pengenalan Gestur Tangan",
-			"desc": "Sistem deep learning ringan untuk pengenalan gestur tangan real-time yang memungkinkan kontrol robot kolaboratif.",
-			"longDesc": "Penelitian yang dipublikasikan: sistem pengenalan gestur real-time menggunakan CNN ringan untuk kontrol robot kolaboratif (cobot) tanpa antarmuka fisik.",
+			"name": "Hand Gesture Recognition Robot",
+			"desc": "Lightweight deep learning system for real-time hand gesture recognition enabling collaborative robot control.",
+			"longDesc": "Published research: real-time gesture recognition system using lightweight CNN for collaborative robot (cobot) control without physical interfaces.",
 			"readmeFile": "hand-gesture-robot"
 		}
 	}
