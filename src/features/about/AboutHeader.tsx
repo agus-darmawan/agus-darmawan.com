@@ -16,10 +16,10 @@ export function AboutHeader({ t }: AboutHeaderProps) {
 				<div className="relative shrink-0">
 					<Image
 						src="/avatar.png"
-						alt="Profile"
+						alt="I Wayan Agus Darmawan profile photo"
 						width={80}
 						height={80}
-						className="rounded-full object-cover shadow-lg"
+						priority
 					/>
 					<span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-(--window-bg) bg-green-500 flex items-center justify-center text-[9px]">
 						✓
