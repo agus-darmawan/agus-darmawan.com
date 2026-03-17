@@ -222,3 +222,29 @@ body {
 		scroll-behavior: auto !important;
 	}
 }
+
+/* ────────────────────────────────────────────────
+   Terminal — override global input styles
+   Input di terminal tidak boleh punya border/ring
+──────────────────────────────────────────────── */
+[role="application"][aria-label="Terminal"] input,
+[role="application"][aria-label="Terminal"] input:focus,
+[role="application"][aria-label="Terminal"] input:focus-visible {
+	border: none !important;
+	outline: none !important;
+	box-shadow: none !important;
+	ring: none !important;
+}
+
+/* ────────────────────────────────────────────────
+   Light mode improvements
+   ExperienceCard, ProjectCard, AboutWindow, etc.
+   Sudah pakai CSS variables — tidak perlu override.
+   Yang perlu di-fix adalah komponen yang hardcode.
+──────────────────────────────────────────────── */
+
+/* ResumeViewer — bg abu abu di light mode jadi lebih elegan */
+.light [style*="background-color: rgb(82, 86, 89)"],
+.light [style*="background-color: #525659"] {
+	background-color: #64748b !important;
+}

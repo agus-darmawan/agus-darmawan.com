@@ -74,7 +74,9 @@ export default function TerminalWindow() {
 		<div
 			role="application"
 			aria-label="Terminal"
-			className="h-full flex flex-col bg-neutral-950 text-zinc-200 font-mono text-sm"
+			className="h-full flex flex-col font-mono text-sm"
+			// Terminal selalu dark — sama seperti real terminal di semua OS
+			style={{ background: "#0d1117", color: "#e6edf3" }}
 			onClick={() => inputRef.current?.focus()}
 		>
 			<div

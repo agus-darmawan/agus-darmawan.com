@@ -154,11 +154,9 @@ export function TerminalInputLine({
 
 	return (
 		<div className="flex items-center text-xs font-mono leading-[1.4]">
-			<span className="text-green-400">darm@wan:</span>
-
-			<span className="text-cyan-300">{cwd}</span>
-
-			<span className="text-gray-300 mr-2">$</span>
+			<span style={{ color: "#4ec9b0" }}>darm@wan:</span>
+			<span style={{ color: "#9cdcfe" }}>{cwd}</span>
+			<span style={{ color: "#d4d4d4", marginRight: "6px" }}>$</span>
 
 			<input
 				ref={inputRef}
@@ -166,7 +164,18 @@ export function TerminalInputLine({
 				placeholder={placeholder}
 				onChange={(e) => onChange(e.target.value)}
 				onKeyDown={handleKeyDown}
-				className="flex-1 bg-transparent outline-none border-none text-gray-100 caret-green-400 placeholder-gray-500"
+				className="flex-1"
+				style={{
+					background: "transparent",
+					border: "none",
+					outline: "none",
+					boxShadow: "none",
+					color: "#e6edf3",
+					caretColor: "#4ec9b0",
+					fontSize: "inherit",
+					fontFamily: "inherit",
+					padding: 0,
+				}}
 				autoFocus
 				spellCheck={false}
 				autoComplete="off"
