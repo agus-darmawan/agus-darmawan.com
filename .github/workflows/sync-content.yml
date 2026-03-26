@@ -1,12 +1,16 @@
-name: Lint and Format Code
+# .github/workflows/sync-content.yml
+name: Sync Content to R2
 
 on:
-  workflow_call:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "content/**"
 
 jobs:
-  lint:
+  sync:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -23,5 +27,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run Biome
-        run: pnpm lint
+      - name: Install Wrangler
+        run: pnpm add -g wrangler
+
+      - name: Upload content to R2
+        run: node scripts/upload-content.mjs
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}

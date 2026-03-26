@@ -6,7 +6,6 @@ interface DockIconProps {
 	app: AppConfig;
 	label: string;
 	isRunning: boolean; // window exists (not closed) → show dot even when minimized
-	isActive: boolean; // window is currently focused → show ring
 	onClick: () => void;
 	className?: string;
 }
@@ -15,7 +14,6 @@ export function DockIcon({
 	app,
 	label,
 	isRunning,
-	isActive,
 	onClick,
 	className = "",
 }: DockIconProps) {
@@ -28,11 +26,6 @@ export function DockIcon({
 				onClick={onClick}
 				aria-label={label}
 				className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center text-white transition-transform duration-150 hover:scale-110 active:scale-95 group`}
-				style={{
-					outline: isActive ? "2px solid rgba(255,255,255,0.6)" : "none",
-					outlineOffset: "2px",
-					boxShadow: "0 2px 10px rgba(0,0,0,0.35)",
-				}}
 			>
 				<Icon size={24} strokeWidth={2} />
 

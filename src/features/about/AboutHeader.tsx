@@ -51,6 +51,7 @@ export function AboutHeader({ t }: AboutHeaderProps) {
 			<p className="relative mt-4 text-sm leading-relaxed text-(--text-secondary)">
 				{t("bio")}
 			</p>
+			
 		</div>
 	);
 }

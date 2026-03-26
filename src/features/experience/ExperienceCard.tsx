@@ -57,7 +57,6 @@ function CompanyLogo({
 }
 
 export function ExperienceCard({ exp, isLast, t, tExp }: ExperienceCardProps) {
-	const hasPromotion = exp.roles.length > 1;
 	const companyName = tExp(`${exp.i18nKey}.company`);
 	const location = tExp(`${exp.i18nKey}.location`);
 
@@ -86,19 +85,6 @@ export function ExperienceCard({ exp, isLast, t, tExp }: ExperienceCardProps) {
 						<h2 className="font-bold text-sm text-(--text-primary)">
 							{companyName}
 						</h2>
-
-						{hasPromotion && (
-							<span
-								className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold border"
-								style={{
-									background: `${exp.color}18`,
-									color: exp.color,
-									borderColor: `${exp.color}30`,
-								}}
-							>
-								↑ {t("promoted")}
-							</span>
-						)}
 					</div>
 
 					<p className="text-xs text-(--text-muted)">{location}</p>
@@ -121,13 +107,12 @@ export function ExperienceCard({ exp, isLast, t, tExp }: ExperienceCardProps) {
 
 						return (
 							<div key={`${role.i18nKey}-${roleIdx}`} className="relative">
-								{hasPromotion && roleIdx < exp.roles.length - 1 && (
+								{roleIdx < exp.roles.length - 1 && (
 									<div
 										className="absolute left-0 top-full w-px h-4 mt-1"
 										style={{ background: `${exp.color}30` }}
 									/>
 								)}
-
 								<div
 									className="flex flex-wrap items-start justify-between gap-1 mb-2 p-2.5 rounded-lg"
 									style={{ background: `${exp.color}0c` }}

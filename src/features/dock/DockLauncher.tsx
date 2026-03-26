@@ -1,6 +1,6 @@
 "use client";
 
-import { Grip, X } from "lucide-react";
+import { Grip } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 interface DockLauncherProps {
@@ -35,11 +35,7 @@ export function DockLauncher({ isOpen, onClick }: DockLauncherProps) {
 						"rgba(255,255,255,0.08)";
 			}}
 		>
-			{isOpen ? (
-				<X size={18} className="text-white" />
-			) : (
-				<Grip size={30} className="text-white/75" />
-			)}
+			<Grip size={30} className="text-white/75" />
 
 			{/* Tooltip */}
 			<span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded text-xs whitespace-nowrap bg-black text-white border border-white/10 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
