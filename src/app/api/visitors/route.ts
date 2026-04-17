@@ -39,6 +39,7 @@ async function fetchVisitorCount(): Promise<number> {
 		},
 		body: JSON.stringify({ query }),
 	});
+	console.log("Cloudflare API response status:", res);
 
 	if (!res.ok) return 0;
 
@@ -51,6 +52,7 @@ async function fetchVisitorCount(): Promise<number> {
 			};
 		};
 	};
+	console.log("Cloudflare API response data:", data);
 
 	return data?.data?.viewer?.accounts?.[0]?.total?.[0]?.count ?? 0;
 }

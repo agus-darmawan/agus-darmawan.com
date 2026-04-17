@@ -238,7 +238,10 @@ export function CommandPalette() {
 						onChange={(e) => setQuery(e.target.value)}
 						onKeyDown={handleKeyDown}
 						className="flex-1 bg-transparent outline-none text-sm"
-						style={{ color: "var(--panel-text)" }}
+						style={{
+							color: "var(--panel-text)",
+							outline: "none",
+						}}
 					/>
 					<button
 						title="Close"

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import "@/styles/globals.css";
 import { Ubuntu } from "next/font/google";
 import { notFound } from "next/navigation";
-import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { hasLocale } from "next-intl";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { Providers } from "./providers";
 
@@ -12,7 +13,7 @@ type Props = {
 };
 
 const ubuntu = Ubuntu({
-	weight: ["300", "400", "500", "700"],
+	weight: ["400", "700"],
 	subsets: ["latin"],
 	display: "swap",
 });
@@ -23,9 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 	return {
 		title: {
-			default: isId
-				? "Agus Darmawan — Full-Stack & Robotics Developer"
-				: "Agus Darmawan — Full-Stack & Robotics Developer",
+			default: "Agus Darmawan — Full-Stack & Robotics Developer",
 			template: "%s · Agus Darmawan",
 		},
 		description: isId
@@ -108,12 +107,16 @@ export default async function LocaleLayout({ children, params }: Props) {
 		notFound();
 	}
 
+	setRequestLocale(locale);
+
+	const messages = await getMessages();
+
 	return (
 		<html lang={locale} suppressHydrationWarning>
 			<body className={`${ubuntu.className} antialiased`}>
-				<NextIntlClientProvider>
-					<Providers>{children}</Providers>
-				</NextIntlClientProvider>
+				<Providers locale={locale} messages={messages}>
+					{children}
+				</Providers>
 			</body>
 		</html>
 	);
