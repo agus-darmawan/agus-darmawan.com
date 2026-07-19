@@ -9,7 +9,8 @@ const MESSAGE_FILES = [
 	"experience",
 	"projects",
 	"terminal-contact-resume",
-	"blog", // ← tambah ini
+	"blog",
+	"onboarding",
 ] as const;
 
 async function loadMessages(locale: string) {

@@ -1,0 +1,16 @@
+{
+	"Onboarding": {
+		"welcomeTitle": "Welcome! 👋",
+		"welcomeBody": "This is an interactive Ubuntu-style desktop portfolio. Let's take a quick look around — you can skip anytime.",
+		"dockTitle": "Dock",
+		"dockBody": "Click an icon here to open apps like Projects, Terminal, or Resume.",
+		"topbarTitle": "Top Bar",
+		"topbarBody": "Check the time, status, and theme settings here.",
+		"shortcutsTitle": "Tips",
+		"shortcutsBody": "Press Ctrl+K for the command palette. Drag a window to a screen edge to split it, or to the top to go fullscreen.",
+		"skip": "Skip",
+		"back": "Back",
+		"next": "Next",
+		"finish": "Start exploring"
+	}
+}

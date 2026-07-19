@@ -1,0 +1,16 @@
+{
+	"Onboarding": {
+		"welcomeTitle": "Selamat datang! 👋",
+		"welcomeBody": "Ini portfolio interaktif ala desktop Ubuntu. Yuk kenalan dulu sebentar — bisa di-skip kapan aja.",
+		"dockTitle": "Dock",
+		"dockBody": "Klik icon di sini buat buka aplikasi kayak Projects, Terminal, atau Resume.",
+		"topbarTitle": "Top Bar",
+		"topbarBody": "Cek waktu, status, dan pengaturan tema di sini.",
+		"shortcutsTitle": "Tips",
+		"shortcutsBody": "Tekan Ctrl+K buat command palette. Drag window ke pinggir layar buat split-screen, ke atas buat fullscreen.",
+		"skip": "Lewati",
+		"back": "Kembali",
+		"next": "Lanjut",
+		"finish": "Mulai jelajah"
+	}
+}

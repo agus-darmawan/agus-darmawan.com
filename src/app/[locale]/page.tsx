@@ -7,6 +7,7 @@ import { BootScreen } from "@/features/boot/BootScreen";
 import { CommandPalette } from "@/features/command-palette/CommandPalette";
 import { DesktopBackground } from "@/features/desktop/DesktopBackground";
 import { Dock } from "@/features/dock/Dock";
+import { OnboardingTour } from "@/features/onboarding/OnboardingTour";
 import ReadmeWindow from "@/features/projects/readme/ReadmeWindow";
 import { Screensaver } from "@/features/screensaver/Screensaver";
 import TopBar from "@/features/top-bar/TopBar";
@@ -199,6 +200,7 @@ export default function IndexPage() {
 			<CommandPalette />
 			<Screensaver />
 			<TopBar />
+			<OnboardingTour />
 
 			<div className="relative h-[calc(100vh-4rem)] mt-8">
 				<SnapPreview snapPreview={snapPreview} />{" "}

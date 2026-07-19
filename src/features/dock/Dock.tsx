@@ -48,6 +48,7 @@ export function Dock({ windows, activeWindow, onIconClick }: DockProps) {
 
 			<div className="fixed bottom-0 left-0 right-0 h-16 flex items-end justify-center pointer-events-none z-40">
 				<div
+					data-tour="dock"
 					className="flex items-center gap-1 px-3 py-2 rounded-t-xl pointer-events-auto"
 					style={{
 						background: "#111111",

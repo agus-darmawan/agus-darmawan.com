@@ -16,6 +16,7 @@ export default function TopBar() {
 
 	return (
 		<header
+			data-tour="topbar"
 			className="fixed top-0 left-0 right-0 h-8 flex items-center justify-between px-2 z-50 border-b"
 			style={{
 				background: "var(--topbar-bg)",
