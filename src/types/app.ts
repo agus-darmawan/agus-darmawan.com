@@ -37,6 +37,7 @@ export interface WindowState {
 		x: number;
 		y: number;
 	};
+	snapZone: "left" | "right" | "full" | null;
 	zIndex: number;
 	data?: WindowPayload;
 }

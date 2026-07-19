@@ -22,6 +22,7 @@ interface WindowStore {
 	minimizeAllWindows: () => void;
 	bringToFront: (id: string) => void;
 	updatePosition: (id: string, x: number, y: number) => void;
+	setSnapZone: (id: string, zone: WindowState["snapZone"]) => void;
 	setActiveWindow: (id: string | null) => void;
 	handleDockClick: (appId: string) => void;
 
@@ -77,6 +78,7 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 			data,
 			minimized: false,
 			maximized: isMobile,
+			snapZone: null,
 			position: {
 				x: WINDOW_OFFSET_X + visibleCount * WINDOW_STAGGER,
 				y: WINDOW_OFFSET_Y + visibleCount * WINDOW_STAGGER,
@@ -110,7 +112,7 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 	toggleMaximize: (id) => {
 		set((s) => ({
 			windows: s.windows.map((w) =>
-				w.id === id ? { ...w, maximized: !w.maximized } : w,
+				w.id === id ? { ...w, maximized: !w.maximized, snapZone: null } : w,
 			),
 		}));
 	},
@@ -139,6 +141,14 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 		set((s) => ({
 			windows: s.windows.map((w) =>
 				w.id === id ? { ...w, position: { x, y } } : w,
+			),
+		}));
+	},
+
+	setSnapZone: (id, zone) => {
+		set((s) => ({
+			windows: s.windows.map((w) =>
+				w.id === id ? { ...w, snapZone: zone } : w,
 			),
 		}));
 	},
@@ -192,7 +202,6 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 		return active ? { id: active.id, name: active.title } : null;
 	},
 
-	// effectiveZ — README windows selalu di atas Projects
 	getEffectiveZ: (win) => {
 		return win.appId.startsWith("readme-") ? win.zIndex + 500 : win.zIndex;
 	},

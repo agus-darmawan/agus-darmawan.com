@@ -7,8 +7,11 @@ import type { WindowState } from "@/types/app";
 const SNAP_THRESHOLD = 48; // px from edge to trigger snap
 const TOP_BAR_HEIGHT = 32; // height of the top bar
 
+type SnapZone = "left" | "right" | "full" | null;
+
 interface SnapResult {
 	snapped: boolean;
+	zone: SnapZone;
 	x: number;
 	y: number;
 	width?: string;
@@ -22,6 +25,7 @@ function getSnapPosition(x: number, y: number): SnapResult {
 	if (x < SNAP_THRESHOLD) {
 		return {
 			snapped: true,
+			zone: "left",
 			x: 0,
 			y: TOP_BAR_HEIGHT,
 			width: "50vw",
@@ -33,6 +37,7 @@ function getSnapPosition(x: number, y: number): SnapResult {
 	if (x > vw - SNAP_THRESHOLD) {
 		return {
 			snapped: true,
+			zone: "right",
 			x: vw / 2,
 			y: TOP_BAR_HEIGHT,
 			width: "50vw",
@@ -44,6 +49,7 @@ function getSnapPosition(x: number, y: number): SnapResult {
 	if (y < TOP_BAR_HEIGHT + SNAP_THRESHOLD) {
 		return {
 			snapped: true,
+			zone: "full",
 			x: 0,
 			y: TOP_BAR_HEIGHT,
 			width: "100vw",
@@ -51,7 +57,7 @@ function getSnapPosition(x: number, y: number): SnapResult {
 		};
 	}
 
-	return { snapped: false, x, y };
+	return { snapped: false, zone: null, x, y };
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -60,6 +66,7 @@ interface UseWindowDragOptions {
 	getWindows: () => WindowState[];
 	onBringToFront: (id: string) => void;
 	onPositionChange: (id: string, x: number, y: number) => void;
+	onSnap: (id: string, zone: SnapZone) => void;
 }
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
@@ -68,6 +75,7 @@ export function useWindowDrag({
 	getWindows,
 	onBringToFront,
 	onPositionChange,
+	onSnap,
 }: UseWindowDragOptions) {
 	const [dragging, setDragging] = useState<string | null>(null);
 	const [snapPreview, setSnapPreview] = useState<SnapResult | null>(null);
@@ -83,12 +91,19 @@ export function useWindowDrag({
 
 			onBringToFront(id);
 			setDragging(id);
+
+			// Kalau window lagi snapped (half-screen), lepas dulu jadi floating
+			// sebelum mulai drag — biar user bisa narik dari posisi split.
+			if (win.snapZone) {
+				onSnap(id, null);
+			}
+
 			dragOffset.current = {
 				x: e.clientX - win.position.x,
 				y: e.clientY - win.position.y,
 			};
 		},
-		[getWindows, onBringToFront],
+		[getWindows, onBringToFront, onSnap],
 	);
 
 	useEffect(() => {
@@ -110,7 +125,7 @@ export function useWindowDrag({
 			const snap = getSnapPosition(e.clientX, e.clientY);
 			if (snap.snapped) {
 				onPositionChange(dragging, snap.x, snap.y);
-				// TODO: apply snap dimensions via store if needed
+				onSnap(dragging, snap.zone);
 			}
 
 			setDragging(null);
@@ -123,7 +138,7 @@ export function useWindowDrag({
 			window.removeEventListener("mousemove", onMove);
 			window.removeEventListener("mouseup", onUp);
 		};
-	}, [dragging, onPositionChange]);
+	}, [dragging, onPositionChange, onSnap]);
 
 	return { dragging, snapPreview, handleMouseDown };
 }

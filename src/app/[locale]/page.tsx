@@ -85,6 +85,7 @@ export default function IndexPage() {
 		getWindows: () => useWindowStore.getState().windows,
 		onBringToFront: bringToFront,
 		onPositionChange: useWindowStore.getState().updatePosition,
+		onSnap: useWindowStore.getState().setSnapZone,
 	});
 
 	// ── Theme & locale for terminal commands ─────────────────────────────────
