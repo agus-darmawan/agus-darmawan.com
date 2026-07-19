@@ -41,7 +41,7 @@ export function usePdfLoader(pdfPath: string): UsePdfLoaderResult {
 			}
 
 			pdfjsLib
-				.getDocument(pdfPath)
+				.getDocument({ url: pdfPath })
 				.promise.then((loadedPdf) => {
 					if (cancelled) return;
 					setPdf(loadedPdf);

@@ -1,7 +1,8 @@
 "use client";
 
-import { ExternalLink, Github, Star, X } from "lucide-react";
+import { ExternalLink, Star, X } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { GithubIcon } from "@/features/icons/BrandIcons";
 import type { ProjectMeta } from "./projects.data";
 import { ReadmeRenderer } from "./readme/ReadmeRenderer";
 
@@ -174,7 +175,7 @@ export function ProjectDetail({
 								"var(--text-secondary)";
 						}}
 					>
-						<Github size={13} />
+						<GithubIcon size={13} />
 						{viewCodeLabel}
 					</a>
 
