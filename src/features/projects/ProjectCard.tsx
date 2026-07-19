@@ -1,12 +1,7 @@
 "use client";
 
-import {
-	ArrowUpRight,
-	ExternalLink,
-	GitFork,
-	Github,
-	Star,
-} from "lucide-react";
+import { ArrowUpRight, ExternalLink, GitFork, Star } from "lucide-react";
+import { GithubIcon } from "@/features/icons/BrandIcons";
 import type { ProjectMeta } from "./projects.data";
 
 interface ProjectCardProps {
@@ -192,7 +187,7 @@ export function ProjectCard({
 									"var(--text-muted)";
 							}}
 						>
-							<Github size={10} />
+							<GithubIcon size={10} />
 							Code
 						</a>
 

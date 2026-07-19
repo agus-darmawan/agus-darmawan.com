@@ -35,7 +35,6 @@ export function Providers({ children, locale, messages }: ProvidersProps) {
 					disableTransitionOnChange
 				>
 					{children}
-					xww{" "}
 				</ThemeProvider>
 			</NextIntlClientProvider>
 

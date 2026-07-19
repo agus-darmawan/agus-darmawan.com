@@ -1,17 +1,18 @@
 "use client";
 
-import { Github, Linkedin, Mail, MapPin } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
+import { GithubIcon, LinkedinIcon } from "@/features/icons/BrandIcons";
 
 export const SOCIAL_LINKS = [
 	{
-		icon: Github,
+		icon: GithubIcon,
 		label: "GitHub",
 		href: "https://github.com/agus-darmawan",
 		value: "@agus-darmawan",
 		color: "#6366f1",
 	},
 	{
-		icon: Linkedin,
+		icon: LinkedinIcon,
 		label: "LinkedIn",
 		href: "https://www.linkedin.com/in/agusdarmawnn/",
 		value: "Agus Darmawan",

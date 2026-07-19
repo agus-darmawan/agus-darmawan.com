@@ -1,8 +1,9 @@
 "use client";
 
-import { Github, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { GithubIcon } from "@/features/icons/BrandIcons";
 import type { ProjectMeta } from "../projects.data";
 import { ReadmeRenderer } from "./ReadmeRenderer";
 
@@ -103,7 +104,7 @@ export default function ReadmeWindow({
 							"var(--text-secondary)";
 					}}
 				>
-					<Github size={12} />
+					<GithubIcon size={12} />
 					GitHub
 				</a>
 			</div>
