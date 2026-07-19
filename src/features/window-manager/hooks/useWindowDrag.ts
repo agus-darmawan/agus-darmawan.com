@@ -1,4 +1,3 @@
-// src/features/window-manager/useWindowDrag.ts
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { WindowState } from "@/types/app";
 
