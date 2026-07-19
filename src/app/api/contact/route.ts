@@ -36,7 +36,7 @@ async function verifyTurnstile(
 		const data = (await res.json()) as { success: boolean };
 		return data.success;
 	} catch {
-		return true;
+		return false;
 	}
 }
 
@@ -61,7 +61,14 @@ export async function POST(req: Request) {
 		}
 
 		// Verify Turnstile — only if secret key is configured
-		if (env.TURNSTILE_SECRET_KEY && body.turnstileToken) {
+		if (env.TURNSTILE_SECRET_KEY) {
+			if (!body.turnstileToken) {
+				return NextResponse.json<ApiResponse<null>>(
+					{ success: false, data: null, error: "Bot verification required" },
+					{ status: 400 },
+				);
+			}
+
 			const isHuman = await verifyTurnstile(
 				env.TURNSTILE_SECRET_KEY,
 				body.turnstileToken,
@@ -105,11 +112,11 @@ export async function POST(req: Request) {
 					</p>
 				`,
 			});
-		} else {
-			console.log("📬 Contact form (SMTP not configured):");
-			console.log("  Name   :", body.name);
-			console.log("  Email  :", body.email);
-			console.log("  Message:", body.message);
+		} else if (process.env.NODE_ENV !== "production") {
+			console.log("📬 Contact form (SMTP not configured):", {
+				name: body.name,
+				email: body.email,
+			});
 		}
 
 		return NextResponse.json<ApiResponse<{ sent: boolean }>>({
