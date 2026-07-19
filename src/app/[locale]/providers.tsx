@@ -1,7 +1,7 @@
 "use client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "next-themes";
 import { useState } from "react";
 
@@ -35,6 +35,7 @@ export function Providers({ children, locale, messages }: ProvidersProps) {
 					disableTransitionOnChange
 				>
 					{children}
+					xww{" "}
 				</ThemeProvider>
 			</NextIntlClientProvider>
 

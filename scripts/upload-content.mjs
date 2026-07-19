@@ -1,4 +1,3 @@
-// scripts/upload-content.mjs
 import { execSync } from "child_process";
 import { readdirSync, statSync } from "fs";
 import { join } from "path";

@@ -74,7 +74,6 @@ export function Dock({ windows, activeWindow, onIconClick }: DockProps) {
 									app={app}
 									label={t(app.name)}
 									isRunning={!!win}
-									isActive={!!win && activeWindow === win.id}
 									onClick={() => handleAppClick(app.id)}
 								/>
 							);
@@ -87,7 +86,6 @@ export function Dock({ windows, activeWindow, onIconClick }: DockProps) {
 									app={app}
 									label={t(app.name)}
 									isRunning={!!win}
-									isActive={!!win && activeWindow === win.id}
 									onClick={() => handleAppClick(app.id)}
 									className="hidden sm:flex"
 								/>
