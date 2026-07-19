@@ -79,7 +79,7 @@ export function WindowHeader({
 						icon={<Minimize2 size={8} />}
 						disabled={isMobile}
 					/>
-					{/* Maximize */}
+					{/* Maximize / Restore */}
 					<TrafficButton
 						color="#64c550"
 						hoverColor="#84d570"
@@ -88,7 +88,7 @@ export function WindowHeader({
 							e.stopPropagation();
 							onMaximize();
 						}}
-						icon={<Maximize2 size={8} />}
+						icon={isMaximized ? <Minimize2 size={8} /> : <Maximize2 size={8} />}
 						disabled={isMobile}
 					/>
 				</div>
@@ -129,6 +129,7 @@ function TrafficButton({
 			title={label}
 			aria-label={label}
 			disabled={disabled}
+			onMouseDown={(e) => e.stopPropagation()}
 			onClick={onClick}
 			className="w-4 h-4 rounded-full flex items-center justify-center group transition-colors disabled:opacity-30"
 			style={{

@@ -111,9 +111,15 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 
 	toggleMaximize: (id) => {
 		set((s) => ({
-			windows: s.windows.map((w) =>
-				w.id === id ? { ...w, maximized: !w.maximized, snapZone: null } : w,
-			),
+			windows: s.windows.map((w) => {
+				if (w.id !== id) return w;
+				const isCurrentlyFullscreen = w.maximized || w.snapZone === "full";
+				return {
+					...w,
+					maximized: !isCurrentlyFullscreen,
+					snapZone: null,
+				};
+			}),
 		}));
 	},
 
