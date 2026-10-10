@@ -1,186 +1,83 @@
 "use client";
 
-import { type RefObject, useCallback } from "react";
-import type { FSNode } from "./types/terminal.types";
+import type { KeyboardEvent, Ref } from "react";
+import type { Effect } from "./lib/commands";
+import { complete } from "./lib/commands";
+import { mkLine } from "./lib/lines";
+import { useTerminalStore } from "./terminal.store";
 
 interface TerminalInputLineProps {
-	inputRef: RefObject<HTMLInputElement | null>;
-	input: string;
-	cwd: string;
-	history: string[];
-	fs: FSNode;
+	ref: Ref<HTMLInputElement>;
+	prompt: string;
+	label: string;
 	placeholder: string;
-	onChange: (val: string) => void;
-	onSubmit: (val: string) => void;
-	onHistoryUp: () => void;
-	onHistoryDown: () => void;
-	onClear: () => void;
-	onAddLines: (text: string) => void;
+	onEffect: (effect: Effect | undefined) => void;
 }
-
-/** Returns immediate subdirectory names under cwd */
-function getSubdirs(fs: FSNode, cwd: string): string[] {
-	const prefix = cwd.endsWith("/") ? cwd : `${cwd}/`;
-	const result: string[] = [];
-
-	for (const key of Object.keys(fs)) {
-		if (key === cwd) continue;
-		if (!key.startsWith(prefix)) continue;
-
-		const rest = key.slice(prefix.length);
-
-		if (rest.length > 0 && !rest.includes("/")) {
-			result.push(rest + "/");
-		}
-	}
-
-	return result;
-}
-
-/** Context aware candidate completion */
-function getCandidates(fs: FSNode, cwd: string, cmd: string): string[] {
-	const files = Object.keys(fs[cwd] ?? {});
-	const dirs = getSubdirs(fs, cwd);
-
-	if (cmd === "cd") return dirs;
-	if (["vim", "nano", "cat", "rm"].includes(cmd)) return files;
-
-	return [...files, ...dirs];
-}
-
-const COMMANDS = [
-	"ls",
-	"cd",
-	"pwd",
-	"cat",
-	"touch",
-	"mkdir",
-	"rm",
-	"echo",
-	"vim",
-	"nano",
-	"git",
-	"neofetch",
-	"cowsay",
-	"fortune",
-	"cal",
-	"history",
-	"clear",
-	"whoami",
-	"date",
-	"uname",
-	"uptime",
-	"exit",
-	"help",
-];
 
 export function TerminalInputLine({
-	inputRef,
-	input,
-	cwd,
-	fs,
+	ref,
+	prompt,
+	label,
 	placeholder,
-	onChange,
-	onSubmit,
-	onHistoryUp,
-	onHistoryDown,
-	onClear,
-	onAddLines,
+	onEffect,
 }: TerminalInputLineProps) {
-	const handleKeyDown = useCallback(
-		(e: React.KeyboardEvent<HTMLInputElement>) => {
-			if (e.key === "Enter") {
-				onSubmit(input);
-				onChange("");
-			} else if (e.key === "ArrowUp") {
-				e.preventDefault();
-				onHistoryUp();
-			} else if (e.key === "ArrowDown") {
-				e.preventDefault();
-				onHistoryDown();
-			} else if (e.key === "Tab") {
-				e.preventDefault();
+	const input = useTerminalStore((s) => s.input);
+	const setInput = useTerminalStore((s) => s.setInput);
 
-				const trimmed = input.trimStart();
-				const parts = trimmed.split(/\s+/);
+	const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+		const store = useTerminalStore.getState();
 
-				const cmd = parts[0] ?? "";
-				const partial = parts[parts.length - 1] ?? "";
-
-				if (parts.length <= 1) {
-					const matches = COMMANDS.filter((c) => c.startsWith(partial));
-
-					if (matches.length === 1) {
-						onChange(matches[0] + " ");
-					} else if (matches.length > 1) {
-						onAddLines(matches.join("  "));
-					}
-
-					return;
-				}
-
-				const candidates = getCandidates(fs, cwd, cmd);
-
-				const matches = candidates.filter((c) => c.startsWith(partial));
-
-				if (matches.length === 1) {
-					const newParts = [...parts];
-					newParts[newParts.length - 1] = matches[0];
-					onChange(newParts.join(" "));
-				} else if (matches.length > 1) {
-					onAddLines(matches.join("  "));
-				}
-			} else if (e.key === "l" && e.ctrlKey) {
-				e.preventDefault();
-				onClear();
-			} else if (e.key === "c" && e.ctrlKey) {
-				e.preventDefault();
-				onAddLines(`darm@wan:${cwd}$ ${input}^C`);
-				onChange("");
+		if (e.key === "Enter") {
+			e.preventDefault();
+			onEffect(store.submit(input));
+		} else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+			e.preventDefault();
+			store.browseHistory(e.key === "ArrowUp" ? "up" : "down");
+		} else if (e.key === "Tab" && !e.shiftKey && input.trim()) {
+			// Only complete when there is something to complete — an empty
+			// prompt lets Tab move focus on, so keyboard users aren't trapped.
+			e.preventDefault();
+			const { cwd, fs } = store;
+			const result = complete(input, { cwd, fs });
+			if (result.input !== undefined) setInput(result.input);
+			if (result.options) {
+				store.print(
+					mkLine("input", `${prompt} ${input}`),
+					mkLine("output", result.options.join("  ")),
+				);
 			}
-		},
-		[
-			input,
-			cwd,
-			fs,
-			onSubmit,
-			onChange,
-			onHistoryUp,
-			onHistoryDown,
-			onClear,
-			onAddLines,
-		],
-	);
+		} else if (e.ctrlKey && e.key.toLowerCase() === "l") {
+			e.preventDefault();
+			store.clear();
+		} else if (
+			e.ctrlKey &&
+			e.key.toLowerCase() === "c" &&
+			!window.getSelection()?.toString()
+		) {
+			e.preventDefault();
+			store.interrupt();
+		}
+	};
 
 	return (
-		<div className="flex items-center text-xs font-mono leading-[1.4]">
-			<span style={{ color: "#4ec9b0" }}>darm@wan:</span>
-			<span style={{ color: "#9cdcfe" }}>{cwd}</span>
-			<span style={{ color: "#d4d4d4", marginRight: "6px" }}>$</span>
-
+		<div className="flex items-center leading-5">
+			<span className="text-[#4ec9b0] whitespace-nowrap">
+				{prompt.replace(/\$$/, "")}
+			</span>
+			<span className="text-[#d4d4d4] mr-1.5">$</span>
 			<input
-				ref={inputRef}
+				ref={ref}
 				value={input}
+				aria-label={label}
 				placeholder={placeholder}
-				onChange={(e) => onChange(e.target.value)}
-				onKeyDown={handleKeyDown}
-				className="flex-1"
-				style={{
-					background: "transparent",
-					border: "none",
-					outline: "none",
-					boxShadow: "none",
-					color: "#e6edf3",
-					caretColor: "#4ec9b0",
-					fontSize: "inherit",
-					fontFamily: "inherit",
-					padding: 0,
-				}}
-				autoFocus
+				onChange={(e) => setInput(e.target.value)}
+				onKeyDown={onKeyDown}
+				className="flex-1 min-w-0 bg-transparent border-0 outline-none shadow-none p-0 text-[#e6edf3] caret-[#4ec9b0] placeholder:text-[#484f58]"
 				spellCheck={false}
 				autoComplete="off"
 				autoCorrect="off"
 				autoCapitalize="off"
+				enterKeyHint="send"
 			/>
 		</div>
 	);
