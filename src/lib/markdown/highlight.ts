@@ -54,7 +54,7 @@ export function highlight(code: string, lang: string): string {
 
 	const comment =
 		family === "py" || family === "sh"
-			? String.raw`#.*$`
+			? "#.*$"
 			: String.raw`\/\/.*$|\/\*[\s\S]*?\*\/`;
 	const pattern = new RegExp(
 		[

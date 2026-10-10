@@ -49,6 +49,7 @@ export default function TerminalWindow() {
 	}
 
 	return (
+		// biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a click anywhere only focuses the (keyboard-reachable) input
 		<div
 			data-terminal
 			className="h-full flex flex-col font-mono text-xs bg-[#0d1117] text-[#e6edf3]"

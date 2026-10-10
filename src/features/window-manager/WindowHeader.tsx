@@ -28,6 +28,7 @@ export function WindowHeader({
 	const draggable = !isMaximized && !isMobile;
 
 	return (
+		// biome-ignore lint/a11y/noStaticElementInteractions: double-click is a mouse shortcut; the maximize button is the accessible control
 		<div
 			className={cn(
 				"window-titlebar h-9 flex items-center gap-2 px-3 select-none shrink-0 border-b border-(--border)",

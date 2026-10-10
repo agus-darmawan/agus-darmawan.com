@@ -149,6 +149,7 @@ export function CommandPalette() {
 	const optionId = (i: number) => `${listId}-${i}`;
 
 	return (
+		// biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: backdrop click is a mouse shortcut; Escape closes for keyboard users
 		<div
 			className="fixed inset-0 z-9998 flex items-start justify-center pt-24 px-4 bg-black/60 backdrop-blur-sm"
 			onClick={(e) => {
@@ -196,20 +197,25 @@ export function CommandPalette() {
 					</button>
 				</div>
 
-				<ul
+				<div
 					id={listId}
 					role="listbox"
+					aria-label={t("title")}
 					className="py-1.5 max-h-80 overflow-auto"
 				>
 					{filtered.length === 0 ? (
-						<li className="text-xs text-center py-6 text-(--panel-text-muted)">
+						<p
+							role="status"
+							className="text-xs text-center py-6 text-(--panel-text-muted)"
+						>
 							{t("empty")}
-						</li>
+						</p>
 					) : (
 						filtered.map((cmd, i) => {
 							const active = i === selected;
 							return (
-								<li
+								// biome-ignore lint/a11y/useKeyWithClickEvents lint/a11y/useFocusableInteractive: combobox pattern — focus stays in the input, options are driven by aria-activedescendant and arrow keys
+								<div
 									key={cmd.id}
 									id={optionId(i)}
 									role="option"
@@ -240,11 +246,11 @@ export function CommandPalette() {
 										</span>
 									</span>
 									{active && <Kbd>↵</Kbd>}
-								</li>
+								</div>
 							);
 						})
 					)}
-				</ul>
+				</div>
 
 				<div className="flex items-center gap-3 px-4 py-2 border-t border-(--panel-border) text-[10px] text-(--panel-text-muted)">
 					<span>
