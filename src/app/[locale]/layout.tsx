@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
 import { Ubuntu } from "next/font/google";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { hasLocale } from "next-intl";
 import {
 	getMessages,
@@ -96,6 +97,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 	setRequestLocale(locale);
 
 	const messages = await getMessages();
+	const beaconToken = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN;
 
 	return (
 		<html lang={locale} suppressHydrationWarning>
@@ -103,6 +105,15 @@ export default async function LocaleLayout({ children, params }: Props) {
 				<Providers locale={locale} messages={messages}>
 					{children}
 				</Providers>
+				{/* Cloudflare Web Analytics: cookie-less, and the source of the
+				    terminal's `uptime` visitor count. */}
+				{beaconToken && (
+					<Script
+						src="https://static.cloudflareinsights.com/beacon.min.js"
+						data-cf-beacon={JSON.stringify({ token: beaconToken })}
+						strategy="afterInteractive"
+					/>
+				)}
 			</body>
 		</html>
 	);
