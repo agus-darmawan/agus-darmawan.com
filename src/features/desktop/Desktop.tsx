@@ -183,7 +183,7 @@ export function Desktop() {
 			<OnboardingTour />
 
 			<div className="relative h-[calc(100vh-4rem)] mt-8">
-				<SnapPreview snapPreview={snapPreview} />
+				<SnapPreview zone={snapPreview} />
 				<AnimatePresence>
 					{windows.map((win) => {
 						const closeLocked = win.appId === "projects" && hasOpenReadme;
