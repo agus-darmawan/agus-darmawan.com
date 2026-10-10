@@ -2,7 +2,7 @@
  * Minimal JSON fetch helper (replaces axios — one less dependency with a
  * steady stream of CVEs, and native fetch already does everything we need).
  */
-export class HttpError extends Error {
+class HttpError extends Error {
 	constructor(
 		readonly status: number,
 		message: string,
