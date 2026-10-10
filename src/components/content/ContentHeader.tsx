@@ -129,6 +129,12 @@ export function ContentHeader({
 						{item.kind === "project" && item.featured && (
 							<Chip>{t("featured")}</Chip>
 						)}
+						{item.kind === "project" && item.source === "github" && (
+							<Chip variant="muted">
+								<GithubIcon size={9} />
+								{t("autoFromGithub")}
+							</Chip>
+						)}
 					</div>
 					<p
 						className={cn(

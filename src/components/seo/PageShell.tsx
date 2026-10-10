@@ -6,6 +6,12 @@ import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { listingPath } from "@/lib/content/paths";
 
+const NAV = [
+	{ href: "/about", labelKey: "aboutTitle" },
+	{ href: listingPath("project"), labelKey: "projectsTitle" },
+	{ href: listingPath("blog"), labelKey: "blogTitle" },
+] as const;
+
 interface Crumb {
 	name: string;
 	href: string;
@@ -47,18 +53,16 @@ export function PageShell({
 					</Link>
 
 					<nav className="flex items-center gap-1 text-xs sm:text-sm">
-						<Link
-							href={listingPath("project")}
-							className="px-2 py-1 rounded-md hover:bg-(--surface-secondary)"
-						>
-							{t("projectsTitle")}
-						</Link>
-						<Link
-							href={listingPath("blog")}
-							className="px-2 py-1 rounded-md hover:bg-(--surface-secondary)"
-						>
-							{t("blogTitle")}
-						</Link>
+						{NAV.map(({ href, labelKey }) => (
+							<Link
+								key={href}
+								href={href}
+								aria-current={path === href ? "page" : undefined}
+								className="px-2 py-1 rounded-md hover:bg-(--surface-secondary) aria-[current=page]:text-[#e95420]"
+							>
+								{t(labelKey)}
+							</Link>
+						))}
 						<span className="mx-1 h-4 w-px bg-(--border)" aria-hidden="true" />
 						{routing.locales.map((l) => (
 							<Link

@@ -12,6 +12,14 @@
 		"elsewhere": "Find me on",
 		"language": "Language",
 		"projectBy": "Project by {name}",
-		"postBy": "Article by {name}"
+		"postBy": "Article by {name}",
+		"aboutTitle": "About",
+		"aboutPageTitle": "About Agus Darmawan — Robotics & Full-Stack Developer",
+		"aboutDescription": "About I Wayan Agus Darmawan (Agus Darmawan): robotics engineer and full-stack developer from Bali — work experience, education, awards and publications.",
+		"downloadCv": "Download CV",
+		"emailMe": "Email me",
+		"notFoundTitle": "Page not found",
+		"notFoundBody": "The page you're looking for doesn't exist or has moved.",
+		"backHome": "Back to home"
 	}
 }

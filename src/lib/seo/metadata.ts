@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { absoluteUrl, SITE } from "@/config/site";
+import { localizedPath } from "@/i18n/paths";
 import { routing } from "@/i18n/routing";
 
 const OG_LOCALE: Record<string, string> = { en: "en_US", id: "id_ID" };
-
-/** `/en/blog/x` style path. `path` is locale-less and starts with "/" (or is ""). */
-export const localizedPath = (locale: string, path = "") =>
-	`/${locale}${path === "/" ? "" : path}`;
 
 /**
  * canonical + hreflang for every locale (+ x-default → default locale).
@@ -29,6 +27,8 @@ interface PageMetaInput {
 	locale: string;
 	path: string;
 	title: string;
+	/** Use the title as-is instead of the "%s · Agus Darmawan" template. */
+	absoluteTitle?: boolean;
 	description: string;
 	type?: "website" | "article" | "profile";
 	publishedTime?: string | null;
@@ -40,6 +40,7 @@ export function pageMetadata({
 	locale,
 	path,
 	title,
+	absoluteTitle = false,
 	description,
 	type = "website",
 	publishedTime,
@@ -47,7 +48,7 @@ export function pageMetadata({
 }: PageMetaInput): Metadata {
 	const url = absoluteUrl(localizedPath(locale, path));
 	return {
-		title,
+		title: absoluteTitle ? { absolute: title } : title,
 		description,
 		alternates: alternates(locale, path),
 		openGraph: {
@@ -73,4 +74,10 @@ export function pageMetadata({
 			creator: SITE.twitterHandle,
 		},
 	};
+}
+
+/** Title + noindex for 404s (the layout's "index, follow" would apply otherwise). */
+export async function notFoundMetadata(locale: string): Promise<Metadata> {
+	const t = await getTranslations({ locale, namespace: "Seo" });
+	return { title: t("notFoundTitle"), robots: { index: false, follow: true } };
 }

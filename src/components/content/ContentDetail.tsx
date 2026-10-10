@@ -8,6 +8,7 @@ import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import type { ContentMeta } from "@/lib/content/types";
 import type { ApiResponse } from "@/types/api";
 import { ContentHeader } from "./ContentHeader";
+import { CopyLinkButton } from "./CopyLinkButton";
 import { accentStyle } from "./primitives";
 
 async function fetchBody(
@@ -51,7 +52,16 @@ export function ContentDetail({ item, leading }: ContentDetailProps) {
 
 	return (
 		<div className="h-full flex flex-col bg-(--window-bg) text-(--text-primary)">
-			<ContentHeader item={item} leading={leading} className="shrink-0" />
+			<ContentHeader
+				item={item}
+				className="shrink-0"
+				leading={
+					<div className="flex items-center justify-between gap-3 mb-3">
+						{leading}
+						<CopyLinkButton item={item} />
+					</div>
+				}
+			/>
 
 			<div
 				ref={scrollRef}

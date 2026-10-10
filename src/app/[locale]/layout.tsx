@@ -50,7 +50,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 		authors: [{ name: SITE.name, url: SITE.url }],
 		creator: SITE.name,
 		publisher: SITE.name,
-		manifest: "/manifest.json",
 		alternates: alternates(locale),
 		openGraph: {
 			title: t("homeTitle"),
