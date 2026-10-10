@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/config/site";
+import { localizedPath } from "@/i18n/paths";
 import { routing } from "@/i18n/routing";
 import { getPosts, getProjects } from "@/lib/content";
 import { contentPath, listingPath } from "@/lib/content/paths";
-import { localizedPath } from "@/lib/seo/metadata";
 
 export const revalidate = 3600;
 
@@ -36,6 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 	return [
 		...localized("", { changeFrequency: "monthly", priority: 1 }),
+		...localized("/about", { changeFrequency: "monthly", priority: 0.9 }),
 		...localized(listingPath("project"), {
 			changeFrequency: "weekly",
 			priority: 0.8,

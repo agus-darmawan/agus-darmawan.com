@@ -4,7 +4,7 @@ import { HomeProfile } from "@/components/seo/HomeProfile";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Desktop } from "@/features/desktop/Desktop";
 import { getPosts, getProjects } from "@/lib/content";
-import { profilePageJsonLd } from "@/lib/seo/jsonld";
+import { homeJsonLd } from "@/lib/seo/jsonld";
 
 // Re-generate hourly so GitHub stars / auto-discovered repos stay fresh.
 export const revalidate = 3600;
@@ -25,7 +25,7 @@ export default async function HomePage({
 
 	return (
 		<>
-			<JsonLd data={profilePageJsonLd(locale, about("bio"))} />
+			<JsonLd data={homeJsonLd(locale, about("bio"))} />
 			<HomeProfile projects={projects} posts={posts} />
 			<ContentProvider value={{ projects, posts }}>
 				<Desktop />

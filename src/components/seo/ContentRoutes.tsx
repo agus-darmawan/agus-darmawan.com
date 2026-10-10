@@ -10,8 +10,13 @@ import { routing } from "@/i18n/routing";
 import { getPostsWithBody, getProjectsWithBody } from "@/lib/content";
 import { contentPath, listingPath } from "@/lib/content/paths";
 import type { ContentKind, ContentMeta, WithBody } from "@/lib/content/types";
-import { postJsonLd, projectJsonLd } from "@/lib/seo/jsonld";
-import { localizedPath, pageMetadata } from "@/lib/seo/metadata";
+import {
+	collectionJsonLd,
+	postJsonLd,
+	projectJsonLd,
+	toJsonLdCrumbs,
+} from "@/lib/seo/jsonld";
+import { notFoundMetadata, pageMetadata } from "@/lib/seo/metadata";
 import { JsonLd } from "./JsonLd";
 import { PageShell } from "./PageShell";
 
@@ -64,15 +69,22 @@ export async function ListingPage({
 	const t = await getTranslations({ locale, namespace: "Seo" });
 	const items = (await loadAll(kind, locale)).map(stripBody);
 	const title = t(listingKeys[kind].title);
+	const crumbs = [
+		{ name: SITE.shortName, href: "/" },
+		{ name: title, href: listingPath(kind) },
+	];
 
 	return (
-		<PageShell
-			path={listingPath(kind)}
-			breadcrumbs={[
-				{ name: SITE.shortName, href: "/" },
-				{ name: title, href: listingPath(kind) },
-			]}
-		>
+		<PageShell path={listingPath(kind)} breadcrumbs={crumbs}>
+			<JsonLd
+				data={collectionJsonLd(
+					locale,
+					listingPath(kind),
+					title,
+					items,
+					toJsonLdCrumbs(locale, crumbs),
+				)}
+			/>
 			<h1 className="text-2xl sm:text-3xl font-bold">{title}</h1>
 			<p className="mt-2 mb-6 text-sm text-(--text-secondary) max-w-2xl">
 				{t(listingKeys[kind].description)}
@@ -105,7 +117,7 @@ export async function detailMetadata(
 ): Promise<Metadata> {
 	const { locale, slug } = await params;
 	const item = await findItem(kind, locale, slug);
-	if (!item) return {};
+	if (!item) return notFoundMetadata(locale);
 	return {
 		...pageMetadata({
 			locale,
@@ -139,10 +151,7 @@ export async function DetailPage({
 		{ name: listingTitle, href: listingPath(kind) },
 		{ name: item.title, href: contentPath(item) },
 	];
-	const ldCrumbs = crumbs.map((c) => ({
-		name: c.name,
-		path: localizedPath(locale, c.href === "/" ? "" : c.href),
-	}));
+	const ldCrumbs = toJsonLdCrumbs(locale, crumbs);
 	const more = all
 		.filter((i) => i.slug !== item.slug)
 		.slice(0, 2)

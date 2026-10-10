@@ -134,7 +134,7 @@ export function ContentWindow<T extends ContentMeta>({
 							ref={backRef}
 							type="button"
 							onClick={() => setSelectedSlug(null)}
-							className="flex items-center gap-1.5 text-xs mb-3 transition-opacity hover:opacity-70 text-(--text-muted)"
+							className="flex items-center gap-1.5 text-xs transition-opacity hover:opacity-70 text-(--text-muted)"
 						>
 							<ArrowLeft size={12} aria-hidden="true" />
 							{labels.back}
