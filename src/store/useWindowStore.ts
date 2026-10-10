@@ -6,7 +6,11 @@ import {
 	WINDOW_OFFSET_Y,
 	WINDOW_STAGGER,
 } from "@/constants/window";
-import type { WindowPayload, WindowState } from "@/types/app";
+import {
+	isProjectWindow,
+	type WindowPayload,
+	type WindowState,
+} from "@/types/app";
 
 interface WindowStore {
 	// State
@@ -33,9 +37,7 @@ interface WindowStore {
 }
 
 function deriveTitle(appId: string, data?: WindowPayload): string {
-	if (appId.startsWith("readme-") && data?.kind === "readme") {
-		return `${data.project.emoji} ${data.name}`;
-	}
+	if (data?.kind === "project") return `${data.emoji} ${data.title}`;
 	return FALLBACK_TITLES[appId] ?? appId;
 }
 
@@ -59,7 +61,13 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 				activeWindowId: existing.id,
 				windows: s.windows.map((w) =>
 					w.id === existing.id
-						? { ...w, minimized: false, data, zIndex: s.zCounter + 1 }
+						? // keep the payload when re-opened without one (dock/terminal)
+							{
+								...w,
+								minimized: false,
+								data: data ?? w.data,
+								zIndex: s.zCounter + 1,
+							}
 						: w,
 				),
 			}));
@@ -209,6 +217,7 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 	},
 
 	getEffectiveZ: (win) => {
-		return win.appId.startsWith("readme-") ? win.zIndex + 500 : win.zIndex;
+		// Project windows always sit above the Projects list that opened them.
+		return isProjectWindow(win.appId) ? win.zIndex + 500 : win.zIndex;
 	},
 }));

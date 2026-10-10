@@ -1,6 +1,7 @@
 "use client";
 
 import NextImage from "next/image";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 interface ImageBlockProps {
@@ -10,6 +11,7 @@ interface ImageBlockProps {
 }
 
 export function ImageBlock({ src, alt, title }: ImageBlockProps) {
+	const t = useTranslations("Content");
 	const [loaded, setLoaded] = useState(false);
 	const [error, setError] = useState(false);
 
@@ -23,7 +25,7 @@ export function ImageBlock({ src, alt, title }: ImageBlockProps) {
 					color: "var(--text-muted)",
 				}}
 			>
-				Failed to load image: {alt}
+				{t("imageFailed", { alt })}
 			</div>
 		);
 	}

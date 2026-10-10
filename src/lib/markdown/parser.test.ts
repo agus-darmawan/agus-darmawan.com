@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseInline, parseMdx } from "./mdx-parser";
+import { parseInline, parseMdx } from "./parser";
 
 // ── parseInline ───────────────────────────────────────────────────────────────
 
@@ -243,5 +243,36 @@ describe("parseMdx — edge cases", () => {
 	it("handles very long paragraph without crashing", () => {
 		const longText = "word ".repeat(500);
 		expect(() => parseMdx(longText)).not.toThrow();
+	});
+});
+
+// ── Regressions ───────────────────────────────────────────────────────────────
+
+describe("regressions", () => {
+	const text = (md: string) =>
+		parseInline(md)
+			.map((n) => (n.type === "text" ? n.value : `<${n.type}>`))
+			.join("");
+
+	it("keeps snake_case identifiers as plain text", () => {
+		expect(text("set use_sim_time and cmd_vel")).toBe(
+			"set use_sim_time and cmd_vel",
+		);
+	});
+
+	it("still parses _italic_ at word boundaries", () => {
+		expect(parseInline("an _important_ note")[1]).toMatchObject({
+			type: "italic",
+		});
+	});
+
+	it("never produces empty heading ids", () => {
+		const { toc } = parseMdx("## 🏆\n\n## 🏆");
+		expect(toc.map((t) => t.id)).toEqual(["section", "section-2"]);
+	});
+
+	it("produces ids for headings that start with a digit", () => {
+		const { toc } = parseMdx("## 2. Install ROS2");
+		expect(toc[0].id).toBe("2-install-ros2");
 	});
 });

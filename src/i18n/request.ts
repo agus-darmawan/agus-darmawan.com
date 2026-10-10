@@ -11,6 +11,7 @@ const MESSAGE_FILES = [
 	"terminal-contact-resume",
 	"blog",
 	"onboarding",
+	"content",
 ] as const;
 
 async function loadMessages(locale: string) {
