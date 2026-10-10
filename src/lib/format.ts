@@ -9,3 +9,11 @@ export function formatDate(
 		{ year: "numeric", month, day: "numeric", timeZone: "UTC" },
 	);
 }
+
+/** "2025-11" → "Nov 2025" / "Nov 2025" (id-ID uses "Agu", "Des", …). */
+export function formatYearMonth(yearMonth: string, locale: string): string {
+	return new Date(`${yearMonth}-01T00:00:00Z`).toLocaleDateString(
+		locale === "id" ? "id-ID" : "en-US",
+		{ year: "numeric", month: "short", timeZone: "UTC" },
+	);
+}
