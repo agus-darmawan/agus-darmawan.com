@@ -10,12 +10,12 @@ import { localizedPath } from "./metadata";
  * guessing which of the many Agus Darmawans this site is about.
  */
 
-export const PERSON_ID = `${SITE.url}/#person`;
-export const WEBSITE_ID = `${SITE.url}/#website`;
+const PERSON_ID = `${SITE.url}/#person`;
+const WEBSITE_ID = `${SITE.url}/#website`;
 
 type Thing = Record<string, unknown>;
 
-export function personJsonLd(description?: string): Thing {
+function personJsonLd(description?: string): Thing {
 	return {
 		"@type": "Person",
 		"@id": PERSON_ID,
@@ -43,7 +43,7 @@ export function personJsonLd(description?: string): Thing {
 	};
 }
 
-export function websiteJsonLd(locale: string): Thing {
+function websiteJsonLd(locale: string): Thing {
 	return {
 		"@type": "WebSite",
 		"@id": WEBSITE_ID,
@@ -74,9 +74,7 @@ export function profilePageJsonLd(locale: string, bio: string): Thing {
 	};
 }
 
-export function breadcrumbJsonLd(
-	items: { name: string; path: string }[],
-): Thing {
+function breadcrumbJsonLd(items: { name: string; path: string }[]): Thing {
 	return {
 		"@type": "BreadcrumbList",
 		itemListElement: items.map((item, i) => ({

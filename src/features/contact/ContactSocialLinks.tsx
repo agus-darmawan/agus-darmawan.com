@@ -3,7 +3,7 @@
 import { Mail, MapPin } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/features/icons/BrandIcons";
 
-export const SOCIAL_LINKS = [
+const SOCIAL_LINKS = [
 	{
 		icon: GithubIcon,
 		label: "GitHub",

@@ -54,4 +54,3 @@ export const localeOverride = z
 	.loose();
 
 export type ProjectFrontmatter = z.infer<typeof projectFrontmatter>;
-export type BlogFrontmatter = z.infer<typeof blogFrontmatter>;
