@@ -1,14 +1,15 @@
 import type { MetadataRoute } from "next";
-
-const BASE_URL = "https://agus-darmawan.com";
+import { absoluteUrl, SITE } from "@/config/site";
 
 export default function robots(): MetadataRoute.Robots {
 	return {
 		rules: {
 			userAgent: "*",
 			allow: "/",
-			disallow: ["/api/"],
+			// /monitoring is the Sentry tunnel route.
+			disallow: ["/api/", "/monitoring"],
 		},
-		sitemap: `${BASE_URL}/sitemap.xml`,
+		sitemap: absoluteUrl("/sitemap.xml"),
+		host: SITE.url,
 	};
 }

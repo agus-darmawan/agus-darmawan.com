@@ -29,10 +29,10 @@ export const SITE = {
 		"Full-Stack Web Development",
 	],
 	twitterHandle: "@agusdarmawnn",
+	/** Display label → URL. Also emitted as JSON-LD `sameAs`. */
 	socials: {
-		github: "https://github.com/agus-darmawan",
-		linkedin: "https://www.linkedin.com/in/agusdarmawnn/",
-		x: "https://x.com/agusdarmawnn",
+		GitHub: "https://github.com/agus-darmawan",
+		LinkedIn: "https://www.linkedin.com/in/agusdarmawnn/",
 	},
 	github: {
 		username: "agus-darmawan",

@@ -7,3 +7,6 @@ export const routing = defineRouting({
 	// Used when no locale matches
 	defaultLocale: "en",
 });
+
+/** Shared by server + client next-intl config (Bali, WITA). */
+export const TIME_ZONE = "Asia/Makassar";

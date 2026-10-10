@@ -4,6 +4,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "next-themes";
 import { useState } from "react";
+import { TIME_ZONE } from "@/i18n/routing";
 
 interface ProvidersProps {
 	children: React.ReactNode;
@@ -27,7 +28,11 @@ export function Providers({ children, locale, messages }: ProvidersProps) {
 
 	return (
 		<QueryClientProvider client={queryClient}>
-			<NextIntlClientProvider locale={locale} messages={messages}>
+			<NextIntlClientProvider
+				locale={locale}
+				messages={messages}
+				timeZone={TIME_ZONE}
+			>
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="dark"
