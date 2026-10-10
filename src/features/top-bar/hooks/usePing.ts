@@ -1,38 +1,30 @@
 import { useQuery } from "@tanstack/react-query";
-import { useRefreshProgress } from "@/hooks/useRefreshProgress";
 import { fetchJson } from "@/lib/fetch-json";
 import type { ApiResponse } from "@/types/api";
 
-const REFETCH_INTERVAL = 10_000;
+export const PING_INTERVAL = 10_000;
 
-async function fetchPing(): Promise<number> {
+async function measurePing(): Promise<number> {
 	const start = performance.now();
-	await fetchJson<ApiResponse<{ ok: boolean }>>("/api/ping");
+	await fetchJson<ApiResponse<{ ok: true }>>("/api/ping", {
+		cache: "no-store",
+		timeoutMs: 5_000,
+	});
 	return Math.round(performance.now() - start);
 }
 
-export interface UsePingResult {
-	ping: number | null;
-	/** Smooth 0→1 arc progress toward next refetch */
-	refreshProgress: number;
-	isLoading: boolean;
-}
-
-export function usePing(): UsePingResult {
-	const { data, isLoading, dataUpdatedAt } = useQuery({
+export function usePing() {
+	const { data, isError, dataUpdatedAt } = useQuery({
 		queryKey: ["ping"],
-		queryFn: fetchPing,
-		refetchInterval: REFETCH_INTERVAL,
-		refetchIntervalInBackground: false,
+		queryFn: measurePing,
+		refetchInterval: PING_INTERVAL,
 		refetchOnWindowFocus: true,
 		retry: false,
 	});
 
-	const refreshProgress = useRefreshProgress(dataUpdatedAt, REFETCH_INTERVAL);
-
 	return {
-		ping: data ?? null,
-		refreshProgress,
-		isLoading,
+		// TanStack keeps the last good value on error; a failed ping is offline.
+		ping: isError ? null : (data ?? null),
+		updatedAt: dataUpdatedAt,
 	};
 }

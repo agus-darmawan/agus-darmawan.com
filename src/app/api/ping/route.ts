@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { ApiResponse } from "@/types/api";
+import type { ApiResponse } from "@/types/api";
 
-export async function GET() {
-	const response: ApiResponse<{ ok: boolean }> = {
-		success: true,
-		data: { ok: true },
-	};
-
-	return NextResponse.json(response);
+/** Round-trip target for the top bar latency indicator. Never cached. */
+export function GET() {
+	return NextResponse.json<ApiResponse<{ ok: true }>>(
+		{ success: true, data: { ok: true } },
+		{ headers: { "Cache-Control": "no-store" } },
+	);
 }
