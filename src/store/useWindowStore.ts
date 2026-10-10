@@ -211,7 +211,11 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 	},
 
 	getEffectiveZ: (win) => {
-		// Project windows always sit above the Projects list that opened them.
-		return isProjectWindow(win.appId) ? win.zIndex + 500 : win.zIndex;
+		// A project window must stay above the Projects list that opened it —
+		// but NOT above every other app (the old flat +500 buried any window
+		// opened later, e.g. Blog, underneath an open README).
+		if (!isProjectWindow(win.appId)) return win.zIndex;
+		const list = get().windows.find((w) => w.appId === "projects");
+		return list ? Math.max(win.zIndex, list.zIndex + 1) : win.zIndex;
 	},
 }));
