@@ -13,7 +13,7 @@
 	},
 	"TerminalWindow": {
 		"title": "Terminal",
-		"welcome": "Ubuntu 22.04.3 LTS — darm@wan — portfolio terminal",
+		"welcome": "Ubuntu 22.04.3 LTS — agus@ubuntu — portfolio terminal",
 		"helpHint": "Type \"help\" for available commands.",
 		"placeholder": "Type a command...",
 		"hintTab": "Tab",
@@ -32,7 +32,13 @@
 		"vimQuitDesc": "=quit",
 		"vimSaveQuit": ":wq",
 		"vimSaveQuitDesc": "=save & quit",
-		"sessionClosed": "Session closed. Goodbye!"
+		"label": "Terminal",
+		"outputLabel": "Terminal output",
+		"inputLabel": "Command",
+		"vimLabel": "Vim editor",
+		"fetching": "Fetching stats…",
+		"noWindow": "close: no other window to close",
+		"closed": "Closed {app}."
 	},
 	"ContactWindow": {
 		"title": "Contact",

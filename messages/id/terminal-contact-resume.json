@@ -13,7 +13,7 @@
 	},
 	"TerminalWindow": {
 		"title": "Terminal",
-		"welcome": "Ubuntu 22.04.3 LTS — darm@wan — terminal portofolio",
+		"welcome": "Ubuntu 22.04.3 LTS — agus@ubuntu — terminal portofolio",
 		"helpHint": "Ketik \"help\" untuk melihat perintah yang tersedia.",
 		"placeholder": "Ketik perintah...",
 		"hintTab": "Tab",
@@ -32,7 +32,13 @@
 		"vimQuitDesc": "=keluar",
 		"vimSaveQuit": ":wq",
 		"vimSaveQuitDesc": "=simpan & keluar",
-		"sessionClosed": "Sesi ditutup. Sampai jumpa!"
+		"label": "Terminal",
+		"outputLabel": "Keluaran terminal",
+		"inputLabel": "Perintah",
+		"vimLabel": "Editor Vim",
+		"fetching": "Mengambil statistik…",
+		"noWindow": "close: tidak ada jendela lain untuk ditutup",
+		"closed": "{app} ditutup."
 	},
 	"ContactWindow": {
 		"title": "Kontak",

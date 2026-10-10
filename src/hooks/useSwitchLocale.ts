@@ -3,12 +3,7 @@
 import { useLocale } from "next-intl";
 import { useCallback } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
-
-export type Locale = (typeof routing.locales)[number];
-
-export const isLocale = (value: string): value is Locale =>
-	(routing.locales as readonly string[]).includes(value);
+import type { Locale } from "@/i18n/routing";
 
 /**
  * Switch the UI language while staying on the current page. Shared by the
