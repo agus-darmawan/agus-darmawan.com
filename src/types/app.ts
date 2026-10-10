@@ -9,7 +9,7 @@ export interface AppConfig {
 }
 
 /** Project detail windows use the app id `project-{slug}`. */
-export const PROJECT_WINDOW_PREFIX = "project-";
+const PROJECT_WINDOW_PREFIX = "project-";
 export const projectWindowId = (slug: string) =>
 	`${PROJECT_WINDOW_PREFIX}${slug}`;
 export const isProjectWindow = (appId: string) =>

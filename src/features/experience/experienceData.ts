@@ -1,4 +1,4 @@
-export interface ExperienceRole {
+interface ExperienceRole {
 	i18nKey: string; // key under Experience.{companyKey}.roles.{roleKey}
 	period: { start: string; end: string | null };
 	tech: string[];
@@ -8,7 +8,6 @@ export interface ExperienceEntry {
 	i18nKey: string; // key under Experience namespace e.g. "ezraRobotics"
 	color: string;
 	logo: string;
-	totalDuration: string; // display string e.g. "1 year 4 months"
 	roles: ExperienceRole[];
 }
 
@@ -17,7 +16,6 @@ export const EXPERIENCES: ExperienceEntry[] = [
 		i18nKey: "ezraRobotics",
 		color: "#e95420",
 		logo: "/companies/ezra-robotics.png",
-		totalDuration: "1y 4m",
 		roles: [
 			{
 				i18nKey: "roboticsEngineer",
@@ -50,7 +48,6 @@ export const EXPERIENCES: ExperienceEntry[] = [
 		i18nKey: "aseec",
 		color: "#3b82f6",
 		logo: "/companies/aseec.png",
-		totalDuration: "3y",
 		roles: [
 			{
 				i18nKey: "researchMentor",
@@ -68,7 +65,6 @@ export const EXPERIENCES: ExperienceEntry[] = [
 		i18nKey: "itsTeknoSains",
 		color: "#10b981",
 		logo: "/companies/its-tekno.png",
-		totalDuration: "1y 8m",
 		roles: [
 			{
 				i18nKey: "roboticsSoftwareEngineer",
@@ -100,7 +96,6 @@ export const EXPERIENCES: ExperienceEntry[] = [
 		i18nKey: "b401Lab",
 		color: "#8b5cf6",
 		logo: "/companies/b401.png",
-		totalDuration: "1y 3m",
 		roles: [
 			{
 				i18nKey: "labAssistant",
@@ -121,7 +116,6 @@ export const EXPERIENCES: ExperienceEntry[] = [
 		i18nKey: "barunastra",
 		color: "#0ea5e9",
 		logo: "/companies/barunastra.png",
-		totalDuration: "2y 8m",
 		roles: [
 			{
 				i18nKey: "divisionLeader",
@@ -154,7 +148,6 @@ export const EXPERIENCES: ExperienceEntry[] = [
 		i18nKey: "satkomindo",
 		color: "#f59e0b",
 		logo: "/companies/satkomindo.png",
-		totalDuration: "5m",
 		roles: [
 			{
 				i18nKey: "fullStackDeveloper",
@@ -175,7 +168,6 @@ export const EXPERIENCES: ExperienceEntry[] = [
 		i18nKey: "mage9",
 		color: "#ec4899",
 		logo: "/companies/mage9.png",
-		totalDuration: "1y 2m",
 		roles: [
 			{
 				i18nKey: "frontendDeveloper",

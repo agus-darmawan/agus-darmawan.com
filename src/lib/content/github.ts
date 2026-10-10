@@ -35,7 +35,7 @@ export interface GitHubRepo {
 }
 
 /** `missing` = GitHub answered 404 (private/renamed/deleted), so don't link it. */
-export type RepoLookup =
+type RepoLookup =
 	| { status: "ok"; repo: GitHubRepo }
 	| { status: "missing" }
 	| { status: "unknown" };

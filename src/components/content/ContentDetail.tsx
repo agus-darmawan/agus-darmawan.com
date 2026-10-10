@@ -25,7 +25,7 @@ async function fetchBody(
 }
 
 /** Lazily loads + renders a body. Cached per locale/slug by React Query. */
-export function useContentBody(item: ContentMeta) {
+function useContentBody(item: ContentMeta) {
 	const locale = useLocale();
 	return useQuery({
 		queryKey: ["content", locale, item.kind, item.slug],

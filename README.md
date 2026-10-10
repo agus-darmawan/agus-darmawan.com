@@ -1,86 +1,115 @@
-# 🖥️ Ubuntu Portfolio
+# 🖥️ agus-darmawan.com
 
-> Interactive Ubuntu 22.04 GNOME desktop simulation — built as a developer portfolio.
+> Portfolio of **I Wayan Agus Darmawan** — an interactive Ubuntu 22.04 GNOME desktop in the browser, plus fast, crawlable pages for every project and post.
 
-[![CI](https://github.com/agus-darmawan/ubuntu-portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/agus-darmawan/ubuntu-portfolio/actions)
-[![Deploy](https://img.shields.io/badge/deployed-vercel-black)](https://agus-darmawan.com)
+[![CI](https://github.com/agus-darmawan/agus-darmawan.com/actions/workflows/ci.yml/badge.svg)](https://github.com/agus-darmawan/agus-darmawan.com/actions)
+[![Live](https://img.shields.io/badge/live-agus--darmawan.com-e95420)](https://agus-darmawan.com)
 
----
-
-## Stack
-
-Next.js 16 · TypeScript · Tailwind CSS v4 · Zustand · TanStack Query · Framer Motion · next-intl · Cloudflare
+Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · Zustand · TanStack Query · Framer Motion · next-intl · Zod · Vitest · Biome
 
 ---
 
 ## Features
 
-- 🪟 Draggable windows with snap-to-edge
-- ⌨️ Functional terminal with `man agus`, easter eggs, and UI commands
-- ⌘ Command palette (`Ctrl+K`)
-- 🌙 Screensaver after 60s idle
-- 🎵 Live Spotify now-playing
-- 🌐 EN / ID bilingual
-- 📬 Contact form with Cloudflare Turnstile
-- 🚀 OG image, web manifest, Sentry error tracking
+- 🪟 Draggable windows with snap-to-edge, dock, command palette (`Ctrl+K`), screensaver
+- ⌨️ Terminal with `man agus`, easter eggs and UI commands
+- 📂 Projects & blog from MDX **+ live GitHub data** (stars, forks, auto-discovered repos)
+- 🔎 SEO: SSG pages per project/post, JSON-LD (`Person`, `ProfilePage`, `BlogPosting`, `SoftwareSourceCode`), hreflang, per-page OG images, sitemap with alternates
+- 🌐 EN / ID, 🌙 dark mode, 🎵 Spotify now-playing, 📬 contact form with Turnstile, 🚨 Sentry
 
 ---
 
-## Quick Start
+## Quick start
 
 ```bash
-git clone https://github.com/agus-darmawan/ubuntu-portfolio.git
-cd ubuntu-portfolio
+git clone https://github.com/agus-darmawan/agus-darmawan.com.git
+cd agus-darmawan.com
 pnpm install
-cp .env.example .env.local
-# Fill in .env.local, then:
+cp .env.example .env.local   # every variable is optional
 pnpm dev
 ```
 
 ---
 
-## Environment Variables
+## Content — adding a project or post
 
-Copy `.env.example` to `.env.local` and fill in the values.
+All projects and posts live in `content/` and are loaded by `src/lib/content`.
+**No TypeScript or i18n edits needed.**
 
-| Variable | Required | Description |
-|---|---|---|
-| `SPOTIFY_CLIENT_ID` | ✅ | Spotify app client ID |
-| `SPOTIFY_CLIENT_SECRET` | ✅ | Spotify app client secret |
-| `SPOTIFY_REFRESH_TOKEN` | ✅ | Spotify refresh token |
-| `SMTP_*` | — | Email delivery for contact form |
-| `CONTACT_EMAIL` | — | Where contact form sends to |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | — | Cloudflare Turnstile (bot protection) |
-| `TURNSTILE_SECRET_KEY` | — | Cloudflare Turnstile secret |
-| `NEXT_PUBLIC_SENTRY_DSN` | — | Sentry error tracking |
-| `SENTRY_AUTH_TOKEN` | — | Sentry source map upload |
-| `NEXT_PUBLIC_CONTENT_URL` | — | Cloudflare R2 CDN for MDX/PDF |
-| `NEXT_PUBLIC_APP_URL` | — | Base URL for OG images |
-| `NEXT_PUBLIC_SPOTIFY_WORKER_URL` | — | Cloudflare Worker for Spotify |
-| `CF_ACCOUNT_ID` | — | Cloudflare account (visitor counter) |
-| `CF_SITE_TAG` | — | Cloudflare Analytics site tag |
-| `CF_API_TOKEN` | — | Cloudflare API token |
-| `GITHUB_TOKEN` | — | GitHub API (higher rate limit) |
+### Option A — zero-code: tag a GitHub repo
 
-### Getting Spotify credentials
+Add the topic **`portfolio`** to any public repo. It appears on the next
+revalidation (≤ 1 h) with its README as the write-up. Extra topics:
 
-1. Create app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard)
-2. Set redirect URI to `http://localhost:3000`
-3. Copy **Client ID** and **Client Secret**
-4. Get refresh token: [spotify-refresh-token](https://github.com/aleccool213/get-spotify-refresh-token) — scopes: `user-read-currently-playing`
+| Topic | Effect |
+|---|---|
+| `featured` | Pinned to the top |
+| `robotics`, `ros`, `ros2`, `drone`, `embedded`, `slam` | Category → Robotics |
+| `research`, `paper`, `machine-learning`, `deep-learning` | Category → Research |
+| *(anything else)* | Shown as tags; category → Web |
+
+### Option B — curated write-up (MDX)
+
+`content/projects/en/<slug>.mdx`
+
+```mdx
+---
+title: "Quadruped Inspection Robot System"
+description: "One sentence, ≤ 300 chars — used for cards, meta description and OG."
+category: robotics        # web | robotics | research
+featured: true
+order: 3                  # lower = earlier
+emoji: "🤖"
+color: "#10b981"
+tags: ["ROS2", "Python", "C++"]
+repo: "agus-darmawan/quadruped-inspection"   # optional → live stars/forks
+demo: "https://example.com"                  # optional
+date: 2025-06-01                              # optional for projects
+---
+
+Body in Markdown. Don't repeat the title as `# H1` — the page renders it.
+```
+
+`content/projects/id/<slug>.mdx` only needs `title`, `description` and the
+body — everything else is inherited from `en`. Missing translation → `en`.
+
+Posts are the same under `content/blog/`, with a required `date` (reading time
+is computed). Add `draft: true` to hide either.
+
+Frontmatter is validated with Zod — a typo fails the build with the file name.
+
+---
+
+## Environment variables
+
+See [`.env.example`](.env.example). Nothing is required; each missing
+integration simply turns its feature off.
+
+| Variable | Feature |
+|---|---|
+| `SPOTIFY_CLIENT_ID` / `SECRET` / `REFRESH_TOKEN` | Now-playing widget |
+| `NEXT_PUBLIC_SPOTIFY_WORKER_URL` | Use the Cloudflare Worker instead of `/api/spotify` |
+| `SMTP_*`, `CONTACT_EMAIL` | Contact form delivery (logs in dev otherwise) |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Bot protection |
+| `GITHUB_TOKEN` | GitHub API 60 → 5000 req/h (recommended in prod) |
+| `NEXT_PUBLIC_APP_URL` | Canonical base URL (defaults to `https://agus-darmawan.com`) |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Search Console ownership meta tag |
+| `NEXT_PUBLIC_CONTENT_URL` | R2 CDN for the resume PDFs |
+| `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN` | Error tracking |
+| `CF_ACCOUNT_ID`, `CF_SITE_TAG`, `CF_API_TOKEN` | Visitor counter in the terminal |
 
 ---
 
 ## Scripts
 
 ```bash
-pnpm dev          # Development server
-pnpm build        # Production build
-pnpm analyze      # Bundle analyzer
-pnpm test:run     # Run tests once
-pnpm type-check   # TypeScript check
-pnpm lint         # Biome lint
-pnpm lint:fix     # Auto-fix lint issues
+pnpm dev          # dev server
+pnpm build        # production build
+pnpm test:run     # unit tests (parser, highlighter, content loader)
+pnpm type-check   # tsc --noEmit
+pnpm lint         # Biome
+pnpm knip         # unused files / exports / deps
+pnpm analyze      # bundle analyzer
 ```
 
 ---
@@ -88,45 +117,36 @@ pnpm lint:fix     # Auto-fix lint issues
 ## Docker
 
 ```bash
-docker build \
-  --build-arg SPOTIFY_CLIENT_ID=xxx \
-  --build-arg SPOTIFY_CLIENT_SECRET=xxx \
-  --build-arg SPOTIFY_REFRESH_TOKEN=xxx \
-  -t ubuntu-portfolio .
-
-docker run -p 3000:3000 ubuntu-portfolio
+docker build -t agus-darmawan.com .
+docker run -p 3000:3000 --env-file .env.local agus-darmawan.com
 ```
+
+The image uses Next's `standalone` output on a distroless Node 22 runtime.
 
 ---
 
-## Project Structure
+## Structure
 
 ```
-src/
-  app/              Next.js App Router + API routes
-  features/         Feature-based components
-    about/
-    blog/
-    contact/
-    dock/
-    experience/
-    projects/
-    resume/
-    screensaver/
-    terminal/
-    top-bar/
-    window-manager/
-    command-palette/
-    boot/
-  hooks/            Shared hooks
-  store/            Zustand stores
-  lib/              Utilities (no React)
-  types/            Shared TypeScript types
-
 content/
-  readme/en|id/     Project README files (MDX)
-  blog/en|id/       Blog posts (MDX)
-  resume/           PDF resume files
+  projects/{en,id}/*.mdx    project write-ups (frontmatter + Markdown)
+  blog/{en,id}/*.mdx        posts
+  resume/                   PDFs (synced to R2)
+src/
+  app/[locale]/             home (desktop) + SSG pages: projects, blog
+  app/api/                  contact, spotify, visitors, content bodies
+  components/
+    content/                ContentCard, ContentHeader, ContentDetail (shared by projects + blog)
+    markdown/               Markdown renderer, code highlighting, TOC
+    seo/                    PageShell, JSON-LD, home text profile, route helpers
+    window/                 WindowHero
+  config/site.ts            identity, URLs, socials — single source of truth
+  features/                 desktop apps (about, blog, projects, terminal, …)
+  lib/
+    content/                loader, GitHub client, Zod schema, types
+    markdown/               parser + highlighter (pure, tested)
+    seo/                    metadata + structured data builders
+  store/                    Zustand window manager
 ```
 
 ---

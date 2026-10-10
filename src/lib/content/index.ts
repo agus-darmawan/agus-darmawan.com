@@ -1,8 +1,6 @@
 export {
-	getPost,
 	getPosts,
 	getPostsWithBody,
-	getProject,
 	getProjects,
 	getProjectsWithBody,
 } from "./loader";

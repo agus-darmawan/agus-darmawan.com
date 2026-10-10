@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import React, { type ReactNode, useEffect, useState } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import type { WindowState } from "@/types/app";
@@ -153,5 +153,3 @@ export function WindowFrame({
 		</motion.div>
 	);
 }
-
-export { AnimatePresence };
