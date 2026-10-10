@@ -1,7 +1,7 @@
 {
 	"BlogWindow": {
 		"title": "Blog",
-		"subtitle": "{count} posts",
+		"subtitle": "{count, plural, one {# post} other {# posts}}",
 		"filterHint": "Filter by topic",
 		"headerDesc": "Thoughts on full-stack development, robotics, and building things that actually work — from Bali.",
 		"latestPosts": "Latest Posts",

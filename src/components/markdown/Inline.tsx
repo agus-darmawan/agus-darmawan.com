@@ -1,6 +1,5 @@
 "use client";
 
-import NextImage from "next/image";
 import type { InlineNode } from "@/lib/markdown/types";
 
 interface InlineProps {
@@ -69,15 +68,17 @@ export function Inline({ nodes, accentColor }: InlineProps) {
 					}
 
 					case "image":
+						// Inline images are mostly README badges: keep their intrinsic
+						// size (next/image forces fixed dimensions → 400px-wide badges).
 						return (
-							<NextImage
+							// biome-ignore lint/performance/noImgElement: intrinsic-size inline images (badges)
+							<img
 								key={i}
 								src={node.src}
 								alt={node.alt}
-								width={400}
-								height={300}
-								className="inline-block max-w-full rounded-lg"
-								unoptimized
+								loading="lazy"
+								decoding="async"
+								className="inline-block max-w-full h-auto align-middle"
 							/>
 						);
 

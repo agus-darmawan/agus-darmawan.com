@@ -104,3 +104,31 @@ describe("content loader (real /content files)", () => {
 		expect(await getPost("en", "nope")).toBeNull();
 	});
 });
+
+describe("absolutizeLinks — README edge cases", () => {
+	it("rewrites both the badge image and its outer link", () => {
+		expect(absolutizeLinks("[![CI](./badge.svg)](./LICENSE)", repo)).toBe(
+			"[![CI](https://raw.githubusercontent.com/me/robot/main/badge.svg)](https://github.com/me/robot/blob/main/LICENSE)",
+		);
+	});
+
+	it("rewrites <img src> in raw HTML", () => {
+		expect(absolutizeLinks('<img src="docs/a.png" width="200">', repo)).toBe(
+			'<img src="https://raw.githubusercontent.com/me/robot/main/docs/a.png" width="200">',
+		);
+	});
+
+	it("does not touch fenced code", () => {
+		const md = "```md\n![x](./y.png)\n```";
+		expect(absolutizeLinks(md, repo)).toBe(md);
+	});
+});
+
+describe("localeOverride", () => {
+	it("strips non-translatable keys from locale files", async () => {
+		const { localeOverride } = await import("./schema");
+		expect(
+			localeOverride.parse({ title: "Judul", featured: false, repo: "x/y" }),
+		).toEqual({ title: "Judul" });
+	});
+});

@@ -40,6 +40,22 @@ function extractYoutubeId(url: string): string | null {
 	return null;
 }
 
+function findClosingBracket(text: string, open: number): number {
+	let depth = 0;
+	for (let j = open; j < text.length; j++) {
+		if (text[j] === "[") depth++;
+		else if (text[j] === "]" && --depth === 0) return j;
+	}
+	return -1;
+}
+
+// Block-level tags only, so inline markup like `<kbd>Ctrl</kbd> + K` survives.
+const HTML_LINE =
+	/^\s*<\/?(?:p|div|img|br|h[1-6]|picture|source|center|details|summary|table|thead|tbody|tr|td|th|hr|a)\b[^>]*>/i;
+const HTML_IMG = /<img\b[^>]*>/gi;
+const attr = (tag: string, name: string) =>
+	tag.match(new RegExp(`\\b${name}\\s*=\\s*["']([^"']*)["']`, "i"))?.[1];
+
 // ── Inline parser ─────────────────────────────────────────────────────────────
 
 export function parseInline(text: string): InlineNode[] {
@@ -62,9 +78,10 @@ export function parseInline(text: string): InlineNode[] {
 			}
 		}
 
-		// Link: [text](href)
+		// Link: [text](href) — label may contain brackets, e.g. a badge
+		// `[![CI](badge.svg)](actions)`, so match the closing `]` by depth.
 		if (text[i] === "[") {
-			const closeLabel = text.indexOf("]", i + 1);
+			const closeLabel = findClosingBracket(text, i);
 			if (closeLabel !== -1 && text[closeLabel + 1] === "(") {
 				const closeHref = text.indexOf(")", closeLabel + 2);
 				if (closeHref !== -1) {
@@ -184,7 +201,12 @@ export function parseMdx(raw: string): { tokens: Token[]; toc: TocEntry[] } {
 		}
 
 		// Table: line with | and next line with ---
-		if (line.includes("|") && lines[i + 1]?.match(/^\|?[\s-|]+\|?$/)) {
+		// (alignment rows like `|:---|--:|` count too)
+		if (
+			line.includes("|") &&
+			/^\s*\|?[\s:|-]+\|?\s*$/.test(lines[i + 1] ?? "") &&
+			lines[i + 1].includes("-")
+		) {
 			const parseRow = (r: string) =>
 				r
 					.split("|")
@@ -276,6 +298,18 @@ export function parseMdx(raw: string): { tokens: Token[]; toc: TocEntry[] } {
 			const [, title, idOrUrl] = ytShortcode;
 			const videoId = extractYoutubeId(idOrUrl) ?? idOrUrl;
 			tokens.push({ type: "youtube", videoId, title });
+			i++;
+			continue;
+		}
+
+		// Raw HTML line (common in GitHub READMEs: <p align="center">, <img …>).
+		// Keep images, drop the markup instead of printing tags as text.
+		if (HTML_LINE.test(line)) {
+			for (const tag of line.match(HTML_IMG) ?? []) {
+				const src = attr(tag, "src");
+				if (src)
+					tokens.push({ type: "image", src, alt: attr(tag, "alt") ?? "" });
+			}
 			i++;
 			continue;
 		}
