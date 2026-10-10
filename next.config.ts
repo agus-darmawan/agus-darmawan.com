@@ -11,6 +11,8 @@ const withBundleAnalyzer = withBundleAnalyzerPkg({
 });
 
 const nextConfig: NextConfig = {
+	// Required by the Dockerfile (it copies .next/standalone). Harmless on Vercel.
+	output: "standalone",
 	images: {
 		remotePatterns: [
 			{ protocol: "https", hostname: "i.scdn.co" },

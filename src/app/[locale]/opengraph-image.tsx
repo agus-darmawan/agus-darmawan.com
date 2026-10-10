@@ -1,6 +1,5 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
 export const alt = "Agus Darmawan — Full-Stack & Robotics Developer";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -67,7 +66,7 @@ export default function OGImage() {
 						display: "flex",
 					}}
 				>
-					Mon Mar 16 · 19:00
+					Full-Stack · Robotics · ROS2
 				</span>
 				<span
 					style={{

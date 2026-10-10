@@ -79,14 +79,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 			type: "website",
 			locale: isId ? "id_ID" : "en_US",
 			alternateLocale: isId ? ["en_US"] : ["id_ID"],
-			images: [
-				{
-					url: "https://agus-darmawan.com/opengraph-image",
-					width: 1200,
-					height: 630,
-					alt: "Agus Darmawan — Full-Stack & Robotics Developer",
-				},
-			],
 		},
 		twitter: {
 			card: "summary_large_image",
@@ -94,7 +86,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 			description:
 				"Full-Stack & Robotics Developer from Bali. Interactive Ubuntu-themed portfolio.",
 			creator: "@agusdarmawnn",
-			images: ["https://agus-darmawan.com/opengraph-image"],
 		},
 		robots: { index: true, follow: true },
 	};
