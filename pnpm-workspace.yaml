@@ -10,3 +10,7 @@ onlyBuiltDependencies:
   - '@sentry/cli'
   - '@swc/core'
   - lefthook
+
+# vitest 4 pins vite 8.0.0, which has open fs.deny bypass advisories.
+overrides:
+  vite: ^8.0.16

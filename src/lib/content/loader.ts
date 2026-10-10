@@ -1,9 +1,9 @@
 import "server-only";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
-import matter from "gray-matter";
 import { cache } from "react";
 import { routing } from "@/i18n/routing";
+import { parseFrontmatter } from "./frontmatter";
 import {
 	type GitHubRepo,
 	getPortfolioRepos,
@@ -69,7 +69,7 @@ async function readEntry(
 			});
 			if (source === null) continue; // try next extension
 			// YAML errors must surface (fail the build), not silently drop the entry.
-			const { data, content } = matter(source);
+			const { data, content } = parseFrontmatter(source);
 			return { slug, data, body: content.trim() };
 		} catch (error) {
 			fail(`${section}/${locale}/${slug}${ext}`, error);
