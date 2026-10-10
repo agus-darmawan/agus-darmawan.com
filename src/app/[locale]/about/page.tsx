@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { PageShell } from "@/components/seo/PageShell";
-import { SITE } from "@/config/site";
+import { resumeUrl, SITE } from "@/config/site";
 import { AboutContent } from "@/features/about/AboutContent";
 import { AboutSection } from "@/features/about/AboutSection";
 import {
@@ -54,7 +54,7 @@ export default async function AboutPage({ params }: Props) {
 		{ name: SITE.shortName, href: "/" },
 		{ name: t("aboutTitle"), href: PATH },
 	];
-	const resumeBase = process.env.NEXT_PUBLIC_CONTENT_URL;
+	const cv = resumeUrl(locale);
 
 	return (
 		<PageShell path={PATH} breadcrumbs={crumbs}>
@@ -86,9 +86,9 @@ export default async function AboutPage({ params }: Props) {
 				</AboutContent>
 
 				<footer className="flex flex-wrap gap-2 px-6 py-5">
-					{resumeBase && (
+					{cv && (
 						<a
-							href={`${resumeBase}/resume/resume_${locale}.pdf`}
+							href={cv}
 							className="inline-flex items-center gap-1.5 rounded-lg bg-[#e95420] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
 						>
 							<Download size={13} aria-hidden="true" />

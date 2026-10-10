@@ -1,59 +1,69 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { useCallback, useRef } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useCallback, useRef, useState } from "react";
+import { resumeUrl } from "@/config/site";
 import { usePdfLoader } from "./hooks/usePdfLoader";
 import { usePdfPageTracker } from "./hooks/usePdfPageTracker";
 import { usePdfZoom } from "./hooks/usePdfZoom";
-import { ResumePageCanvas } from "./ResumePageCanvas";
 import { ResumeToolbar } from "./ResumeToolbar";
 import { ResumeViewer } from "./ResumeViewer";
 
-interface ResumeViewerClientProps {
-	// t is passed in from the server-safe wrapper to avoid calling useTranslations
-	// inside a dynamically-imported component (which has no SSR context).
-	t: (key: string) => string;
-}
+export default function ResumeViewerClient() {
+	const t = useTranslations("ResumeWindow");
+	const locale = useLocale();
+	const url = resumeUrl(locale);
+	const filename = `Agus-Darmawan-Resume-${locale.toUpperCase()}.pdf`;
 
-export default function ResumeViewerClient({ t }: ResumeViewerClientProps) {
-	const params = useParams();
-	const locale = (params?.locale as string) ?? "en";
-	const contentUrl = process.env.NEXT_PUBLIC_CONTENT_URL ?? "";
-	const pdfPath = `${contentUrl}/resume/resume_${locale}.pdf`;
 	const { zoom, zoomIn, zoomOut, resetZoom } = usePdfZoom();
-	const { pdf, numPages, isLoading, error } = usePdfLoader(pdfPath);
-
+	const { pdf, isLoading, failed } = usePdfLoader(url);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
-
 	const { currentPage, goToPage } = usePdfPageTracker(containerRef, canvasRefs);
+	const [downloading, setDownloading] = useState(false);
 
-	const handleDownload = useCallback(() => {
-		const a = document.createElement("a");
-		a.href = pdfPath;
-		a.download = `resume_${locale}.pdf`;
-		a.click();
-	}, [pdfPath, locale]);
+	// `<a download>` is ignored for cross-origin URLs (the PDF is served from
+	// the content host), so the old button navigated away from the desktop.
+	// Fetch it and save a same-origin blob instead.
+	const download = useCallback(async () => {
+		if (!url) return;
+		setDownloading(true);
+		try {
+			const res = await fetch(url);
+			if (!res.ok) throw new Error(String(res.status));
+			const href = URL.createObjectURL(await res.blob());
+			const a = Object.assign(document.createElement("a"), {
+				href,
+				download: filename,
+			});
+			a.click();
+			setTimeout(() => URL.revokeObjectURL(href), 1_000);
+		} catch {
+			window.open(url, "_blank", "noopener");
+		} finally {
+			setDownloading(false);
+		}
+	}, [url, filename]);
 
 	return (
 		<div className="h-full flex flex-col bg-(--window-bg) text-(--text-primary)">
 			<ResumeToolbar
 				zoom={zoom}
-				numPages={numPages}
+				numPages={pdf?.numPages ?? 0}
 				currentPage={currentPage}
+				downloading={downloading}
+				canDownload={url !== null}
 				onZoomIn={zoomIn}
 				onZoomOut={zoomOut}
 				onResetZoom={resetZoom}
 				onPrevPage={() => goToPage(currentPage - 1)}
 				onNextPage={() => goToPage(currentPage + 1)}
-				onDownload={handleDownload}
-				t={t}
+				onDownload={download}
 			/>
 			<ResumeViewer
 				pdf={pdf}
-				numPages={numPages}
 				isLoading={isLoading}
-				error={error}
+				failed={failed}
 				zoom={zoom}
 				containerRef={containerRef}
 				canvasRefs={canvasRefs}

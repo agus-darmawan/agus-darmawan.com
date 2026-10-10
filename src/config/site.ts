@@ -43,3 +43,9 @@ export const SITE = {
 
 export const absoluteUrl = (path = "/") =>
 	`${SITE.url}${path.startsWith("/") ? path : `/${path}`}`;
+
+/** The CV PDF for a locale, served from the content repo (null if unset). */
+export function resumeUrl(locale: string): string | null {
+	const base = process.env.NEXT_PUBLIC_CONTENT_URL?.replace(/\/$/, "");
+	return base ? `${base}/resume/resume_${locale}.pdf` : null;
+}

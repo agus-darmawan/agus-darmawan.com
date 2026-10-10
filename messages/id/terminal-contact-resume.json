@@ -3,13 +3,14 @@
 		"title": "Resume",
 		"download": "Unduh PDF",
 		"loading": "Memuat PDF…",
-		"errorLoad": "Gagal memuat PDF. Pastikan file ada di folder /public.",
+		"errorLoad": "Gagal memuat resume. Silakan coba lagi nanti.",
 		"zoomIn": "Perbesar",
 		"zoomOut": "Perkecil",
 		"resetZoom": "Reset zoom",
 		"prevPage": "Halaman sebelumnya",
 		"nextPage": "Halaman berikutnya",
-		"pageOf": "dari"
+		"pageOf": "dari",
+		"loadingViewer": "Memuat penampil PDF…"
 	},
 	"TerminalWindow": {
 		"title": "Terminal",
