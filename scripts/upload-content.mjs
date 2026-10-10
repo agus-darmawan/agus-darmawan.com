@@ -3,7 +3,9 @@ import { readdirSync, statSync } from "fs";
 import { join } from "path";
 
 const BUCKET = "agus-darmawan";
-const CONTENT_DIR = "./content";
+// Only binary assets live on R2 now. MDX (projects/blog) is read from the repo
+// at build time by src/lib/content so it can be server-rendered for SEO.
+const CONTENT_DIR = "./content/resume";
 
 function getAllFiles(dir, base = "") {
 	const entries = readdirSync(dir);
@@ -23,7 +25,7 @@ function getAllFiles(dir, base = "") {
 	return files;
 }
 
-const files = getAllFiles(CONTENT_DIR);
+const files = getAllFiles(CONTENT_DIR, "resume");
 let success = 0;
 let failed = 0;
 
