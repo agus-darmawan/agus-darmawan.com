@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import React, { type ReactNode, useEffect, useState } from "react";
+import { FLOATING_SIZE, SNAP_STYLES } from "@/constants/window";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import type { WindowState } from "@/types/app";
 import { WindowHeader } from "./WindowHeader";
@@ -82,27 +83,10 @@ export function WindowFrame({
 	const isFullscreen = win.maximized || win.snapZone === "full" || isMobile;
 
 	const positionStyle: React.CSSProperties = isFullscreen
-		? { top: 0, left: 0, right: 0, bottom: 0, width: "100%", height: "100%" }
-		: win.snapZone === "left"
-			? {
-					top: 32,
-					left: 0,
-					width: "50vw",
-					height: "calc(100vh - 32px)",
-				}
-			: win.snapZone === "right"
-				? {
-						top: 32,
-						left: "50vw",
-						width: "50vw",
-						height: "calc(100vh - 32px)",
-					}
-				: {
-						top: win.position.y,
-						left: win.position.x,
-						width: "clamp(320px, 90vw, 900px)",
-						height: "clamp(400px, 80vh, 650px)",
-					};
+		? SNAP_STYLES.full
+		: win.snapZone
+			? SNAP_STYLES[win.snapZone]
+			: { top: win.position.y, left: win.position.x, ...FLOATING_SIZE };
 	// Use reducedVariants if user prefers reduced motion
 	const variants = prefersReduced ? reducedVariants : windowVariants;
 

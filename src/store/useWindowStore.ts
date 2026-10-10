@@ -120,7 +120,15 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 	toggleMaximize: (id) => {
 		set((s) => ({
 			windows: s.windows.map((w) =>
-				w.id === id ? { ...w, maximized: !w.maximized, snapZone: null } : w,
+				w.id === id
+					? {
+							...w,
+							// A window snapped to the top edge is already full screen:
+							// the button must restore it (it used to need two clicks).
+							maximized: !(w.maximized || w.snapZone === "full"),
+							snapZone: null,
+						}
+					: w,
 			),
 		}));
 	},

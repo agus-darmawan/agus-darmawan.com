@@ -19,6 +19,8 @@ export type WindowPayload =
 	| { kind: "project"; slug: string; title: string; emoji: string }
 	| undefined;
 
+export type SnapZone = "left" | "right" | "full" | null;
+
 export interface WindowState {
 	id: string;
 	appId: string;
@@ -29,7 +31,7 @@ export interface WindowState {
 		x: number;
 		y: number;
 	};
-	snapZone: "left" | "right" | "full" | null;
+	snapZone: SnapZone;
 	zIndex: number;
 	data?: WindowPayload;
 }
