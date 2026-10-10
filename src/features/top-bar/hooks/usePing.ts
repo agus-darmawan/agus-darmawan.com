@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { useRefreshProgress } from "@/hooks/useRefreshProgress";
+import { fetchJson } from "@/lib/fetch-json";
 import type { ApiResponse } from "@/types/api";
 
 const REFETCH_INTERVAL = 10_000;
 
 async function fetchPing(): Promise<number> {
 	const start = performance.now();
-	await axios.get<ApiResponse<{ ok: boolean }>>("/api/ping");
+	await fetchJson<ApiResponse<{ ok: boolean }>>("/api/ping");
 	return Math.round(performance.now() - start);
 }
 
