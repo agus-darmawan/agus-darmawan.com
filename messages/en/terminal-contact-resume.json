@@ -3,13 +3,14 @@
 		"title": "Resume",
 		"download": "Download PDF",
 		"loading": "Loading PDF…",
-		"errorLoad": "Failed to load PDF. Make sure the file exists in /public.",
+		"errorLoad": "Couldn't load the resume. Please try again later.",
 		"zoomIn": "Zoom in",
 		"zoomOut": "Zoom out",
 		"resetZoom": "Reset zoom",
 		"prevPage": "Previous page",
 		"nextPage": "Next page",
-		"pageOf": "of"
+		"pageOf": "of",
+		"loadingViewer": "Loading PDF viewer…"
 	},
 	"TerminalWindow": {
 		"title": "Terminal",

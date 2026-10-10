@@ -1,67 +1,61 @@
-import { useEffect, useRef, useState } from "react";
+import type { PDFDocumentLoadingTask, PDFDocumentProxy } from "pdfjs-dist";
+import { useEffect, useState } from "react";
 
-// We avoid importing pdfjs-dist at the top level because canvas.js calls
-// `new DOMMatrix()` at module evaluation time, which crashes in Node/SSR.
-// Using `unknown` here is intentional — the real type is only available
-// after the dynamic import resolves in the browser.
-export type PDFDocumentProxy = unknown;
+// pdfjs-dist evaluates `new DOMMatrix()` at import time, which crashes on
+// the server — so the runtime module is imported lazily in the effect. The
+// type-only import above is erased at build time and costs nothing.
 
-interface UsePdfLoaderResult {
+export type { PDFDocumentProxy };
+
+interface PdfState {
 	pdf: PDFDocumentProxy | null;
-	numPages: number;
 	isLoading: boolean;
-	error: string | null;
+	failed: boolean;
 }
 
-export function usePdfLoader(pdfPath: string): UsePdfLoaderResult {
-	const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null);
-	const [numPages, setNumPages] = useState(0);
-	const [isLoading, setIsLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-	const initialised = useRef(false);
+export function usePdfLoader(url: string | null): PdfState {
+	const [state, setState] = useState<PdfState>({
+		pdf: null,
+		isLoading: true,
+		failed: false,
+	});
 
 	useEffect(() => {
 		let cancelled = false;
-		setIsLoading(true);
-		setError(null);
-		setPdf(null);
-		setNumPages(0);
+		let task: PDFDocumentLoadingTask | null = null;
+		if (!url) {
+			setState({ pdf: null, isLoading: false, failed: true });
+			return;
+		}
+		setState({ pdf: null, isLoading: true, failed: false });
 
-		// Dynamic import keeps pdfjs out of the SSR bundle entirely.
-		import("pdfjs-dist").then((pdfjsLib) => {
-			if (cancelled) return;
-
-			// Configure worker only once, only in the browser.
-			if (!initialised.current) {
-				pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+		import("pdfjs-dist")
+			.then((pdfjs) => {
+				if (cancelled) return;
+				pdfjs.GlobalWorkerOptions.workerSrc ||= new URL(
 					"pdfjs-dist/build/pdf.worker.min.mjs",
 					import.meta.url,
 				).toString();
-				initialised.current = true;
-			}
-
-			pdfjsLib
-				.getDocument({ url: pdfPath })
-				.promise.then((loadedPdf) => {
-					if (cancelled) return;
-					setPdf(loadedPdf);
-					setNumPages(loadedPdf.numPages);
-				})
-				.catch((err: unknown) => {
-					if (!cancelled) {
-						console.error("Failed to load PDF:", err);
-						setError("errorLoad");
-					}
-				})
-				.finally(() => {
-					if (!cancelled) setIsLoading(false);
-				});
-		});
+				task = pdfjs.getDocument({ url });
+				return task.promise;
+			})
+			.then((pdf) => {
+				if (!cancelled && pdf)
+					setState({ pdf, isLoading: false, failed: false });
+			})
+			.catch((error: unknown) => {
+				if (cancelled) return;
+				console.error("Failed to load PDF:", error);
+				setState({ pdf: null, isLoading: false, failed: true });
+			});
 
 		return () => {
 			cancelled = true;
+			// Tears down the document AND its worker — they used to leak on
+			// every language switch or window close.
+			void task?.destroy();
 		};
-	}, [pdfPath]);
+	}, [url]);
 
-	return { pdf, numPages, isLoading, error };
+	return state;
 }
