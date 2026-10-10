@@ -33,5 +33,8 @@
 			"blog": "writing,posts,articles",
 			"contact": "email,message,hire"
 		}
+	},
+	"Screensaver": {
+		"wake": "Move the mouse or press a key to wake"
 	}
 }

@@ -43,7 +43,7 @@ interface ExperienceCardProps {
 	headingLevel?: 2 | 3;
 }
 
-export function ExperienceCard({
+function ExperienceCard({
 	exp,
 	isLast,
 	headingLevel = 2,

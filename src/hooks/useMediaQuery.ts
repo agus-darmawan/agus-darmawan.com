@@ -1,7 +1,7 @@
 import { useCallback, useSyncExternalStore } from "react";
 
 /** Subscribes to a CSS media query; `false` during SSR and hydration. */
-export function useMediaQuery(query: string): boolean {
+function useMediaQuery(query: string): boolean {
 	const subscribe = useCallback(
 		(onChange: () => void) => {
 			const mq = window.matchMedia(query);
@@ -19,7 +19,7 @@ export function useMediaQuery(query: string): boolean {
 }
 
 /** Matches the `md` breakpoint the store and drag hook use (768px). */
-export const MOBILE_QUERY = "(max-width: 767.98px)";
+const MOBILE_QUERY = "(max-width: 767.98px)";
 
 export const useIsMobile = () => useMediaQuery(MOBILE_QUERY);
 

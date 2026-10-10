@@ -33,5 +33,8 @@
 			"blog": "tulisan,artikel",
 			"contact": "email,pesan,kontak"
 		}
+	},
+	"Screensaver": {
+		"wake": "Gerakkan mouse atau tekan tombol untuk kembali"
 	}
 }
