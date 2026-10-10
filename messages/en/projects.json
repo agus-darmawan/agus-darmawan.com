@@ -2,8 +2,10 @@
 	"ProjectsWindow": {
 		"title": "Projects",
 		"headerDesc": "A mix of web apps, autonomous robots, and research — things I've built and shipped.",
-		"featured": "Featured",
 		"stars": "stars",
-		"repos": "projects"
+		"repos": "projects",
+		"searchPlaceholder": "Search projects…",
+		"listLabel": "All projects",
+		"noResults": "No projects found."
 	}
 }

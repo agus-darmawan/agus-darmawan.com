@@ -26,10 +26,10 @@
 			"research": "Research"
 		},
 		"categoryLabel": "Category",
-		"noProjects": "No projects in this category",
 		"projectsSummary": "{count, plural, one {# project} other {# projects}} · {featured} featured",
 		"moreTags": "+{count} more",
 		"morePosts": "More posts",
-		"moreProjects": "More projects"
+		"moreProjects": "More projects",
+		"clearSearch": "Clear search"
 	}
 }

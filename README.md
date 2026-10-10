@@ -136,7 +136,8 @@ src/
   app/[locale]/             home (desktop) + SSG pages: projects, blog
   app/api/                  contact, spotify, visitors, content bodies
   components/
-    content/                ContentCard, ContentHeader, ContentDetail (shared by projects + blog)
+    content/                ContentWindow (list + in-window detail), ContentCard, ContentHeader,
+                            ContentDetail — one implementation behind both Projects and Blog
     markdown/               Markdown renderer, code highlighting, TOC
     seo/                    PageShell, JSON-LD, home text profile, route helpers
     window/                 WindowHero

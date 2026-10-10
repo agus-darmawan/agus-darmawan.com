@@ -6,11 +6,7 @@ import {
 	WINDOW_OFFSET_Y,
 	WINDOW_STAGGER,
 } from "@/constants/window";
-import {
-	isProjectWindow,
-	type WindowPayload,
-	type WindowState,
-} from "@/types/app";
+import type { WindowState } from "@/types/app";
 
 interface WindowStore {
 	// State
@@ -19,7 +15,7 @@ interface WindowStore {
 	zCounter: number;
 
 	// Window actions
-	openWindow: (appId: string, data?: WindowPayload) => void;
+	openWindow: (appId: string) => void;
 	closeWindow: (id: string) => void;
 	minimizeWindow: (id: string) => void;
 	toggleMaximize: (id: string) => void;
@@ -33,11 +29,9 @@ interface WindowStore {
 	// Derived — computed dari windows
 	getOpenApps: () => { id: string; name: string }[];
 	getActiveApp: () => { id: string; name: string } | null;
-	getEffectiveZ: (win: WindowState) => number;
 }
 
-function deriveTitle(appId: string, data?: WindowPayload): string {
-	if (data?.kind === "project") return `${data.emoji} ${data.title}`;
+function deriveTitle(appId: string): string {
 	return FALLBACK_TITLES[appId] ?? appId;
 }
 
@@ -51,7 +45,7 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 	activeWindowId: null,
 	zCounter: WINDOW_BASE_Z_INDEX,
 
-	openWindow: (appId, data) => {
+	openWindow: (appId) => {
 		const { windows, zCounter } = get();
 		const existing = windows.find((w) => w.appId === appId);
 
@@ -61,13 +55,7 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 				activeWindowId: existing.id,
 				windows: s.windows.map((w) =>
 					w.id === existing.id
-						? // keep the payload when re-opened without one (dock/terminal)
-							{
-								...w,
-								minimized: false,
-								data: data ?? w.data,
-								zIndex: s.zCounter + 1,
-							}
+						? { ...w, minimized: false, zIndex: s.zCounter + 1 }
 						: w,
 				),
 			}));
@@ -82,8 +70,7 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 		const newWindow: WindowState = {
 			id,
 			appId,
-			title: deriveTitle(appId, data),
-			data,
+			title: deriveTitle(appId),
 			minimized: false,
 			maximized: isMobile,
 			snapZone: null,
@@ -216,14 +203,5 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 		if (windows.length === 0) return null;
 		const active = windows.find((w) => w.id === activeWindowId);
 		return active ? { id: active.id, name: active.title } : null;
-	},
-
-	getEffectiveZ: (win) => {
-		// A project window must stay above the Projects list that opened it —
-		// but NOT above every other app (the old flat +500 buried any window
-		// opened later, e.g. Blog, underneath an open README).
-		if (!isProjectWindow(win.appId)) return win.zIndex;
-		const list = get().windows.find((w) => w.appId === "projects");
-		return list ? Math.max(win.zIndex, list.zIndex + 1) : win.zIndex;
 	},
 }));

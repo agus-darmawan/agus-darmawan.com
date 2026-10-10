@@ -2,13 +2,12 @@
 
 import { AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BootScreen } from "@/features/boot/BootScreen";
 import { CommandPalette } from "@/features/command-palette/CommandPalette";
 import { DesktopBackground } from "@/features/desktop/DesktopBackground";
 import { Dock } from "@/features/dock/Dock";
 import { OnboardingTour } from "@/features/onboarding/OnboardingTour";
-import ProjectWindow from "@/features/projects/ProjectWindow";
 import { Screensaver } from "@/features/screensaver/Screensaver";
 import TopBar from "@/features/top-bar/TopBar";
 import { useWindowDrag } from "@/features/window-manager/hooks/useWindowDrag";
@@ -17,15 +16,11 @@ import { WindowFrame } from "@/features/window-manager/WindowFrame";
 import { getWindowComponent } from "@/features/window-manager/window.registry";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useWindowStore } from "@/store/useWindowStore";
-import { isProjectWindow, type WindowState } from "@/types/app";
+import type { WindowState } from "@/types/app";
 
 // ── Window Content ────────────────────────────────────────────────────────────
 
 function WindowContent({ win }: { win: WindowState }) {
-	if (win.data?.kind === "project") {
-		return <ProjectWindow slug={win.data.slug} />;
-	}
-
 	const Component = getWindowComponent(win.appId);
 
 	if (!Component) {
@@ -74,7 +69,6 @@ export function Desktop() {
 	const setActiveWindow = useWindowStore((s) => s.setActiveWindow);
 	const handleDockClick = useWindowStore((s) => s.handleDockClick);
 	const minimizeAllWindows = useWindowStore((s) => s.minimizeAllWindows);
-	const getEffectiveZ = useWindowStore((s) => s.getEffectiveZ);
 
 	const { dragging, snapPreview, handleMouseDown } = useWindowDrag({
 		getWindows: () => useWindowStore.getState().windows,
@@ -135,31 +129,6 @@ export function Desktop() {
 			window.removeEventListener("setLocale", handler as EventListener);
 	}, [router, pathname]);
 
-	// ── Derived ──────────────────────────────────────────────────────────────
-
-	const hasOpenReadme = useMemo(
-		() => windows.some((w) => isProjectWindow(w.appId) && !w.minimized),
-		[windows],
-	);
-
-	// ── Handlers ─────────────────────────────────────────────────────────────
-
-	const handleClose = useCallback(
-		(win: WindowState) => {
-			const closeLocked = win.appId === "projects" && hasOpenReadme;
-			if (closeLocked) {
-				windows
-					.filter((w) => isProjectWindow(w.appId) && !w.minimized)
-					.forEach((w) => {
-						bringToFront(w.id);
-					});
-				return;
-			}
-			closeWindow(win.id);
-		},
-		[hasOpenReadme, windows, bringToFront, closeWindow],
-	);
-
 	// ── Render ────────────────────────────────────────────────────────────────
 
 	// null = unknown (SSR / first paint) → render nothing to avoid flash
@@ -186,11 +155,10 @@ export function Desktop() {
 				<SnapPreview zone={snapPreview} />
 				<AnimatePresence>
 					{windows.map((win) => {
-						const closeLocked = win.appId === "projects" && hasOpenReadme;
 						return (
 							<WindowFrame
 								key={win.id}
-								window={{ ...win, zIndex: getEffectiveZ(win) }}
+								window={win}
 								isActive={activeWindowId === win.id}
 								isDragging={dragging === win.id}
 								onMouseDown={(e) => handleMouseDown(e, win.id)}
@@ -198,10 +166,9 @@ export function Desktop() {
 									setActiveWindow(win.id);
 									bringToFront(win.id);
 								}}
-								onClose={() => handleClose(win)}
+								onClose={() => closeWindow(win.id)}
 								onMinimize={() => minimizeWindow(win.id)}
 								onMaximize={() => toggleMaximize(win.id)}
-								closeLocked={closeLocked}
 							>
 								<WindowContent win={win} />
 							</WindowFrame>

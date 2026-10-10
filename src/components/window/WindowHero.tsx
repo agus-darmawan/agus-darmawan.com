@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-interface WindowHeroProps {
+export interface WindowHeroProps {
 	accent: string;
 	/** Optional second gradient stop for the top bar (blog: orange → aubergine). */
 	accentTo?: string;
