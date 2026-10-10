@@ -19,13 +19,8 @@ export function SnapPreview({ zone }: { zone: SnapZone }) {
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 					transition={{ duration: 0.1 }}
-					className="absolute pointer-events-none rounded-xl z-9990"
-					style={{
-						...SNAP_STYLES[zone],
-						background: "rgba(233, 84, 32, 0.12)",
-						border: "2px solid rgba(233, 84, 32, 0.4)",
-						backdropFilter: "blur(4px)",
-					}}
+					className="absolute pointer-events-none rounded-xl z-9990 bg-ubuntu-orange/12 border-2 border-ubuntu-orange/40 backdrop-blur-xs"
+					style={SNAP_STYLES[zone]}
 				/>
 			)}
 		</AnimatePresence>

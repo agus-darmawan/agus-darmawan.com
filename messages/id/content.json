@@ -30,6 +30,8 @@
 		"moreTags": "+{count} lainnya",
 		"morePosts": "Tulisan lainnya",
 		"moreProjects": "Proyek lainnya",
-		"clearSearch": "Hapus pencarian"
+		"clearSearch": "Hapus pencarian",
+		"video": "Video YouTube",
+		"playVideo": "Putar video: {title}"
 	}
 }

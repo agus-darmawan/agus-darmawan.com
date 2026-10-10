@@ -1,75 +1,30 @@
-"use client";
-
-/**
- * DesktopBackground — decorative SVG background for the Ubuntu desktop.
- * Renders behind all windows. Purely visual, no interactivity.
- */
+/** Decorative wallpaper behind the windows: gradient, glows, dot grid. */
 export function DesktopBackground() {
 	return (
 		<div
-			className="absolute inset-0 overflow-hidden pointer-events-none"
 			aria-hidden="true"
+			className="absolute inset-0 overflow-hidden pointer-events-none"
 		>
-			{/* ── Base gradient — dark purple → near-black ───────── */}
-			<div
-				className="absolute inset-0"
-				style={{
-					background:
-						"radial-gradient(ellipse at 30% 40%, #3d1145 0%, #1a0828 45%, #0d0010 100%)",
-				}}
-			/>
+			<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_40%,#3d1145_0%,#1a0828_45%,#0d0010_100%)]" />
+			<div className="absolute -top-20 -right-15 size-125 rounded-full bg-[radial-gradient(circle,rgba(233,84,32,0.07)_0%,transparent_65%)]" />
+			<div className="absolute -bottom-25 -left-20 size-150 rounded-full bg-[radial-gradient(circle,rgba(119,33,111,0.12)_0%,transparent_65%)]" />
 
-			{/* ── Subtle light leak — top right corner ───────────── */}
-			<div
-				className="absolute"
-				style={{
-					top: "-80px",
-					right: "-60px",
-					width: "500px",
-					height: "500px",
-					borderRadius: "50%",
-					background:
-						"radial-gradient(circle, rgba(233,84,32,0.07) 0%, transparent 65%)",
-				}}
-			/>
-
-			{/* ── Soft purple bloom — bottom left ────────────────── */}
-			<div
-				className="absolute"
-				style={{
-					bottom: "-100px",
-					left: "-80px",
-					width: "600px",
-					height: "600px",
-					borderRadius: "50%",
-					background:
-						"radial-gradient(circle, rgba(119,33,111,0.12) 0%, transparent 65%)",
-				}}
-			/>
-
-			{/* ── SVG: dot grid + diagonal texture ───────────────── */}
 			<svg
+				aria-hidden="true"
 				className="absolute inset-0 w-full h-full"
 				xmlns="http://www.w3.org/2000/svg"
 			>
 				<defs>
-					{/* Dot pattern */}
 					<pattern
-						id="dots"
-						x="0"
-						y="0"
+						id="desktop-dots"
 						width="28"
 						height="28"
 						patternUnits="userSpaceOnUse"
 					>
 						<circle cx="1" cy="1" r="1" fill="rgba(255,255,255,0.045)" />
 					</pattern>
-
-					{/* Diagonal line pattern */}
 					<pattern
-						id="diag"
-						x="0"
-						y="0"
+						id="desktop-diag"
 						width="40"
 						height="40"
 						patternUnits="userSpaceOnUse"
@@ -83,27 +38,21 @@ export function DesktopBackground() {
 							strokeWidth="1"
 						/>
 					</pattern>
-
-					{/* Mask for soft fade */}
-					<radialGradient id="fade" cx="50%" cy="50%" r="55%">
+					<radialGradient id="desktop-fade" cx="50%" cy="50%" r="55%">
 						<stop offset="0%" stopColor="white" stopOpacity="1" />
 						<stop offset="100%" stopColor="white" stopOpacity="0" />
 					</radialGradient>
-					<mask id="vignette">
-						<rect width="100%" height="100%" fill="url(#fade)" />
+					<mask id="desktop-vignette">
+						<rect width="100%" height="100%" fill="url(#desktop-fade)" />
 					</mask>
 				</defs>
-
-				{/* Dot grid */}
 				<rect
 					width="100%"
 					height="100%"
-					fill="url(#dots)"
-					mask="url(#vignette)"
+					fill="url(#desktop-dots)"
+					mask="url(#desktop-vignette)"
 				/>
-
-				{/* Diagonal texture */}
-				<rect width="100%" height="100%" fill="url(#diag)" />
+				<rect width="100%" height="100%" fill="url(#desktop-diag)" />
 			</svg>
 		</div>
 	);
