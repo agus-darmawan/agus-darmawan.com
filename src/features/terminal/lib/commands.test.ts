@@ -81,6 +81,14 @@ describe("executeCommand", () => {
 			"~/projects",
 		);
 		expect(text(executeCommand("rm -rf /", ctx()))).toMatch(/who hurt you/);
+		// Resolved paths: `..`, `~/` and the cwd itself are protected too.
+		for (const target of ["..", "~/", "/home/agus/", "."]) {
+			const result = executeCommand(
+				`rm -r ${target}`,
+				ctx({ cwd: "~/projects" }),
+			);
+			expect(result.fs).toBeUndefined();
+		}
 	});
 
 	it("ls hides dotfiles unless -a", () => {

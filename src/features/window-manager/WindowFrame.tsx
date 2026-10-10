@@ -2,7 +2,7 @@
 
 import { motion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { type CSSProperties, type MouseEvent, memo } from "react";
+import { type CSSProperties, type MouseEvent, memo, useState } from "react";
 import { FLOATING_SIZE, SNAP_STYLES } from "@/constants/window";
 import { useIsMobile, useReducedMotion } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
@@ -96,7 +96,13 @@ export const WindowFrame = memo(function WindowFrame({
 	isDragging,
 	onTitleBarMouseDown,
 }: WindowFrameProps) {
-	const win = useWindowStore((s) => s.windows.find((w) => w.id === id));
+	const live = useWindowStore((s) => s.windows.find((w) => w.id === id));
+	// Once closed, the store no longer has this window, but AnimatePresence
+	// keeps the frame mounted for its exit animation — render the last
+	// known state (derived state, updated during render) until it's gone.
+	const [last, setLast] = useState(live);
+	if (live && live !== last) setLast(live);
+	const win = live ?? last;
 	const isActive = useWindowStore((s) => s.activeWindowId === id);
 	const { focusWindow, closeWindow, minimizeWindow, toggleMaximize } =
 		useWindowStore.getState();

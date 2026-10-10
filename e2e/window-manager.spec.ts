@@ -98,6 +98,10 @@ test("a project opens inside the Projects window, not a new tab", async ({
 });
 
 test("command palette launches apps", async ({ page }) => {
+	// Start with focus inside another app: it must not jump back on top.
+	await launch(page, "Terminal");
+	await page.getByRole("textbox", { name: "Command" }).focus();
+
 	const palette = page.getByRole("dialog", { name: "Command palette" });
 	// The shortcut listener attaches after hydration; retry until it's live.
 	await expect(async () => {
@@ -108,4 +112,23 @@ test("command palette launches apps", async ({ page }) => {
 	await page.keyboard.press("Enter");
 	await expect(windowNamed(page, "Blog")).toBeVisible();
 	await expect(palette).toHaveCount(0);
+	const z = (name: string) =>
+		windowNamed(page, name).evaluate((el) =>
+			Number((el as HTMLElement).style.zIndex),
+		);
+	await expect
+		.poll(async () => (await z("Blog")) > (await z("Terminal")))
+		.toBe(true);
+});
+
+test("the app grid brings an active app forward instead of minimizing it", async ({
+	page,
+}) => {
+	await launch(page, "About Me");
+	await dock(page).getByRole("button", { name: "Show Apps" }).click();
+	await page
+		.getByRole("dialog", { name: "Show Apps" })
+		.getByRole("button", { name: "About Me" })
+		.click();
+	await expect(windowNamed(page, "About Me")).toBeVisible();
 });

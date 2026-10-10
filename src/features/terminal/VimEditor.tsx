@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { isShortcut } from "./lib/vim";
 import { TerminalHintsBar } from "./TerminalHintsBar";
 import { useTerminalStore } from "./terminal.store";
 
@@ -43,10 +44,23 @@ export function VimEditor({ label, hints }: VimEditorProps) {
 			tabIndex={0}
 			className="flex flex-col h-full bg-[#1a1a2e] text-gray-200 font-mono text-sm outline-none"
 			onKeyDown={(e) => {
-				// Normal mode lets Tab through so keyboard users can leave.
-				if (e.key === "Tab" && vim.mode === "normal") return;
+				const key = {
+					key: e.key,
+					ctrl: e.ctrlKey,
+					meta: e.metaKey,
+					alt: e.altKey,
+				};
+				// Let the browser keep its shortcuts (⌘R, Ctrl+T, F5…) and, in
+				// normal mode, Tab — so keyboard users can leave the editor.
+				if (
+					(isShortcut(key) && !(e.ctrlKey && e.key === "[")) ||
+					/^F\d+$/.test(e.key) ||
+					(e.key === "Tab" && vim.mode === "normal")
+				) {
+					return;
+				}
 				e.preventDefault();
-				vimKey({ key: e.key, ctrl: e.ctrlKey, meta: e.metaKey, alt: e.altKey });
+				vimKey(key);
 			}}
 		>
 			<div className="flex justify-between px-3 py-1 text-xs bg-[#16213e] border-b border-[#0f3460] text-gray-400">

@@ -52,6 +52,8 @@ export function TerminalInputLine({
 		} else if (
 			e.ctrlKey &&
 			e.key.toLowerCase() === "c" &&
+			// A selection in the prompt (or the log) means "copy", not ^C.
+			e.currentTarget.selectionStart === e.currentTarget.selectionEnd &&
 			!window.getSelection()?.toString()
 		) {
 			e.preventDefault();
