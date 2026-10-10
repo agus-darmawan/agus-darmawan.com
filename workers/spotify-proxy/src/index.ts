@@ -12,17 +12,19 @@ interface SpotifyTokenResponse {
 }
 
 interface SpotifyNowPlaying {
+	currently_playing_type: "track" | "episode" | "ad" | "unknown";
+	// null for ads / private sessions; podcasts have no album/artists
 	item: {
 		name: string;
 		duration_ms: number;
-		album: {
+		album?: {
 			name: string;
 			images: { url: string }[];
 		};
-		artists: { name: string }[];
-	};
+		artists?: { name: string }[];
+	} | null;
 	is_playing: boolean;
-	progress_ms: number;
+	progress_ms: number | null;
 }
 
 async function getAccessToken(env: Env): Promise<string | null> {
@@ -86,22 +88,23 @@ export default {
 
 		// 204 = nothing playing
 		const data =
-			spotifyRes.status === 204
-				? null
-				: ((await spotifyRes.json()) as SpotifyNowPlaying);
+			spotifyRes.status === 200
+				? ((await spotifyRes.json()) as SpotifyNowPlaying)
+				: null;
 
-		// Normalize response sama seperti format di lib/spotify.ts
+		// Same shape as src/lib/spotify.ts — ads/podcasts are treated as "nothing playing"
+		const item = data?.currently_playing_type === "track" ? data.item : null;
 		const normalized =
-			data === null
+			data === null || item === null
 				? null
 				: {
-						name: data.item.name,
-						artist: data.item.artists.map((a) => a.name).join(", "),
-						album: data.item.album.name,
-						albumArt: data.item.album.images[0]?.url ?? "",
+						name: item.name,
+						artist: item.artists?.map((a) => a.name).join(", ") ?? "",
+						album: item.album?.name ?? "",
+						albumArt: item.album?.images[0]?.url ?? "",
 						isPlaying: data.is_playing,
-						progress: data.progress_ms,
-						duration: data.item.duration_ms,
+						progress: data.progress_ms ?? 0,
+						duration: item.duration_ms,
 					};
 
 		const response = Response.json(
