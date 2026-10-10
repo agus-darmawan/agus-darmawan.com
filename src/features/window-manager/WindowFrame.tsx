@@ -12,7 +12,6 @@ interface WindowFrameProps {
 	isActive: boolean;
 	isDragging: boolean;
 	children: ReactNode;
-	closeLocked?: boolean;
 	onMouseDown: (e: React.MouseEvent) => void;
 	onClick: () => void;
 	onClose: () => void;
@@ -68,7 +67,6 @@ export function WindowFrame({
 	isActive,
 	isDragging,
 	children,
-	closeLocked = false,
 	onMouseDown,
 	onClick,
 	onClose,
@@ -118,7 +116,6 @@ export function WindowFrame({
 				title={win.title}
 				isActive={isActive}
 				isMaximized={isFullscreen}
-				closeLocked={closeLocked}
 				onClose={onClose}
 				onMinimize={onMinimize}
 				onMaximize={onMaximize}

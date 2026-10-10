@@ -1,15 +1,12 @@
 "use client";
 
 import { Maximize2, Minimize2, X } from "lucide-react";
-import { useState } from "react";
 
 interface WindowHeaderProps {
 	title: string;
 	isActive: boolean;
 	isMaximized: boolean;
 	isMobile?: boolean;
-	/** When true, clicking close shakes the button instead of closing */
-	closeLocked?: boolean;
 	onClose: () => void;
 	onMinimize: () => void;
 	onMaximize: () => void;
@@ -20,23 +17,14 @@ export function WindowHeader({
 	isActive,
 	isMaximized,
 	isMobile = false,
-	closeLocked = false,
 	onClose,
 	onMinimize,
 	onMaximize,
 }: WindowHeaderProps) {
 	const draggable = !isMaximized && !isMobile;
-	const [shaking, setShaking] = useState(false);
 
 	const handleClose = (e: React.MouseEvent) => {
 		e.stopPropagation();
-		if (closeLocked) {
-			// Shake animation to indicate it's locked
-			setShaking(true);
-			setTimeout(() => setShaking(false), 500);
-			onClose(); // still call so page.tsx can bring README to front
-			return;
-		}
 		onClose();
 	};
 
@@ -45,7 +33,6 @@ export function WindowHeader({
 			className={[
 				"window-titlebar h-9 flex items-center justify-between px-3 select-none shrink-0",
 				draggable ? "cursor-grab active:cursor-grabbing" : "",
-				shaking ? "wm-shake" : "",
 			]
 				.filter(Boolean)
 				.join(" ")}
@@ -60,12 +47,11 @@ export function WindowHeader({
 				<div className="flex gap-2">
 					{/* Close */}
 					<TrafficButton
-						color={closeLocked ? "#888888" : "#f46067"}
-						hoverColor={closeLocked ? "#aaaaaa" : "#f68086"}
-						label={closeLocked ? "Close (close README first)" : "Close"}
+						color="#f46067"
+						hoverColor="#f68086"
+						label="Close"
 						onClick={handleClose}
 						icon={<X size={10} />}
-						dimmed={closeLocked}
 					/>
 					{/* Minimize */}
 					<TrafficButton
@@ -111,7 +97,6 @@ interface TrafficButtonProps {
 	onClick: (e: React.MouseEvent) => void;
 	icon: React.ReactNode;
 	disabled?: boolean;
-	dimmed?: boolean;
 }
 
 function TrafficButton({
@@ -121,7 +106,6 @@ function TrafficButton({
 	onClick,
 	icon,
 	disabled = false,
-	dimmed = false,
 }: TrafficButtonProps) {
 	return (
 		<button
@@ -131,11 +115,7 @@ function TrafficButton({
 			disabled={disabled}
 			onClick={onClick}
 			className="w-4 h-4 rounded-full flex items-center justify-center group transition-colors disabled:opacity-30"
-			style={{
-				background: color,
-				opacity: dimmed ? 0.5 : 1,
-				cursor: dimmed ? "not-allowed" : "pointer",
-			}}
+			style={{ background: color }}
 			onMouseEnter={(e) => {
 				if (!disabled)
 					(e.currentTarget as HTMLElement).style.background = hoverColor;

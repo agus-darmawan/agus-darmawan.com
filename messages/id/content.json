@@ -26,10 +26,10 @@
 			"research": "Riset"
 		},
 		"categoryLabel": "Kategori",
-		"noProjects": "Belum ada proyek di kategori ini",
 		"projectsSummary": "{count} proyek · {featured} unggulan",
 		"moreTags": "+{count} lainnya",
 		"morePosts": "Tulisan lainnya",
-		"moreProjects": "Proyek lainnya"
+		"moreProjects": "Proyek lainnya",
+		"clearSearch": "Hapus pencarian"
 	}
 }

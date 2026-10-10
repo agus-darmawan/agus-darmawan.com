@@ -2,8 +2,10 @@
 	"ProjectsWindow": {
 		"title": "Proyek",
 		"headerDesc": "Gabungan aplikasi web, robot otonom, dan riset — hal-hal yang sudah saya bangun dan rilis.",
-		"featured": "Unggulan",
 		"stars": "bintang",
-		"repos": "proyek"
+		"repos": "proyek",
+		"searchPlaceholder": "Cari proyek…",
+		"listLabel": "Semua proyek",
+		"noResults": "Tidak ada proyek ditemukan."
 	}
 }
