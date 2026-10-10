@@ -1,177 +1,178 @@
 "use client";
 
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import type { ExperienceEntry } from "./experienceData";
+import { accentStyle } from "@/components/content/primitives";
+import { formatYearMonth } from "@/lib/format";
+import type { ExperienceEntry } from "./experience.data";
 
-interface ExperienceCardProps {
-	exp: ExperienceEntry;
-	isLast: boolean;
-	t: (key: string, values?: Record<string, string>) => string;
-	tExp: (key: string) => string;
-}
+function CompanyLogo({ src, company }: { src?: string; company: string }) {
+	const [failed, setFailed] = useState(false);
 
-function CompanyLogo({
-	src,
-	company,
-	color,
-	alt,
-}: {
-	src: string;
-	company: string;
-	color: string;
-	alt: string;
-}) {
-	const [errored, setErrored] = useState(false);
-	const initial = company.charAt(0).toUpperCase();
-
-	if (errored) {
+	if (!src || failed) {
 		return (
-			<div
-				className="w-10 h-10 rounded-xl flex items-center justify-center text-base font-bold text-white shrink-0 shadow-md select-none"
-				style={{ background: color }}
+			<span
 				role="img"
-				aria-label={alt}
+				aria-label={company}
+				className="w-10 h-10 rounded-xl flex items-center justify-center text-base font-bold text-white shrink-0 shadow-md select-none bg-(--accent)"
 			>
-				{initial}
-			</div>
+				{company.charAt(0).toUpperCase()}
+			</span>
 		);
 	}
 
 	return (
-		<div
-			className="w-10 h-10 rounded-xl overflow-hidden shrink-0 shadow-md border"
-			style={{ borderColor: `${color}30` }}
-		>
+		<span className="w-10 h-10 rounded-xl overflow-hidden shrink-0 shadow-md border border-(--accent)/20">
 			<Image
 				src={src}
-				alt={alt}
+				alt={company}
 				width={40}
 				height={40}
 				className="object-cover w-full h-full"
-				onError={() => setErrored(true)}
-				unoptimized
+				onError={() => setFailed(true)}
 			/>
-		</div>
+		</span>
 	);
 }
 
-export function ExperienceCard({ exp, isLast, t, tExp }: ExperienceCardProps) {
-	const companyName = tExp(`${exp.i18nKey}.company`);
-	const location = tExp(`${exp.i18nKey}.location`);
+interface ExperienceCardProps {
+	exp: ExperienceEntry;
+	isLast: boolean;
+	/** h2 inside the Experience window, h3 under the About page's h2. */
+	headingLevel?: 2 | 3;
+}
+
+export function ExperienceCard({
+	exp,
+	isLast,
+	headingLevel = 2,
+}: ExperienceCardProps) {
+	const t = useTranslations("ExperienceWindow");
+	const tExp = useTranslations("Experience");
+	const locale = useLocale();
+	const Company = headingLevel === 2 ? "h2" : "h3";
+	const Role = headingLevel === 2 ? "h3" : "h4";
+
+	const company = tExp(`${exp.i18nKey}.company`);
 
 	return (
-		<div className="relative flex gap-4">
+		<article style={accentStyle(exp.color)} className="relative flex gap-4">
 			{!isLast && (
-				<div
-					className="absolute left-5 top-12 w-px"
-					style={{
-						bottom: "-1.5rem",
-						background: `linear-gradient(to bottom, ${exp.color}60, transparent)`,
-					}}
+				<span
+					aria-hidden="true"
+					className="absolute left-5 top-12 -bottom-6 w-px bg-linear-to-b from-(--accent)/40 to-transparent"
 				/>
 			)}
 
-			<CompanyLogo
-				src={exp.logo}
-				company={companyName}
-				color={exp.color}
-				alt={companyName}
-			/>
+			<CompanyLogo src={exp.logo} company={company} />
 
 			<div className="flex-1 min-w-0 pb-2">
-				<div className="mb-3">
-					<div className="flex items-center gap-2 flex-wrap">
-						<h2 className="font-bold text-sm text-(--text-primary)">
-							{companyName}
-						</h2>
-					</div>
-
-					<p className="text-xs text-(--text-muted)">{location}</p>
-				</div>
+				<header className="mb-3">
+					<Company className="font-bold text-sm text-(--text-primary)">
+						{company}
+					</Company>
+					<p className="text-xs text-(--text-muted)">
+						{tExp(`${exp.i18nKey}.location`)}
+					</p>
+				</header>
 
 				<div className="space-y-4">
-					{exp.roles.map((role, roleIdx) => {
-						const roleTitle = tExp(
-							`${exp.i18nKey}.roles.${role.i18nKey}.title`,
-						);
-						const responsibilities = Array.from({ length: 3 }, (_, i) => {
-							try {
-								return tExp(
-									`${exp.i18nKey}.roles.${role.i18nKey}.responsibilities.${i}`,
-								);
-							} catch {
-								return null;
-							}
-						}).filter(Boolean) as string[];
+					{exp.roles.map((role, index) => {
+						const base = `${exp.i18nKey}.roles.${role.i18nKey}`;
+						// `raw` returns the array itself — no more guessing at a fixed
+						// number of `.0/.1/.2` keys inside a try/catch.
+						const responsibilities = tExp.raw(`${base}.responsibilities`) as
+							| string[]
+							| undefined;
+						const start = formatYearMonth(role.period.start, locale);
+						const end = role.period.end
+							? formatYearMonth(role.period.end, locale)
+							: t("present");
 
 						return (
-							<div key={`${role.i18nKey}-${roleIdx}`} className="relative">
-								{roleIdx < exp.roles.length - 1 && (
-									<div
-										className="absolute left-0 top-full w-px h-4 mt-1"
-										style={{ background: `${exp.color}30` }}
+							<section key={role.i18nKey} className="relative">
+								{index < exp.roles.length - 1 && (
+									<span
+										aria-hidden="true"
+										className="absolute left-0 top-full w-px h-4 mt-1 bg-(--accent)/20"
 									/>
 								)}
-								<div
-									className="flex flex-wrap items-start justify-between gap-1 mb-2 p-2.5 rounded-lg"
-									style={{ background: `${exp.color}0c` }}
-								>
-									<h3 className="font-semibold text-sm text-(--text-primary)">
-										{roleTitle}
-									</h3>
 
-									<span
-										className="text-[10px] px-2 py-0.5 rounded-full border shrink-0 font-medium"
-										style={{
-											color: exp.color,
-											borderColor: `${exp.color}40`,
-											background: `${exp.color}10`,
-										}}
-									>
-										{role.period.start} – {role.period.end ?? t("present")}
+								<div className="flex flex-wrap items-start justify-between gap-1 mb-2 p-2.5 rounded-lg bg-(--accent)/5">
+									<Role className="font-semibold text-sm text-(--text-primary)">
+										{tExp(`${base}.title`)}
+									</Role>
+									<span className="text-[10px] px-2 py-0.5 rounded-full border shrink-0 font-medium text-(--accent) border-(--accent)/25 bg-(--accent)/6">
+										<time dateTime={role.period.start}>{start}</time>
+										{" – "}
+										{role.period.end ? (
+											<time dateTime={role.period.end}>{end}</time>
+										) : (
+											end
+										)}
 									</span>
 								</div>
 
-								<div className="rounded-xl p-3 mb-2.5 border bg-(--surface-secondary) border-(--border)">
-									<ul className="space-y-1.5">
-										{responsibilities.map((r, i) => (
+								{responsibilities && responsibilities.length > 0 && (
+									<ul className="rounded-xl p-3 mb-2.5 border bg-(--surface-secondary) border-(--border) space-y-1.5">
+										{responsibilities.map((item) => (
 											<li
-												key={i}
+												key={item}
 												className="flex gap-2 text-xs text-(--text-secondary)"
 											>
 												<span
-													className="mt-0.5 shrink-0 text-[10px]"
-													style={{ color: exp.color }}
+													aria-hidden="true"
+													className="mt-0.5 shrink-0 text-[10px] text-(--accent)"
 												>
 													▸
 												</span>
-												<span>{r}</span>
+												<span>{item}</span>
 											</li>
 										))}
 									</ul>
-								</div>
+								)}
 
-								<div className="flex flex-wrap gap-1.5">
+								<ul
+									className="flex flex-wrap gap-1.5"
+									aria-label={t("techStack")}
+								>
 									{role.tech.map((tech) => (
-										<span
+										<li
 											key={tech}
-											className="text-[10px] px-2 py-0.5 rounded-full font-medium border"
-											style={{
-												background: `${exp.color}12`,
-												color: exp.color,
-												borderColor: `${exp.color}28`,
-											}}
+											className="text-[10px] px-2 py-0.5 rounded-full font-medium border bg-(--accent)/7 text-(--accent) border-(--accent)/15"
 										>
 											{tech}
-										</span>
+										</li>
 									))}
-								</div>
-							</div>
+								</ul>
+							</section>
 						);
 					})}
 				</div>
 			</div>
+		</article>
+	);
+}
+
+/** The full timeline — used by the Experience window and the /about page. */
+export function ExperienceTimeline({
+	entries,
+	headingLevel,
+}: {
+	entries: ExperienceEntry[];
+	headingLevel?: 2 | 3;
+}) {
+	return (
+		<div className="space-y-8">
+			{entries.map((exp, index) => (
+				<ExperienceCard
+					key={exp.i18nKey}
+					exp={exp}
+					isLast={index === entries.length - 1}
+					headingLevel={headingLevel}
+				/>
+			))}
 		</div>
 	);
 }

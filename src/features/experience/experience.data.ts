@@ -1,13 +1,23 @@
+/** `YYYY-MM`; formatted per locale at render time. */
+type YearMonth = `${number}-${number}`;
+
 interface ExperienceRole {
-	i18nKey: string; // key under Experience.{companyKey}.roles.{roleKey}
-	period: { start: string; end: string | null };
+	/** Key under `Experience.{company}.roles.{role}` in messages/{locale}/experience.json */
+	i18nKey: string;
+	period: { start: YearMonth; end: YearMonth | null };
 	tech: string[];
 }
 
 export interface ExperienceEntry {
-	i18nKey: string; // key under Experience namespace e.g. "ezraRobotics"
+	/** Key under the `Experience` namespace, e.g. "ezraRobotics". */
+	i18nKey: string;
 	color: string;
-	logo: string;
+	/**
+	 * Optional logo in /public (e.g. "/companies/ezra-robotics.png"). Omitted
+	 * entries render the company initial — the old paths all 404'd because
+	 * /public/companies never existed.
+	 */
+	logo?: string;
 	roles: ExperienceRole[];
 }
 
@@ -15,11 +25,10 @@ export const EXPERIENCES: ExperienceEntry[] = [
 	{
 		i18nKey: "ezraRobotics",
 		color: "#e95420",
-		logo: "/companies/ezra-robotics.png",
 		roles: [
 			{
 				i18nKey: "roboticsEngineer",
-				period: { start: "Nov 2025", end: null },
+				period: { start: "2025-11", end: null },
 				tech: [
 					"ROS2",
 					"Python",
@@ -32,7 +41,7 @@ export const EXPERIENCES: ExperienceEntry[] = [
 			},
 			{
 				i18nKey: "juniorRoboticsEngineer",
-				period: { start: "Dec 2024", end: "Nov 2025" },
+				period: { start: "2024-12", end: "2025-11" },
 				tech: [
 					"ROS2",
 					"Python",
@@ -47,11 +56,10 @@ export const EXPERIENCES: ExperienceEntry[] = [
 	{
 		i18nKey: "aseec",
 		color: "#3b82f6",
-		logo: "/companies/aseec.png",
 		roles: [
 			{
 				i18nKey: "researchMentor",
-				period: { start: "Apr 2023", end: "Mar 2026" },
+				period: { start: "2023-04", end: "2026-03" },
 				tech: [
 					"IoT",
 					"Machine Learning",
@@ -64,11 +72,10 @@ export const EXPERIENCES: ExperienceEntry[] = [
 	{
 		i18nKey: "itsTeknoSains",
 		color: "#10b981",
-		logo: "/companies/its-tekno.png",
 		roles: [
 			{
 				i18nKey: "roboticsSoftwareEngineer",
-				period: { start: "Sep 2024", end: "Aug 2025" },
+				period: { start: "2024-09", end: "2025-08" },
 				tech: [
 					"ROS Noetic",
 					"DLIO",
@@ -80,7 +87,7 @@ export const EXPERIENCES: ExperienceEntry[] = [
 			},
 			{
 				i18nKey: "roboticsEngineerAsv",
-				period: { start: "Sep 2023", end: "Dec 2023" },
+				period: { start: "2023-09", end: "2023-12" },
 				tech: [
 					"ROS Noetic",
 					"GPS RTK",
@@ -95,11 +102,10 @@ export const EXPERIENCES: ExperienceEntry[] = [
 	{
 		i18nKey: "b401Lab",
 		color: "#8b5cf6",
-		logo: "/companies/b401.png",
 		roles: [
 			{
 				i18nKey: "labAssistant",
-				period: { start: "Jun 2024", end: "Aug 2025" },
+				period: { start: "2024-06", end: "2025-08" },
 				tech: [
 					"ROS",
 					"Gazebo",
@@ -115,11 +121,10 @@ export const EXPERIENCES: ExperienceEntry[] = [
 	{
 		i18nKey: "barunastra",
 		color: "#0ea5e9",
-		logo: "/companies/barunastra.png",
 		roles: [
 			{
 				i18nKey: "divisionLeader",
-				period: { start: "Dec 2023", end: "Nov 2024" },
+				period: { start: "2023-12", end: "2024-11" },
 				tech: [
 					"ROS",
 					"Electronics Design",
@@ -130,7 +135,7 @@ export const EXPERIENCES: ExperienceEntry[] = [
 			},
 			{
 				i18nKey: "roboticsSoftwareEngineer",
-				period: { start: "Apr 2022", end: "Dec 2023" },
+				period: { start: "2022-04", end: "2023-12" },
 				tech: [
 					"ROS Noetic",
 					"LiDAR",
@@ -147,11 +152,10 @@ export const EXPERIENCES: ExperienceEntry[] = [
 	{
 		i18nKey: "satkomindo",
 		color: "#f59e0b",
-		logo: "/companies/satkomindo.png",
 		roles: [
 			{
 				i18nKey: "fullStackDeveloper",
-				period: { start: "Feb 2024", end: "Jun 2024" },
+				period: { start: "2024-02", end: "2024-06" },
 				tech: [
 					"React",
 					"AdonisJS",
@@ -167,11 +171,10 @@ export const EXPERIENCES: ExperienceEntry[] = [
 	{
 		i18nKey: "mage9",
 		color: "#ec4899",
-		logo: "/companies/mage9.png",
 		roles: [
 			{
 				i18nKey: "frontendDeveloper",
-				period: { start: "Jan 2023", end: "Feb 2024" },
+				period: { start: "2023-01", end: "2024-02" },
 				tech: ["Next.js", "Tailwind CSS", "TypeScript", "Firebase"],
 			},
 		],
