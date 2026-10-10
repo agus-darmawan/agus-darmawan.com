@@ -5,19 +5,13 @@ import type { TocEntry } from "@/lib/markdown/types";
 
 interface TocProps {
 	entries: TocEntry[];
-	accentColor: string;
 	activeId: string | null;
 	onNavigate: (id: string) => void;
 }
 
-const INDENT = { 1: 0, 2: 8, 3: 16 } as const;
+const INDENT = { 1: "pl-0", 2: "pl-2", 3: "pl-4" } as const;
 
-export function TableOfContents({
-	entries,
-	accentColor,
-	activeId,
-	onNavigate,
-}: TocProps) {
+export function TableOfContents({ entries, activeId, onNavigate }: TocProps) {
 	const t = useTranslations("Content");
 	if (entries.length < 2) return null;
 
@@ -42,12 +36,7 @@ export function TableOfContents({
 									onNavigate(entry.id);
 								}}
 								aria-current={isActive ? "location" : undefined}
-								className="block w-full text-left text-[11px] leading-snug py-0.5 truncate transition-colors"
-								style={{
-									paddingLeft: INDENT[entry.level],
-									color: isActive ? accentColor : "var(--text-muted)",
-									fontWeight: isActive ? 500 : 400,
-								}}
+								className={`block w-full text-left text-[11px] leading-snug py-0.5 truncate transition-colors ${INDENT[entry.level]} ${isActive ? "text-(--accent) font-medium" : "text-(--text-muted) hover:text-(--text-secondary)"}`}
 							>
 								{entry.text}
 							</a>

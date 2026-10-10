@@ -1,6 +1,7 @@
 "use client";
 
 import { type RefObject, useMemo } from "react";
+import { accentStyle } from "@/components/content/primitives";
 import { parseMdx } from "@/lib/markdown/parser";
 import { MarkdownBlocks } from "./MarkdownBlocks";
 import { TableOfContents } from "./TableOfContents";
@@ -8,6 +9,7 @@ import { useHeadingScroll } from "./useHeadingScroll";
 
 interface MarkdownRendererProps {
 	content: string;
+	/** Exposed to every block as the `--accent` CSS variable. */
 	accentColor: string;
 	/**
 	 * The element that actually scrolls (desktop window body). Omit it on
@@ -25,14 +27,12 @@ export function MarkdownRenderer({
 	const { activeId, navigateTo } = useHeadingScroll(scrollRef ?? null, toc);
 
 	return (
-		<div className="flex gap-5 min-w-0">
+		<div className="flex gap-5 min-w-0" style={accentStyle(accentColor)}>
 			<div className="flex-1 min-w-0">
-				<MarkdownBlocks tokens={tokens} accentColor={accentColor} />
+				<MarkdownBlocks tokens={tokens} />
 			</div>
-
 			<TableOfContents
 				entries={toc}
-				accentColor={accentColor}
 				activeId={activeId}
 				onNavigate={navigateTo}
 			/>

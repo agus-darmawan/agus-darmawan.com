@@ -30,6 +30,8 @@
 		"moreTags": "+{count} more",
 		"morePosts": "More posts",
 		"moreProjects": "More projects",
-		"clearSearch": "Clear search"
+		"clearSearch": "Clear search",
+		"video": "YouTube video",
+		"playVideo": "Play video: {title}"
 	}
 }
