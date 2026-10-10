@@ -60,3 +60,16 @@ describe("vim", () => {
 		expect(vimContent(session)).toBe("one\nthree\new");
 	});
 });
+
+describe("vim modifiers", () => {
+	it("types AltGr / Option characters", () => {
+		const start = vimKey(openVim("~", "a.txt", ""), { key: "i" }).session;
+		const { session } = vimKey(start, { key: "@", ctrl: true, alt: true });
+		expect(vimContent(session)).toBe("@");
+	});
+
+	it("treats Ctrl+[ as Escape", () => {
+		const start = vimKey(openVim("~", "a.txt", ""), { key: "i" }).session;
+		expect(vimKey(start, { key: "[", ctrl: true }).session.mode).toBe("normal");
+	});
+});

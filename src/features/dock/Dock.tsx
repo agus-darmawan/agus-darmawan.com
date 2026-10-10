@@ -18,13 +18,20 @@ export function Dock() {
 		useShallow((s) => s.windows.map((w) => w.appId)),
 	);
 	const handleDockClick = useWindowStore((s) => s.handleDockClick);
+	const openWindow = useWindowStore((s) => s.openWindow);
 
 	const closeGrid = useCallback(() => setGridOpen(false), []);
 	useClickOutside(dockRef, closeGrid);
 
+	// Dock icons toggle (open → minimize → restore); the app grid always
+	// brings the app forward, like GNOME's overview.
 	const launch = (appId: string) => {
 		setGridOpen(false);
 		handleDockClick(appId);
+	};
+	const launchFromGrid = (appId: string) => {
+		setGridOpen(false);
+		openWindow(appId);
 	};
 
 	return (
@@ -34,7 +41,7 @@ export function Dock() {
 			{gridOpen && (
 				<AppGrid
 					runningApps={runningApps}
-					onAppClick={launch}
+					onAppClick={launchFromGrid}
 					onClose={closeGrid}
 				/>
 			)}

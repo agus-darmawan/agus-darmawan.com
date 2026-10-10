@@ -242,10 +242,14 @@ function commandKey(s: VimSession, { key }: VimKey): VimResult {
 	}
 }
 
+export const isShortcut = ({ ctrl, meta, alt }: VimKey) =>
+	Boolean(meta || (ctrl && !alt));
+
 /** Apply one key press. Pure — the caller persists `write` actions. */
 export function vimKey(s: VimSession, input: VimKey): VimResult {
-	// Browser/OS shortcuts (Ctrl+C, ⌘R…) are not text: never insert them.
-	if (input.ctrl || input.meta || input.alt) {
+	// Ctrl/⌘ shortcuts are not text. Alt is: AltGr reports Ctrl+Alt on
+	// Windows and macOS Option types characters (@, {, [ on many layouts).
+	if (isShortcut(input)) {
 		return input.ctrl && input.key === "["
 			? vimKey(s, { key: "Escape" })
 			: { session: s };

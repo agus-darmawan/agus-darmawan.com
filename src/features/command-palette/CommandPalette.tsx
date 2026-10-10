@@ -105,17 +105,22 @@ export function CommandPalette() {
 		return () => window.removeEventListener("keydown", onKey);
 	}, []);
 
+	// Dismissing returns focus to where it was; running a command doesn't —
+	// refocusing the previous window would raise it over the app just opened.
+	const restoreFocus = useRef(true);
 	useEffect(() => {
 		if (!open) return;
+		restoreFocus.current = true;
 		const previous = document.activeElement as HTMLElement | null;
 		const id = requestAnimationFrame(() => inputRef.current?.focus());
 		return () => {
 			cancelAnimationFrame(id);
-			previous?.focus?.();
+			if (restoreFocus.current) previous?.focus?.({ preventScroll: true });
 		};
 	}, [open]);
 
 	const run = (cmd: Command) => {
+		restoreFocus.current = false;
 		close();
 		cmd.action();
 	};

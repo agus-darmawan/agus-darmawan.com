@@ -126,7 +126,9 @@ function ls(args: string[], { cwd, fs }: Required<Context>): Result {
 	if (!isDir(fs, path)) {
 		const { dir, name } = splitPath(cwd, target ?? "");
 		if (target && readFile(fs, dir, name) !== undefined) return out(target);
-		return err(`ls: cannot access '${target}': No such file or directory`);
+		return err(
+			`ls: cannot access '${target ?? "."}': No such file or directory`,
+		);
 	}
 
 	const entries = [
@@ -143,7 +145,9 @@ function rm(args: string[], { cwd, fs }: Required<Context>): Result {
 	const targets = args.filter((a) => !a.startsWith("-"));
 	const recursive = /[rR]/.test(flags);
 
-	if (recursive && targets.some((t) => ["/", "~", "/home/agus"].includes(t))) {
+	const protectedPath = (full: string) =>
+		full === "/" || full === "~" || cwd === full || cwd.startsWith(`${full}/`);
+	if (recursive && targets.some((t) => protectedPath(resolvePath(cwd, t)))) {
 		return err(RM_RF_RESPONSE);
 	}
 	if (targets.length === 0) return err("rm: missing operand");

@@ -6,52 +6,78 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const IDLE_TIMEOUT_MS = 60_000;
 const FADE_MS = 500;
 
-const ACTIVITY_EVENTS = [
-	"pointermove",
-	"pointerdown",
-	"keydown",
-	"wheel",
-	"touchstart",
-] as const;
+const PASSIVE_EVENTS = ["pointermove", "wheel", "touchstart"] as const;
+/** Inputs that would also act on the app underneath when they wake it. */
+const WAKING_EVENTS = ["keydown", "pointerdown"] as const;
 
 /**
  * Calls `onIdle` after `timeout` ms without input and `onActive` on the next
  * input. Scroll is caught in the capture phase (it doesn't bubble from the
  * windows' scroll containers), and focus inside an iframe (YouTube, PDF)
- * counts as activity because its events never reach this document.
+ * counts as activity because its events never reach this document. The key
+ * press or click that wakes the screen is swallowed, so it can't submit a
+ * terminal command or click a button hidden behind the clock.
  */
 function useIdle(timeout: number, onIdle: () => void, onActive: () => void) {
 	const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 	const idle = useRef(false);
 
-	const reset = useCallback(() => {
-		clearTimeout(timer.current);
-		if (idle.current) {
-			idle.current = false;
-			onActive();
-		}
-		timer.current = setTimeout(() => {
-			if (document.activeElement instanceof HTMLIFrameElement) {
-				reset();
-				return;
+	const reset = useCallback(
+		(event?: Event) => {
+			clearTimeout(timer.current);
+			if (idle.current) {
+				idle.current = false;
+				onActive();
+				if (
+					event &&
+					(WAKING_EVENTS as readonly string[]).includes(event.type)
+				) {
+					event.preventDefault();
+					event.stopPropagation();
+					if (event.type === "pointerdown") swallowNextClick();
+				}
 			}
-			idle.current = true;
-			onIdle();
-		}, timeout);
-	}, [timeout, onIdle, onActive]);
+			timer.current = setTimeout(() => {
+				if (document.activeElement instanceof HTMLIFrameElement) {
+					reset();
+					return;
+				}
+				idle.current = true;
+				onIdle();
+			}, timeout);
+		},
+		[timeout, onIdle, onActive],
+	);
 
 	useEffect(() => {
-		const opts = { passive: true, capture: true } as const;
-		for (const e of ACTIVITY_EVENTS) window.addEventListener(e, reset, opts);
-		document.addEventListener("scroll", reset, opts);
+		const passive = { passive: true, capture: true } as const;
+		const active = { capture: true } as const;
+		for (const e of PASSIVE_EVENTS) window.addEventListener(e, reset, passive);
+		for (const e of WAKING_EVENTS) window.addEventListener(e, reset, active);
+		document.addEventListener("scroll", reset, passive);
 		reset();
 		return () => {
-			for (const e of ACTIVITY_EVENTS)
-				window.removeEventListener(e, reset, opts);
-			document.removeEventListener("scroll", reset, opts);
+			for (const e of PASSIVE_EVENTS)
+				window.removeEventListener(e, reset, passive);
+			for (const e of WAKING_EVENTS)
+				window.removeEventListener(e, reset, active);
+			document.removeEventListener("scroll", reset, passive);
 			clearTimeout(timer.current);
 		};
 	}, [reset]);
+}
+
+function swallowNextClick() {
+	const swallow = (e: Event) => {
+		e.preventDefault();
+		e.stopPropagation();
+	};
+	window.addEventListener("click", swallow, { capture: true, once: true });
+	// If the press never becomes a click (drag), drop the trap.
+	setTimeout(
+		() => window.removeEventListener("click", swallow, { capture: true }),
+		1_000,
+	);
 }
 
 function ScreensaverClock() {

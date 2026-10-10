@@ -80,7 +80,7 @@ export function useTerminalEffects() {
 									line.id,
 									visitors === undefined
 										? `${base}, 1 user, ${load}`
-										: `${base}, ${visitors.toLocaleString("en-US")} visitors (30d), ${load}`,
+										: `${base}, ${visitors.toLocaleString("en-US")} page views (30d), ${load}`,
 								);
 						})
 						.catch(() => {
