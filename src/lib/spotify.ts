@@ -1,5 +1,5 @@
 import "server-only";
-import type { SpotifyTrack } from "@/features/top-bar/types/spotify.types";
+import type { SpotifyTrack } from "@/types/spotify";
 import { env, isSpotifyConfigured } from "./env";
 import { fetchJson } from "./fetch-json";
 

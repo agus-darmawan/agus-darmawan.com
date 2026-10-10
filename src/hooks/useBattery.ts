@@ -32,6 +32,7 @@ export function useBattery(): BatteryState {
 		if (!("getBattery" in navigator)) return;
 
 		let battery: BatteryManager | null = null;
+		let cancelled = false;
 
 		const update = () => {
 			if (!battery) return;
@@ -44,17 +45,21 @@ export function useBattery(): BatteryState {
 		(navigator as NavigatorWithBattery)
 			.getBattery()
 			.then((bat) => {
+				// Unmounted before the promise resolved: don't attach listeners
+				// that the cleanup below already ran without.
+				if (cancelled) return;
 				battery = bat;
 				battery.addEventListener("levelchange", update);
 				battery.addEventListener("chargingchange", update);
 				update();
 			})
 			.catch(() => {
-				// Battery API tidak tersedia (Firefox, Safari, semua iOS) — biarkan saja
-				// state tetap { level: null, charging: false }, komponen tidak render battery
+				// No Battery API (Firefox, Safari, iOS): keep `level: null` so the
+				// UI simply hides the battery item.
 			});
 
 		return () => {
+			cancelled = true;
 			if (!battery) return;
 			battery.removeEventListener("levelchange", update);
 			battery.removeEventListener("chargingchange", update);
