@@ -10,7 +10,7 @@ export interface WindowHeroProps {
 	subtitle?: string;
 	description?: string;
 	stats?: { value: number; label: string }[];
-	decoration?: "arcs" | "hatch" | "timeline";
+	decoration?: "arcs" | "hatch" | "timeline" | "wave";
 	children?: ReactNode;
 }
 
@@ -71,6 +71,43 @@ function Decoration({
 						strokeWidth="1"
 					/>
 				))}
+			</svg>
+		);
+	}
+
+	if (kind === "wave") {
+		return (
+			<svg
+				className="absolute right-0 top-0 h-full pointer-events-none opacity-45"
+				width="130"
+				viewBox="0 0 130 120"
+				preserveAspectRatio="xMaxYMid meet"
+				aria-hidden="true"
+			>
+				{[0, 12, 24, 36, 48, 60, 72, 84, 96, 108].map((y, i) => (
+					<line
+						key={y}
+						x1={130 - (i % 2 === 0 ? 20 : 40)}
+						y1={y}
+						x2={130}
+						y2={y}
+						stroke="var(--border)"
+						strokeWidth="1"
+					/>
+				))}
+				<path
+					d="M130,0 Q110,30 130,60 Q110,90 130,120"
+					fill="none"
+					stroke="var(--border)"
+					strokeWidth="1"
+				/>
+				<path
+					d="M130,0 Q95,30 130,60 Q95,90 130,120"
+					fill="none"
+					stroke="var(--border)"
+					strokeWidth="0.6"
+					opacity="0.6"
+				/>
 			</svg>
 		);
 	}

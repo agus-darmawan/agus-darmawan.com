@@ -44,6 +44,19 @@
 		"emailPlaceholder": "email@kamu.com",
 		"messagePlaceholder": "Ceritakan proyek atau ide kamu…",
 		"send": "Kirim Pesan",
-		"sent": "Pesan terkirim!"
+		"sent": "Pesan terkirim!",
+		"sending": "Mengirim…",
+		"nameLabel": "Nama",
+		"emailLabel": "Email",
+		"messageLabel": "Pesan",
+		"locationLabel": "Lokasi",
+		"errors": {
+			"invalid_input": "Periksa kembali nama, email, dan pesan kamu.",
+			"rate_limited": "Terlalu banyak pesan — coba lagi beberapa menit lagi.",
+			"verification_failed": "Verifikasi bot gagal — silakan coba lagi.",
+			"not_configured": "Form kontak sedang offline — silakan kirim email langsung.",
+			"send_failed": "Pesan gagal terkirim — coba lagi atau kirim email langsung.",
+			"network": "Kesalahan jaringan — silakan coba lagi."
+		}
 	}
 }

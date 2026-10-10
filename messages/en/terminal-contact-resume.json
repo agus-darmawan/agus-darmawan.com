@@ -44,6 +44,19 @@
 		"emailPlaceholder": "your@email.com",
 		"messagePlaceholder": "Tell me about your project or idea…",
 		"send": "Send Message",
-		"sent": "Message sent!"
+		"sent": "Message sent!",
+		"sending": "Sending…",
+		"nameLabel": "Name",
+		"emailLabel": "Email",
+		"messageLabel": "Message",
+		"locationLabel": "Location",
+		"errors": {
+			"invalid_input": "Please check your name, email and message.",
+			"rate_limited": "Too many messages — please try again in a few minutes.",
+			"verification_failed": "Bot verification failed — please try again.",
+			"not_configured": "The contact form is offline right now — please email me directly.",
+			"send_failed": "Couldn't send your message — please try again or email me.",
+			"network": "Network error — please try again."
+		}
 	}
 }
