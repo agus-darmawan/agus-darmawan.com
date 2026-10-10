@@ -32,13 +32,3 @@ export const SNAP_STYLES: Record<NonNullable<SnapZone>, CSSProperties> = {
 	left: { top: 0, left: 0, width: "50%", height: "100%" },
 	right: { top: 0, left: "50%", width: "50%", height: "100%" },
 };
-
-export const FALLBACK_TITLES: Record<string, string> = {
-	about: "About Me",
-	resume: "Resume",
-	experience: "Experience",
-	projects: "Projects",
-	terminal: "Terminal",
-	blog: "Blog",
-	contact: "Contact",
-};

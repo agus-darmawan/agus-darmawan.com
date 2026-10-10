@@ -9,7 +9,29 @@
 		"battery": "Baterai",
 		"charging": "Mengisi Daya",
 		"offline": "Offline",
-		"openApps": "Aplikasi Terbuka",
-		"noOpenApps": "Tidak ada aplikasi terbuka"
+		"settings": "Menu sistem",
+		"albumCover": "Sampul album {album}"
+	},
+	"CommandPalette": {
+		"title": "Palet perintah",
+		"placeholder": "Cari perintah…",
+		"empty": "Perintah tidak ditemukan",
+		"openWindow": "Buka jendela",
+		"toggleTheme": "Ganti tema",
+		"lightMode": "Ganti ke mode terang",
+		"darkMode": "Ganti ke mode gelap",
+		"changeLanguage": "Ganti bahasa",
+		"navigate": "navigasi",
+		"select": "pilih",
+		"close": "Tutup",
+		"keywords": {
+			"about": "saya,bio,profil",
+			"terminal": "cli,bash,shell",
+			"resume": "cv,pdf",
+			"experience": "kerja,karier,pengalaman",
+			"projects": "portofolio,kode,github,proyek",
+			"blog": "tulisan,artikel",
+			"contact": "email,pesan,kontak"
+		}
 	}
 }

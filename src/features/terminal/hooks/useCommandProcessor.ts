@@ -1,4 +1,7 @@
+import { useTheme } from "next-themes";
 import { useCallback } from "react";
+import { useSwitchLocale } from "@/hooks/useSwitchLocale";
+import { useWindowStore } from "@/store/useWindowStore";
 import {
 	COWSAY_DEFAULT,
 	MAN_PAGE,
@@ -91,6 +94,9 @@ export function useCommandProcessor({
 	clearTerminal,
 	sessionClosedMsg,
 }: UseCommandProcessorOptions) {
+	const { setTheme } = useTheme();
+	const { switchLocale } = useSwitchLocale();
+
 	const processCommand = useCallback(
 		(raw: string) => {
 			const trimmed = raw.trim();
@@ -473,16 +479,18 @@ export function useCommandProcessor({
 						);
 						break;
 					}
-					window.dispatchEvent(
-						new CustomEvent("openApp", { detail: { appId } }),
-					);
+					useWindowStore.getState().openWindow(appId);
 					addLines(mkLine("output", `Opening ${appId}...`));
 					break;
 				}
 
 				case "close": {
-					window.dispatchEvent(new CustomEvent("closeActiveWindow"));
-					addLines(mkLine("output", "Closed active window."));
+					const closed = useWindowStore.getState().closeTopWindow("terminal");
+					addLines(
+						closed
+							? mkLine("output", `Closed ${closed}.`)
+							: mkLine("error", "close: no other window to close"),
+					);
 					break;
 				}
 
@@ -492,7 +500,7 @@ export function useCommandProcessor({
 						addLines(mkLine("error", "Usage: theme <dark|light>"));
 						break;
 					}
-					window.dispatchEvent(new CustomEvent("setTheme", { detail: mode }));
+					setTheme(mode);
 					addLines(mkLine("output", `Theme set to ${mode}.`));
 					break;
 				}
@@ -503,9 +511,7 @@ export function useCommandProcessor({
 						addLines(mkLine("error", "Usage: lang <en|id>"));
 						break;
 					}
-					window.dispatchEvent(
-						new CustomEvent("setLocale", { detail: locale }),
-					);
+					switchLocale(locale);
 					addLines(mkLine("output", `Language set to ${locale}.`));
 					break;
 				}
@@ -535,6 +541,8 @@ export function useCommandProcessor({
 			openVim,
 			clearTerminal,
 			sessionClosedMsg,
+			setTheme,
+			switchLocale,
 		],
 	);
 

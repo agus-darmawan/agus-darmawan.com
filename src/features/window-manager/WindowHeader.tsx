@@ -1,12 +1,15 @@
 "use client";
 
 import { Maximize2, Minimize2, X } from "lucide-react";
+import { useTranslations } from "next-intl";
+import type { MouseEvent, ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface WindowHeaderProps {
 	title: string;
 	isActive: boolean;
 	isMaximized: boolean;
-	isMobile?: boolean;
+	isMobile: boolean;
 	onClose: () => void;
 	onMinimize: () => void;
 	onMaximize: () => void;
@@ -16,92 +19,67 @@ export function WindowHeader({
 	title,
 	isActive,
 	isMaximized,
-	isMobile = false,
+	isMobile,
 	onClose,
 	onMinimize,
 	onMaximize,
 }: WindowHeaderProps) {
+	const t = useTranslations("Window");
 	const draggable = !isMaximized && !isMobile;
-
-	const handleClose = (e: React.MouseEvent) => {
-		e.stopPropagation();
-		onClose();
-	};
 
 	return (
 		<div
-			className={[
-				"window-titlebar h-9 flex items-center justify-between px-3 select-none shrink-0",
-				draggable ? "cursor-grab active:cursor-grabbing" : "",
-			]
-				.filter(Boolean)
-				.join(" ")}
-			style={{
-				background: isActive
-					? "var(--window-header-active)"
-					: "var(--window-header)",
-				borderBottom: "1px solid var(--border)",
+			className={cn(
+				"window-titlebar h-9 flex items-center gap-2 px-3 select-none shrink-0 border-b border-(--border)",
+				isActive ? "bg-(--window-header-active)" : "bg-(--window-header)",
+				draggable && "cursor-grab active:cursor-grabbing",
+			)}
+			onDoubleClick={(e) => {
+				if (!isMobile && !(e.target as HTMLElement).closest("button")) {
+					onMaximize();
+				}
 			}}
 		>
-			<div className="flex items-center gap-2">
-				<div className="flex gap-2">
-					{/* Close */}
-					<TrafficButton
-						color="#f46067"
-						hoverColor="#f68086"
-						label="Close"
-						onClick={handleClose}
-						icon={<X size={10} />}
-					/>
-					{/* Minimize */}
-					<TrafficButton
-						color="#f6a847"
-						hoverColor="#f8b867"
-						label="Minimize"
-						onClick={(e) => {
-							e.stopPropagation();
-							onMinimize();
-						}}
-						icon={<Minimize2 size={8} />}
-						disabled={isMobile}
-					/>
-					{/* Maximize */}
-					<TrafficButton
-						color="#64c550"
-						hoverColor="#84d570"
-						label={isMaximized ? "Restore" : "Maximize"}
-						onClick={(e) => {
-							e.stopPropagation();
-							onMaximize();
-						}}
-						icon={<Maximize2 size={8} />}
-						disabled={isMobile}
-					/>
-				</div>
-
-				<span
-					className="text-sm font-medium ml-2 truncate max-w-48"
-					style={{ color: "var(--text-primary)" }}
-				>
-					{title}
-				</span>
+			<div className="flex gap-2">
+				<TrafficButton
+					className="bg-[#f46067] hover:bg-[#f68086]"
+					label={t("close")}
+					onClick={onClose}
+					icon={<X size={10} />}
+				/>
+				<TrafficButton
+					className="bg-[#f6a847] hover:bg-[#f8b867]"
+					label={t("minimize")}
+					onClick={onMinimize}
+					icon={<Minimize2 size={8} />}
+					disabled={isMobile}
+				/>
+				<TrafficButton
+					className="bg-[#64c550] hover:bg-[#84d570]"
+					label={isMaximized ? t("restore") : t("maximize")}
+					onClick={onMaximize}
+					icon={<Maximize2 size={8} />}
+					disabled={isMobile}
+				/>
 			</div>
+
+			<span className="text-sm font-medium ml-2 truncate max-w-48 text-(--text-primary)">
+				{title}
+			</span>
 		</div>
 	);
 }
 
 interface TrafficButtonProps {
-	color: string;
-	hoverColor: string;
+	className: string;
 	label: string;
-	onClick: (e: React.MouseEvent) => void;
-	icon: React.ReactNode;
+	onClick: () => void;
+	icon: ReactNode;
 	disabled?: boolean;
 }
 
 function TrafficButton({
-	color,
-	hoverColor,
+	className,
 	label,
 	onClick,
 	icon,
@@ -113,18 +91,17 @@ function TrafficButton({
 			title={label}
 			aria-label={label}
 			disabled={disabled}
-			onClick={onClick}
-			className="w-4 h-4 rounded-full flex items-center justify-center group transition-colors disabled:opacity-30"
-			style={{ background: color }}
-			onMouseEnter={(e) => {
-				if (!disabled)
-					(e.currentTarget as HTMLElement).style.background = hoverColor;
+			onClick={(e: MouseEvent) => {
+				// Don't let the frame's click handler re-focus a window being closed.
+				e.stopPropagation();
+				onClick();
 			}}
-			onMouseLeave={(e) => {
-				(e.currentTarget as HTMLElement).style.background = color;
-			}}
+			className={cn(
+				"w-4 h-4 rounded-full flex items-center justify-center group transition-colors disabled:opacity-30 disabled:pointer-events-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70",
+				className,
+			)}
 		>
-			<span className="text-[#2d0922] opacity-0 group-hover:opacity-100 transition-opacity">
+			<span className="text-[#2d0922] opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity">
 				{icon}
 			</span>
 		</button>
