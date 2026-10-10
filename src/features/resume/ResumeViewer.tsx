@@ -5,6 +5,9 @@ import type { RefObject } from "react";
 import type { PDFDocumentProxy } from "./hooks/usePdfLoader";
 import { ResumePageCanvas } from "./ResumePageCanvas";
 
+const pageNumbers = (count: number) =>
+	Array.from({ length: count }, (_, i) => i + 1);
+
 interface ResumeViewerProps {
 	pdf: PDFDocumentProxy | null;
 	isLoading: boolean;
@@ -44,14 +47,14 @@ export function ResumeViewer({
 				)}
 
 				{pdf &&
-					Array.from({ length: pdf.numPages }, (_, i) => (
+					pageNumbers(pdf.numPages).map((page) => (
 						<ResumePageCanvas
-							key={i + 1}
+							key={page}
 							pdf={pdf}
-							pageNumber={i + 1}
+							pageNumber={page}
 							zoom={zoom}
 							canvasRef={(el) => {
-								canvasRefs.current[i] = el;
+								canvasRefs.current[page - 1] = el;
 							}}
 						/>
 					))}

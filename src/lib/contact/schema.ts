@@ -8,6 +8,7 @@ const singleLine = (max: number) =>
 		.trim()
 		.min(1)
 		.max(max)
+		// biome-ignore lint/suspicious/noControlCharactersInRegex: rejecting control characters is the point
 		.refine((v) => !/[\u0000-\u001f\u007f]/.test(v), "Invalid characters");
 
 export const CONTACT_LIMITS = {

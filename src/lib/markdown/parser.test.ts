@@ -227,7 +227,7 @@ describe("parseMdx — edge cases", () => {
 
 	it("handles string with only whitespace", () => {
 		const { tokens } = parseMdx("   \n   \n   ");
-		tokens.forEach((t) => expect(t.type).toBe("blank"));
+		for (const t of tokens) expect(t.type).toBe("blank");
 	});
 
 	it("handles heading with inline formatting", () => {

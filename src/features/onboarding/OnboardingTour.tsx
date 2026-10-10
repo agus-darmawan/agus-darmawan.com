@@ -158,12 +158,6 @@ export function OnboardingTour() {
 					}}
 				/>
 
-				{/* Clicking the dark area does nothing — user drives via the buttons */}
-				<div
-					className="absolute inset-0"
-					onClick={(e) => e.stopPropagation()}
-				/>
-
 				{/* Plain wrapper — owns the anchor transform, untouched by Framer Motion */}
 				<div key={step.id} className="absolute w-72" style={anchorStyle}>
 					<motion.div

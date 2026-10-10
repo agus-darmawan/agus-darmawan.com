@@ -34,6 +34,7 @@ export function VimEditor({ label, hints }: VimEditorProps) {
 	const insert = vim.mode === "insert";
 
 	return (
+		// biome-ignore lint/a11y/useSemanticElements: a modal editor drawn from state; a <textarea> can't express vim's modes and cursor
 		<div
 			ref={editorRef}
 			role="textbox"

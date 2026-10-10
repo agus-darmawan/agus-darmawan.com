@@ -1,6 +1,6 @@
-import { execSync } from "child_process";
-import { readdirSync, statSync } from "fs";
-import { join } from "path";
+import { execSync } from "node:child_process";
+import { readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 
 const BUCKET = "agus-darmawan";
 // Only binary assets live on R2 now. MDX (projects/blog) is read from the repo

@@ -6,7 +6,6 @@ import { ContentHeader } from "@/components/content/ContentHeader";
 import { accentStyle } from "@/components/content/primitives";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { SITE } from "@/config/site";
-import { routing } from "@/i18n/routing";
 import { getPostsWithBody, getProjectsWithBody } from "@/lib/content";
 import { contentPath, listingPath } from "@/lib/content/paths";
 import type { ContentKind, ContentMeta, WithBody } from "@/lib/content/types";
