@@ -5,6 +5,8 @@ export default defineConfig({
 	test: {
 		environment: "node",
 		globals: true,
+		// Playwright owns e2e/; vitest only runs unit tests.
+		include: ["src/**/*.test.ts"],
 	},
 	resolve: {
 		alias: {

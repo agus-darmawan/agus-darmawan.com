@@ -1,51 +1,43 @@
-name: CI Pipeline Controller
+name: CI
 
 on:
   pull_request:
-    branches: [main]
   push:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  lint:
-    uses: ./.github/workflows/lint.yml
-  type-check:
+  quality:
+    name: Lint, types, unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/setup
+      - run: pnpm lint
+      - run: pnpm knip
       - run: pnpm type-check
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
       - run: pnpm test:run
-  build:
+
+  e2e:
+    name: Build + end-to-end
     runs-on: ubuntu-latest
-    needs: [lint, type-check, test]
+    needs: quality
+    env:
+      # Lifts the GitHub API rate limit for README/star enrichment at build.
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/setup
       - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      # playwright.config.ts starts the standalone server (pnpm start:standalone).
+      - run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

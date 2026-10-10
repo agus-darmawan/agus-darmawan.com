@@ -7,6 +7,7 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
+		"start:standalone": "cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/ && cp -r content .next/standalone/ && node .next/standalone/server.js",
 		"lint": "biome check",
 		"lint:fix": "biome check --write .",
 		"format": "biome format --write",
@@ -15,7 +16,8 @@
 		"test:run": "vitest run",
 		"type-check": "tsc --noEmit",
 		"analyze": "ANALYZE=true next build --webpack",
-		"knip": "knip"
+		"knip": "knip",
+		"test:e2e": "playwright test"
 	},
 	"dependencies": {
 		"@marsidev/react-turnstile": "^1.6.1",
@@ -42,6 +44,7 @@
 		"@commitlint/cli": "^21.2.3",
 		"@commitlint/config-conventional": "^21.2.3",
 		"@next/bundle-analyzer": "16.3.8",
+		"@playwright/test": "1.64.0",
 		"@tailwindcss/postcss": "^4.3.3",
 		"@tanstack/react-query-devtools": "^5.104.1",
 		"@types/node": "^26.6.5",

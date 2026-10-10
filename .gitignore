@@ -50,3 +50,7 @@ next-env.d.ts
 # Workers
 workers/*/node_modules
 workers/*/.wrangler
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
