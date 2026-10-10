@@ -1,8 +1,8 @@
 "use client";
 
 import { AnimatePresence } from "framer-motion";
-import { useTheme } from "next-themes";
 import { useCallback, useEffect, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { BootScreen } from "@/features/boot/BootScreen";
 import { CommandPalette } from "@/features/command-palette/CommandPalette";
 import { DesktopBackground } from "@/features/desktop/DesktopBackground";
@@ -13,175 +13,74 @@ import TopBar from "@/features/top-bar/TopBar";
 import { useWindowDrag } from "@/features/window-manager/hooks/useWindowDrag";
 import { SnapPreview } from "@/features/window-manager/SnapPreview";
 import { WindowFrame } from "@/features/window-manager/WindowFrame";
-import { getWindowComponent } from "@/features/window-manager/window.registry";
-import { usePathname, useRouter } from "@/i18n/navigation";
+import { storage } from "@/lib/storage";
 import { useWindowStore } from "@/store/useWindowStore";
-import type { WindowState } from "@/types/app";
+import type { SnapZone } from "@/types/app";
 
-// ── Window Content ────────────────────────────────────────────────────────────
+const BOOTED_KEY = "hasBooted";
 
-function WindowContent({ win }: { win: WindowState }) {
-	const Component = getWindowComponent(win.appId);
-
-	if (!Component) {
-		return (
-			<div
-				className="h-full flex items-center justify-center text-sm"
-				style={{ color: "var(--text-muted)" }}
-			>
-				Not found
-			</div>
-		);
-	}
-
-	return <Component />;
-}
-
-// ── Page ──────────────────────────────────────────────────────────────────────
+// Module-level so the drag hook's handlers are created once.
+const dragCallbacks = {
+	getWindows: () => useWindowStore.getState().windows,
+	onBringToFront: (id: string) => useWindowStore.getState().focusWindow(id),
+	onPositionChange: (id: string, x: number, y: number) =>
+		useWindowStore.getState().updatePosition(id, x, y),
+	onSnap: (id: string, zone: SnapZone) =>
+		useWindowStore.getState().setSnapZone(id, zone),
+};
 
 /** The interactive Ubuntu desktop (client-only shell). */
 export function Desktop() {
-	// ── Boot screen ──────────────────────────────────────────────────────────
-	// Start as null (unknown) to avoid SSR/client mismatch
-	// useEffect runs only on client — safe to read sessionStorage there
+	// null = not known yet (SSR / first paint): render nothing to avoid a flash.
 	const [booting, setBooting] = useState<boolean | null>(null);
 
 	useEffect(() => {
-		// Only runs on client — no SSR mismatch
-		const hasBooted = sessionStorage.getItem("hasBooted");
-		setBooting(!hasBooted);
+		setBooting(!storage.get("session", BOOTED_KEY));
 	}, []);
 
 	const handleBootDone = useCallback(() => {
-		sessionStorage.setItem("hasBooted", "1");
+		storage.set("session", BOOTED_KEY, "1");
 		setBooting(false);
 	}, []);
 
-	// ── Store ────────────────────────────────────────────────────────────────
+	// Only the id list: a window moving must not re-render the desktop.
+	const windowIds = useWindowStore(
+		useShallow((s) => s.windows.map((w) => w.id)),
+	);
+	const { dragging, snapPreview, handleMouseDown } =
+		useWindowDrag(dragCallbacks);
 
-	const windows = useWindowStore((s) => s.windows);
-	const activeWindowId = useWindowStore((s) => s.activeWindowId);
-	const openWindow = useWindowStore((s) => s.openWindow);
-	const closeWindow = useWindowStore((s) => s.closeWindow);
-	const minimizeWindow = useWindowStore((s) => s.minimizeWindow);
-	const toggleMaximize = useWindowStore((s) => s.toggleMaximize);
-	const bringToFront = useWindowStore((s) => s.bringToFront);
-	const setActiveWindow = useWindowStore((s) => s.setActiveWindow);
-	const handleDockClick = useWindowStore((s) => s.handleDockClick);
-	const minimizeAllWindows = useWindowStore((s) => s.minimizeAllWindows);
-
-	const { dragging, snapPreview, handleMouseDown } = useWindowDrag({
-		getWindows: () => useWindowStore.getState().windows,
-		onBringToFront: bringToFront,
-		onPositionChange: useWindowStore.getState().updatePosition,
-		onSnap: useWindowStore.getState().setSnapZone,
-	});
-
-	// ── Theme & locale for terminal commands ─────────────────────────────────
-
-	const { setTheme } = useTheme();
-	const router = useRouter();
-	const pathname = usePathname();
-
-	// ── Events ───────────────────────────────────────────────────────────────
-
-	useEffect(() => {
-		const handler = () => minimizeAllWindows();
-		window.addEventListener("minimizeAllWindows", handler);
-		return () => window.removeEventListener("minimizeAllWindows", handler);
-	}, [minimizeAllWindows]);
-
-	// Terminal → open app
-	useEffect(() => {
-		const handler = (e: CustomEvent) => openWindow(e.detail.appId);
-		window.addEventListener("openApp", handler as EventListener);
-		return () =>
-			window.removeEventListener("openApp", handler as EventListener);
-	}, [openWindow]);
-
-	// Terminal → close active window
-	// Use getState() to avoid re-registering on every focus change
-	useEffect(() => {
-		const handler = () => {
-			const id = useWindowStore.getState().activeWindowId;
-			if (id) useWindowStore.getState().closeWindow(id);
-		};
-		window.addEventListener("closeActiveWindow", handler);
-		return () => window.removeEventListener("closeActiveWindow", handler);
-	}, []);
-
-	// Terminal → switch theme
-	useEffect(() => {
-		const handler = (e: CustomEvent) => setTheme(e.detail);
-		window.addEventListener("setTheme", handler as EventListener);
-		return () =>
-			window.removeEventListener("setTheme", handler as EventListener);
-	}, [setTheme]);
-
-	// Terminal → switch locale
-	// router and pathname are stable refs from next-intl — no need to add locale
-	useEffect(() => {
-		const handler = (e: CustomEvent) => {
-			router.push(pathname, { locale: e.detail });
-		};
-		window.addEventListener("setLocale", handler as EventListener);
-		return () =>
-			window.removeEventListener("setLocale", handler as EventListener);
-	}, [router, pathname]);
-
-	// ── Render ────────────────────────────────────────────────────────────────
-
-	// null = unknown (SSR / first paint) → render nothing to avoid flash
 	if (booting === null) return null;
+	if (booting) return <BootScreen onDone={handleBootDone} />;
 
-	// true = first visit this session → show boot screen
-	if (booting) {
-		return <BootScreen onDone={handleBootDone} />;
-	}
-
-	// false = already booted → show portfolio
 	return (
-		<main
-			className="w-full h-screen overflow-hidden select-none"
-			style={{ background: "#0d0010" }}
-		>
+		<main className="relative w-full h-dvh overflow-hidden bg-[#0d0010]">
 			<DesktopBackground />
-			<CommandPalette />
-			<Screensaver />
 			<TopBar />
-			<OnboardingTour />
 
-			<div className="relative h-[calc(100vh-4rem)] mt-8">
+			{/*
+			 * `isolate` makes the window area its own stacking context: window
+			 * z-indices only order windows among themselves and can never cover
+			 * the top bar menus, the dock or the dialogs. It ends above the dock.
+			 */}
+			<div className="absolute inset-x-0 top-8 bottom-18 isolate">
 				<SnapPreview zone={snapPreview} />
 				<AnimatePresence>
-					{windows.map((win) => {
-						return (
-							<WindowFrame
-								key={win.id}
-								window={win}
-								isActive={activeWindowId === win.id}
-								isDragging={dragging === win.id}
-								onMouseDown={(e) => handleMouseDown(e, win.id)}
-								onClick={() => {
-									setActiveWindow(win.id);
-									bringToFront(win.id);
-								}}
-								onClose={() => closeWindow(win.id)}
-								onMinimize={() => minimizeWindow(win.id)}
-								onMaximize={() => toggleMaximize(win.id)}
-							>
-								<WindowContent win={win} />
-							</WindowFrame>
-						);
-					})}
+					{windowIds.map((id) => (
+						<WindowFrame
+							key={id}
+							id={id}
+							isDragging={dragging === id}
+							onTitleBarMouseDown={handleMouseDown}
+						/>
+					))}
 				</AnimatePresence>
 			</div>
 
-			<Dock
-				windows={windows}
-				activeWindow={activeWindowId}
-				onIconClick={handleDockClick}
-			/>
+			<Dock />
+			<CommandPalette />
+			<Screensaver />
+			<OnboardingTour />
 		</main>
 	);
 }

@@ -1,33 +1,36 @@
 import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-/**
- * MenuTrigger — chevron button that opens/closes the settings panel.
- */
+interface MenuTriggerProps {
+	open: boolean;
+	controls: string;
+	label: string;
+	onToggle: () => void;
+}
+
+/** Chevron button that opens/closes the system menu. */
 export function MenuTrigger({
 	open,
+	controls,
+	label,
 	onToggle,
-}: {
-	open: boolean;
-	onToggle: () => void;
-}) {
+}: MenuTriggerProps) {
 	return (
 		<button
 			type="button"
 			onClick={onToggle}
-			aria-haspopup="true"
-			aria-label="Open settings menu"
-			className="p-1.5 rounded-md transition-colors"
-			style={{ color: "var(--topbar-text)" }}
-			onMouseEnter={(e) => {
-				(e.currentTarget as HTMLElement).style.background =
-					"var(--topbar-hover)";
-			}}
-			onMouseLeave={(e) => {
-				(e.currentTarget as HTMLElement).style.background = "transparent";
-			}}
+			aria-haspopup="dialog"
+			aria-expanded={open}
+			aria-controls={open ? controls : undefined}
+			aria-label={label}
+			className="p-1.5 rounded-md transition-colors text-(--topbar-text) hover:bg-(--topbar-hover)"
 		>
 			<ChevronDown
-				className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+				aria-hidden
+				className={cn(
+					"w-4 h-4 transition-transform duration-200",
+					open && "rotate-180",
+				)}
 			/>
 		</button>
 	);
