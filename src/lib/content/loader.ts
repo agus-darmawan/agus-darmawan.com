@@ -63,10 +63,16 @@ async function readEntry(
 	for (const ext of [".mdx", ".md"]) {
 		try {
 			const file = path.join(CONTENT_DIR, section, locale, `${slug}${ext}`);
-			const { data, content } = matter(await readFile(file, "utf8"));
+			const source = await readFile(file, "utf8").catch((e: unknown) => {
+				if ((e as NodeJS.ErrnoException).code === "ENOENT") return null;
+				throw e;
+			});
+			if (source === null) continue; // try next extension
+			// YAML errors must surface (fail the build), not silently drop the entry.
+			const { data, content } = matter(source);
 			return { slug, data, body: content.trim() };
-		} catch {
-			// try next extension
+		} catch (error) {
+			fail(`${section}/${locale}/${slug}${ext}`, error);
 		}
 	}
 	return null;
@@ -81,7 +87,9 @@ async function readLocalized(section: Section, slug: string, locale: string) {
 	const local = await readEntry(section, locale, slug);
 	if (!local) return base;
 
-	const override = localeOverride.parse(local.data);
+	const parsed = localeOverride.safeParse(local.data);
+	if (!parsed.success) fail(`${section}/${locale}/${slug}`, parsed.error);
+	const override = parsed.data;
 	return {
 		slug,
 		data: { ...base.data, ...override },
@@ -178,7 +186,10 @@ function projectFromRepo(
 	const topics = repo.topics ?? [];
 	const category = categoryFromTopics(topics);
 	const description = repo.description ?? humanize(repo.name);
-	const body = readme ?? `${description}\n\n[View on GitHub](${repo.html_url})`;
+	// The page renders the title as <h1>; drop the README's own leading H1.
+	const body = readme
+		? readme.replace(/^\s*#\s+.*\n+/, "")
+		: `${description}\n\n[View on GitHub](${repo.html_url})`;
 	return {
 		kind: "project",
 		source: "github",

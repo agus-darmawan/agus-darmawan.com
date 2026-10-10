@@ -59,10 +59,15 @@ export function highlight(code: string, lang: string): string {
 	const pattern = new RegExp(
 		[
 			`(?<comment>${comment})`,
-			String.raw`(?<string>(["'\`])(?:\\.|(?!\3)[^\\])*\3)`,
+			// '…' and "…" end at the line break (a stray apostrophe in `don't`
+			// must not color the rest of the block); template literals may span lines.
+			String.raw`(?<string>(["'])(?:\\.|(?!\3)[^\\\n])*\3|\`(?:\\.|[^\\\`])*\`)`,
 			`(?<keyword>\\b(?:${KEYWORDS[family]})\\b)`,
 			String.raw`(?<number>\b\d+(?:\.\d+)?\b)`,
-			...(family === "js" ? [String.raw`(?<tag></?[A-Za-z][\w.]*)`] : []),
+			// JSX tags only where an element can start — not `i<n` or `Array<string>`.
+			...(family === "js"
+				? [String.raw`(?<tag>(?<=^|[\s(=>{,;:?&|]|return )<\/?[A-Za-z][\w.]*)`]
+				: []),
 		].join("|"),
 		"gm",
 	);

@@ -63,7 +63,7 @@ export function ContentCard({ item, onOpen }: ContentCardProps) {
 											e.preventDefault();
 											onOpen(item);
 										}}
-										className="outline-none after:absolute after:inset-0 after:content-['']"
+										className="outline-none after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-(--accent)"
 									>
 										{item.title}
 									</Link>

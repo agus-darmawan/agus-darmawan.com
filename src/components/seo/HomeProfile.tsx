@@ -35,6 +35,7 @@ export function HomeProfile({
 
 			<section
 				id="profile"
+				tabIndex={-1}
 				aria-labelledby="profile-name"
 				className="sr-only focus-within:not-sr-only focus-within:fixed focus-within:inset-0 focus-within:z-[9999] focus-within:overflow-auto focus-within:bg-(--window-bg) focus-within:p-8 focus-within:text-(--text-primary)"
 			>

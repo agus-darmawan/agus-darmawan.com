@@ -90,13 +90,9 @@ export async function ListingPage({
 
 // ── Detail (/projects/[slug], /blog/[slug]) ──────────────────────────────────
 
-export async function detailStaticParams(kind: ContentKind) {
-	const perLocale = await Promise.all(
-		routing.locales.map(async (locale) =>
-			(await loadAll(kind, locale)).map(({ slug }) => ({ locale, slug })),
-		),
-	);
-	return perLocale.flat();
+/** Called once per locale by Next (the parent layout provides `locale`). */
+export async function detailStaticParams(kind: ContentKind, locale: string) {
+	return (await loadAll(kind, locale)).map(({ slug }) => ({ slug }));
 }
 
 async function findItem(kind: ContentKind, locale: string, slug: string) {

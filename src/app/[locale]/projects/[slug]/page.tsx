@@ -10,7 +10,11 @@ import {
 export const revalidate = 3600;
 export const dynamicParams = true;
 
-export const generateStaticParams = () => detailStaticParams("project");
+export const generateStaticParams = ({
+	params,
+}: {
+	params: { locale: string };
+}) => detailStaticParams("project", params.locale);
 
 export const generateMetadata = (props: DetailParams) =>
 	detailMetadata("project", props);

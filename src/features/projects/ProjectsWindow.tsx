@@ -82,7 +82,7 @@ export default function ProjectsWindow() {
 					<div className="flex-1 h-px bg-linear-to-r from-(--border) to-transparent" />
 				</div>
 
-				<div className="flex gap-1.5 flex-wrap" role="tablist">
+				<div className="flex gap-1.5 flex-wrap">
 					{FILTERS.filter((f) => f === "all" || stats.counts[f] > 0).map(
 						(key) => {
 							const active = filter === key;
@@ -91,8 +91,7 @@ export default function ProjectsWindow() {
 								<button
 									key={key}
 									type="button"
-									role="tab"
-									aria-selected={active}
+									aria-pressed={active}
 									onClick={() => setFilter(key)}
 									className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-200"
 									style={

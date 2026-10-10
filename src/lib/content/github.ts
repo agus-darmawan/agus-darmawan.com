@@ -108,14 +108,33 @@ export function absolutizeLinks(
 	const blob = `https://github.com/${repo.full_name}/blob/${repo.default_branch}/`;
 	const isRelative = (url: string) =>
 		!/^(?:[a-z][a-z\d+.-]*:|\/\/|#)/i.test(url);
-	const clean = (url: string) => url.replace(/^\.?\//, "");
+	const resolve = (base: string, url: string) =>
+		isRelative(url) ? `${base}${url.replace(/^\.?\//, "")}` : url;
 
-	return markdown.replace(
-		/(!?)\[([^\]]*)\]\(([^)\s]+)((?:\s+"[^"]*")?)\)/g,
-		(match, bang: string, label: string, url: string, title: string) => {
-			if (!isRelative(url)) return match;
-			const base = bang ? raw : blob;
-			return `${bang}[${label}](${base}${clean(url)}${title})`;
-		},
-	);
+	const rewrite = (text: string) =>
+		text
+			// 1) images first: ![alt](src "title")
+			.replace(
+				/!\[([^\]]*)\]\(([^)\s]+)((?:\s+"[^"]*")?)\)/g,
+				(_, alt: string, url: string, title: string) =>
+					`![${alt}](${resolve(raw, url)}${title})`,
+			)
+			// 2) links whose label may itself be an image (badges): [![…](…)](href)
+			.replace(
+				/(?<!!)\[((?:[^[\]]|\[[^\]]*\])*)\]\(([^)\s]+)((?:\s+"[^"]*")?)\)/g,
+				(_, label: string, url: string, title: string) =>
+					`[${label}](${resolve(blob, url)}${title})`,
+			)
+			// 3) <img src="…"> in raw HTML
+			.replace(
+				/(<img\b[^>]*\bsrc\s*=\s*["'])([^"']+)(["'])/gi,
+				(_, pre: string, url: string, post: string) =>
+					`${pre}${resolve(raw, url)}${post}`,
+			);
+
+	// Leave fenced code untouched.
+	return markdown
+		.split(/(^```[\s\S]*?^```)/m)
+		.map((chunk) => (chunk.startsWith("```") ? chunk : rewrite(chunk)))
+		.join("");
 }

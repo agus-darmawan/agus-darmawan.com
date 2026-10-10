@@ -276,3 +276,31 @@ describe("regressions", () => {
 		expect(toc[0].id).toBe("2-install-ros2");
 	});
 });
+
+describe("GitHub README compatibility", () => {
+	it("parses image-inside-link badges", () => {
+		const [node] = parseInline("[![CI](badge.svg)](https://ci.example)");
+		expect(node).toMatchObject({
+			type: "link",
+			href: "https://ci.example",
+			children: [{ type: "image", src: "badge.svg", alt: "CI" }],
+		});
+	});
+
+	it("recognises tables with alignment rows", () => {
+		const { tokens } = parseMdx("| a | b |\n|:--|--:|\n| 1 | 2 |");
+		expect(tokens[0]).toMatchObject({ type: "table" });
+	});
+
+	it("keeps <img> from raw HTML and drops the markup", () => {
+		const { tokens } = parseMdx(
+			'<p align="center">\n  <img src="logo.png" alt="Logo" width="200">\n</p>',
+		);
+		expect(tokens).toEqual([{ type: "image", src: "logo.png", alt: "Logo" }]);
+	});
+
+	it("keeps paragraphs that merely start with inline HTML", () => {
+		const { tokens } = parseMdx("<kbd>Ctrl</kbd> + K opens the palette");
+		expect(tokens[0]).toMatchObject({ type: "p" });
+	});
+});

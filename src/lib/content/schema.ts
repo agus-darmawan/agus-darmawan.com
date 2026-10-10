@@ -44,13 +44,14 @@ export const blogFrontmatter = z.object({
 	draft: z.boolean().default(false),
 });
 
-/** Locale override file — only translatable fields. */
-export const localeOverride = z
-	.object({
-		title: z.string().min(1).optional(),
-		description: z.string().min(1).max(300).optional(),
-		tags: z.array(z.string()).optional(),
-	})
-	.loose();
+/**
+ * Locale override file — only translatable fields. Unknown keys are stripped
+ * so an `id` file can't silently change `repo`, `featured`, `draft`, …
+ */
+export const localeOverride = z.object({
+	title: z.string().min(1).optional(),
+	description: z.string().min(1).max(300).optional(),
+	tags: z.array(z.string()).optional(),
+});
 
 export type ProjectFrontmatter = z.infer<typeof projectFrontmatter>;

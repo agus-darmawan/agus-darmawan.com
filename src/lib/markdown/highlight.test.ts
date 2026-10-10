@@ -31,3 +31,22 @@ describe("highlight", () => {
 		expect(html).toContain('<span style="color:#6272a4"># note</span>');
 	});
 });
+
+describe("highlight edge cases", () => {
+	it("does not let an apostrophe swallow following lines", () => {
+		const html = highlight("echo don't\nls # c", "bash");
+		expect(html).toContain('<span style="color:#6272a4"># c</span>');
+	});
+
+	it("does not treat generics or comparisons as JSX tags", () => {
+		const html = highlight("const a: Array<string> = []; if (i<n) {}", "ts");
+		expect(html).not.toContain('color:#50fa7b">&lt;string');
+		expect(html).not.toContain('color:#50fa7b">&lt;n');
+	});
+
+	it("still colors real JSX tags", () => {
+		expect(highlight("return <App />", "tsx")).toContain(
+			'<span style="color:#50fa7b">&lt;App</span>',
+		);
+	});
+});
