@@ -13,6 +13,11 @@ const withBundleAnalyzer = withBundleAnalyzerPkg({
 const nextConfig: NextConfig = {
 	// Required by the Dockerfile (it copies .next/standalone). Harmless on Vercel.
 	output: "standalone",
+	// The content layer reads /content with fs at request time (ISR) — make
+	// sure those files ship with the serverless/standalone bundle.
+	outputFileTracingIncludes: {
+		"/**": ["./content/projects/**/*", "./content/blog/**/*"],
+	},
 	images: {
 		remotePatterns: [
 			{ protocol: "https", hostname: "i.scdn.co" },
