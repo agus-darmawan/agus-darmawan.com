@@ -1,17 +1,18 @@
-import type {
-	InlineNode,
-	TocEntry,
-	Token,
-} from "@/features/projects/types/project.types";
+import type { InlineNode, TocEntry, Token } from "./types";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function slugify(text: string): string {
-	return text
+	const slug = text
 		.toLowerCase()
+		.normalize("NFKD")
 		.replace(/[^\w\s-]/g, "")
 		.trim()
-		.replace(/\s+/g, "-");
+		.replace(/[\s_]+/g, "-")
+		.replace(/-+/g, "-")
+		.replace(/^-|-$/g, "");
+	// Never return "" (emoji-only headings) — an empty id can't be linked to.
+	return slug || "section";
 }
 
 function extractText(nodes: InlineNode[]): string {
@@ -93,10 +94,14 @@ export function parseInline(text: string): InlineNode[] {
 			}
 		}
 
-		// Italic *text* or _text_
-		if (text[i] === "*" || text[i] === "_") {
+		// Italic *text* or _text_ — `_` only at a word boundary, so identifiers
+		// like `use_sim_time` or `cmd_vel` stay plain text.
+		if (text[i] === "*" || (text[i] === "_" && !/\w/.test(text[i - 1] ?? ""))) {
 			const marker = text[i];
-			const end = text.indexOf(marker, i + 1);
+			let end = text.indexOf(marker, i + 1);
+			while (marker === "_" && end !== -1 && /\w/.test(text[end + 1] ?? "")) {
+				end = text.indexOf(marker, end + 1);
+			}
 			if (end !== -1 && end > i + 1) {
 				nodes.push({
 					type: "italic",

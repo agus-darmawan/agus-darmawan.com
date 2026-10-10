@@ -1,7 +1,7 @@
 "use client";
 
 import NextImage from "next/image";
-import type { InlineNode } from "../types/project.types";
+import type { InlineNode } from "@/lib/markdown/types";
 
 interface InlineProps {
 	nodes: InlineNode[];

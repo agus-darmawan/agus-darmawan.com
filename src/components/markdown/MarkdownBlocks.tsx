@@ -1,17 +1,17 @@
 "use client";
 
-import type { Token } from "../types/project.types";
+import type { Token } from "@/lib/markdown/types";
 import { CodeBlock } from "./CodeBlock";
 import { ImageBlock } from "./ImageBlock";
 import { Inline } from "./Inline";
 import { YoutubeBlock } from "./YoutubeBlock";
 
-interface ReadmeBlocksProps {
+interface MarkdownBlocksProps {
 	tokens: Token[];
 	accentColor: string;
 }
 
-export function ReadmeBlocks({ tokens, accentColor }: ReadmeBlocksProps) {
+export function MarkdownBlocks({ tokens, accentColor }: MarkdownBlocksProps) {
 	return (
 		<>
 			{tokens.map((token, idx) => {
@@ -76,7 +76,7 @@ export function ReadmeBlocks({ tokens, accentColor }: ReadmeBlocksProps) {
 									color: "var(--text-muted)",
 								}}
 							>
-								<ReadmeBlocks
+								<MarkdownBlocks
 									tokens={token.children}
 									accentColor={accentColor}
 								/>

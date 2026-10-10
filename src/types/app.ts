@@ -1,13 +1,4 @@
-import { type LucideIcon } from "lucide-react";
-import type { ProjectMeta } from "@/features/projects/projects.data";
-
-export interface OpenApp {
-	id: string;
-	name: string;
-	icon?: string;
-	type?: "document" | "app" | "browser";
-	openedAt: number;
-}
+import type { LucideIcon } from "lucide-react";
 
 export interface AppConfig {
 	id: string;
@@ -17,14 +8,15 @@ export interface AppConfig {
 	category?: string;
 }
 
+/** Project detail windows use the app id `project-{slug}`. */
+export const PROJECT_WINDOW_PREFIX = "project-";
+export const projectWindowId = (slug: string) =>
+	`${PROJECT_WINDOW_PREFIX}${slug}`;
+export const isProjectWindow = (appId: string) =>
+	appId.startsWith(PROJECT_WINDOW_PREFIX);
+
 export type WindowPayload =
-	| {
-			kind: "readme";
-			project: ProjectMeta;
-			name: string;
-			desc: string;
-			readmeFile: string;
-	  }
+	| { kind: "project"; slug: string; title: string; emoji: string }
 	| undefined;
 
 export interface WindowState {
