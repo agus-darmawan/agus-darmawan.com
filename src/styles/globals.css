@@ -16,8 +16,14 @@
 	--color-ubuntu-success: #0e8420;
 	--color-ubuntu-warning: #f99b11;
 	--color-ubuntu-error: #c7162b;
+}
 
-	--font-ubuntu: "Ubuntu", system-ui, sans-serif;
+/* next/font defines the variables on <html>; `inline` makes the utilities
+   reference them directly instead of resolving them on :root. */
+@theme inline {
+	--font-sans: var(--font-ubuntu), system-ui, sans-serif;
+	--font-mono:
+		var(--font-ubuntu-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 
 /* ────────────────────────────────────────────────
@@ -73,6 +79,53 @@
 }
 
 /* ────────────────────────────────────────────────
+   Classic website — Ubuntu's own brand palette:
+   aubergine ink, orange for actions, warm greys.
+   It also re-maps the shared tokens, so components
+   reused from the desktop (markdown, contact form,
+   content headers) follow the site palette.
+──────────────────────────────────────────────── */
+.site {
+	--site-bg: #ffffff;
+	--site-raised: #f6f4f2;
+	--site-ink: #2c001e;
+	--site-text: #3a3a3a;
+	--site-muted: #6e6862;
+	--site-line: #e8e4e0;
+	--site-link: #c2421a;
+	--site-primary: #2c001e;
+	--site-on-primary: #ffffff;
+
+	--surface: var(--site-bg);
+	--surface-secondary: var(--site-raised);
+	--window-bg: var(--site-bg);
+	--text-primary: var(--site-ink);
+	--text-secondary: var(--site-text);
+	--text-muted: var(--site-muted);
+	--border: var(--site-line);
+
+	background-color: var(--site-bg);
+	color: var(--site-text);
+}
+
+.dark .site {
+	--site-bg: #190a16;
+	--site-raised: #24121f;
+	--site-ink: #fbf4f8;
+	--site-text: #e2d8de;
+	--site-muted: #a9989f;
+	--site-line: rgb(255 255 255 / 0.09);
+	--site-link: #f47c4c;
+	--site-primary: #fbf4f8;
+	--site-on-primary: #190a16;
+}
+
+/* Anchored headings clear the sticky header. */
+.site :is(h1, h2, h3)[id] {
+	scroll-margin-top: 6rem;
+}
+
+/* ────────────────────────────────────────────────
    Base
 ──────────────────────────────────────────────── */
 *,
@@ -87,7 +140,7 @@ body {
 }
 
 body {
-	font-family: var(--font-ubuntu);
+	font-family: var(--font-ubuntu), system-ui, sans-serif;
 	background-color: var(--surface);
 	color: var(--text-primary);
 	-webkit-font-smoothing: antialiased;

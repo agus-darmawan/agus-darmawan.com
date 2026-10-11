@@ -1,0 +1,89 @@
+{
+	"Site": {
+		"skipToContent": "Langsung ke konten",
+		"primaryNav": "Utama",
+		"breadcrumb": "Jejak halaman",
+		"home": "Beranda",
+		"nav": {
+			"about": "Tentang",
+			"experience": "Pengalaman",
+			"projects": "Proyek",
+			"blog": "Blog",
+			"contact": "Kontak"
+		},
+		"menu": "Buka menu",
+		"closeMenu": "Tutup menu",
+		"language": "Bahasa",
+		"theme": {
+			"label": "Tema",
+			"toDark": "Ganti ke tema gelap",
+			"toLight": "Ganti ke tema terang",
+			"dark": "Gelap",
+			"light": "Terang"
+		},
+		"openDesktop": "Buka desktop",
+		"openInDesktop": "Buka di desktop",
+		"hero": {
+			"role": "Robotics engineer dan full-stack developer",
+			"lede": "Saya menulis perangkat lunak yang membuat robot berkaki empat mampu menginspeksi gardu listrik, beserta dashboard web yang diandalkan operatornya. Sebelumnya, saya membangun kapal otonom yang menjuarai kompetisi internasional.",
+			"now": "Saat ini {role} di {company}",
+			"seeProjects": "Lihat proyek",
+			"getInTouch": "Hubungi saya",
+			"downloadCv": "Unduh CV",
+			"previewTitle": "Website ini juga sebuah desktop",
+			"previewBody": "Portofolio yang sama dalam bentuk desktop ala Ubuntu, lengkap dengan jendela, terminal, dan dock. Paling nyaman dengan mouse dan keyboard.",
+			"launch": "Jalankan desktop"
+		},
+		"work": {
+			"title": "Karya pilihan",
+			"all": "Semua {count} proyek"
+		},
+		"experience": {
+			"title": "Pengalaman",
+			"all": "Lihat semua pengalaman",
+			"summary": "{roles} posisi di {orgs} organisasi sejak {year}.",
+			"current": "Saat ini"
+		},
+		"recognition": {
+			"title": "Pencapaian",
+			"awards": "Penghargaan",
+			"publications": "Publikasi",
+			"read": "Baca makalah"
+		},
+		"writing": {
+			"title": "Tulisan",
+			"all": "Semua tulisan"
+		},
+		"cta": {
+			"title": "Punya robot, dashboard, atau ide yang perlu dibangun?",
+			"body": "Ceritakan apa yang sedang kamu kerjakan, entah robot, aplikasi web, atau riset.",
+			"email": "Kirim email",
+			"form": "Kirim pesan"
+		},
+		"about": {
+			"seeExperience": "Lihat pengalaman saya"
+		},
+		"contact": {
+			"direct": "Hubungi langsung",
+			"formTitle": "Kirim pesan",
+			"formNote": "Pesanmu langsung masuk ke inbox saya."
+		},
+		"projects": {
+			"filter": "Saring proyek berdasarkan kategori",
+			"empty": "Belum ada proyek di kategori ini.",
+			"featured": "Unggulan"
+		},
+		"footer": {
+			"tagline": "Robotics engineer dan full-stack developer di Denpasar, Bali.",
+			"pages": "Halaman",
+			"elsewhere": "Temukan saya",
+			"preferences": "Preferensi",
+			"view": "Tampilan",
+			"website": "Website",
+			"desktop": "Desktop",
+			"cv": "CV (PDF)",
+			"source": "Kode sumber",
+			"copyright": "© {year} {name}"
+		}
+	}
+}

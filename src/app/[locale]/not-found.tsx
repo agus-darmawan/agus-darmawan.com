@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
-import { PageShell } from "@/components/seo/PageShell";
-import { SITE } from "@/config/site";
+import { Container } from "@/features/site/Container";
+import { SiteShell } from "@/features/site/SiteShell";
 import { Link } from "@/i18n/navigation";
 import { listingPath } from "@/lib/content/paths";
 
@@ -9,8 +9,8 @@ export default function NotFound() {
 	const t = useTranslations("Seo");
 
 	return (
-		<PageShell path="/" breadcrumbs={[{ name: SITE.shortName, href: "/" }]}>
-			<div className="py-16 text-center">
+		<SiteShell>
+			<Container className="py-24 text-center">
 				<p aria-hidden="true" className="text-6xl mb-4">
 					🤖
 				</p>
@@ -38,7 +38,7 @@ export default function NotFound() {
 						{t("blogTitle")}
 					</Link>
 				</div>
-			</div>
-		</PageShell>
+			</Container>
+		</SiteShell>
 	);
 }
