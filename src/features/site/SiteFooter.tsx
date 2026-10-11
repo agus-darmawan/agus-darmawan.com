@@ -113,21 +113,23 @@ export function SiteFooter() {
 				</div>
 			</Container>
 
-			<Container className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-(--site-line) py-6 text-sm text-(--site-muted)">
-				<p>
-					{t("footer.copyright", {
-						year: new Date().getFullYear(),
-						name: SITE.name,
-					})}
-				</p>
-				<a
-					href={SOURCE_URL}
-					target="_blank"
-					rel="noopener noreferrer"
-					className="transition-colors hover:text-(--site-ink)"
-				>
-					{t("footer.source")}
-				</a>
+			<Container>
+				<div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-(--site-line) py-6 text-sm text-(--site-muted)">
+					<p>
+						{t("footer.copyright", {
+							year: new Date().getFullYear(),
+							name: SITE.name,
+						})}
+					</p>
+					<a
+						href={SOURCE_URL}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="transition-colors hover:text-(--site-ink)"
+					>
+						{t("footer.source")}
+					</a>
+				</div>
 			</Container>
 		</footer>
 	);

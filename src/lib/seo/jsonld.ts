@@ -147,6 +147,40 @@ export function aboutJsonLd({
 	);
 }
 
+interface PageJsonLdInput {
+	locale: string;
+	path: string;
+	name: string;
+	breadcrumbs: Crumb[];
+	/** schema.org page type, e.g. ContactPage. */
+	type?: "WebPage" | "ContactPage";
+}
+
+/** A page about the person (experience, contact): page + person + trail. */
+export function pageJsonLd({
+	locale,
+	path,
+	name,
+	breadcrumbs,
+	type = "WebPage",
+}: PageJsonLdInput) {
+	const url = absoluteUrl(localizedPath(locale, path));
+	return graph(
+		{
+			"@type": type,
+			"@id": `${url}#webpage`,
+			url,
+			name,
+			inLanguage: locale,
+			isPartOf: { "@id": WEBSITE_ID },
+			about: { "@id": PERSON_ID },
+			...(type === "ContactPage" && { mainEntity: { "@id": PERSON_ID } }),
+		},
+		personJsonLd(),
+		breadcrumbJsonLd(breadcrumbs),
+	);
+}
+
 /** /projects and /blog listings. */
 export function collectionJsonLd(
 	locale: string,

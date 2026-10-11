@@ -8,8 +8,20 @@ import { cn } from "@/lib/utils";
 import { ContactInputField, ContactTextareaField } from "./ContactFormField";
 import { useContactForm } from "./hooks/useContactForm";
 
-export function ContactForm() {
+/** Roomier fields for the contact page. */
+const FIELD_PAGE = "px-3.5 py-2.5 text-base rounded-lg bg-(--surface)";
+
+interface ContactFormProps {
+	/**
+	 * window — compact form inside the desktop app (heading, hidden labels)
+	 * page   — the contact page: visible labels, roomier fields, no heading
+	 */
+	variant?: "window" | "page";
+}
+
+export function ContactForm({ variant = "window" }: ContactFormProps) {
 	const t = useTranslations("ContactWindow");
+	const page = variant === "page";
 	const {
 		fields,
 		setField,
@@ -25,26 +37,35 @@ export function ContactForm() {
 
 	return (
 		<form
-			className="px-6 py-5"
+			className={page ? undefined : "px-6 py-5"}
 			noValidate
 			onSubmit={(e) => {
 				e.preventDefault();
 				void submit();
 			}}
 		>
-			<div className="flex items-center gap-2 mb-4">
-				<div className="h-px flex-1 bg-(--border)" aria-hidden="true" />
-				<h2 className="text-[10px] font-semibold uppercase tracking-widest shrink-0 text-(--text-muted)">
-					{t("sendMessage")}
-				</h2>
-				<div className="h-px flex-1 bg-(--border)" aria-hidden="true" />
-			</div>
+			{!page && (
+				<div className="flex items-center gap-2 mb-4">
+					<div className="h-px flex-1 bg-(--border)" aria-hidden="true" />
+					<h2 className="text-[10px] font-semibold uppercase tracking-widest shrink-0 text-(--text-muted)">
+						{t("sendMessage")}
+					</h2>
+					<div className="h-px flex-1 bg-(--border)" aria-hidden="true" />
+				</div>
+			)}
 
-			<div className="space-y-3">
-				<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+			<div className={page ? "space-y-5" : "space-y-3"}>
+				<div
+					className={cn(
+						"grid grid-cols-1 sm:grid-cols-2",
+						page ? "gap-5" : "gap-3",
+					)}
+				>
 					<ContactInputField
 						id="contact-name"
 						label={t("nameLabel")}
+						labelVisible={page}
+						className={page ? FIELD_PAGE : undefined}
 						placeholder={t("namePlaceholder")}
 						type="text"
 						value={fields.name}
@@ -57,6 +78,8 @@ export function ContactForm() {
 					<ContactInputField
 						id="contact-email"
 						label={t("emailLabel")}
+						labelVisible={page}
+						className={page ? FIELD_PAGE : undefined}
 						placeholder={t("emailPlaceholder")}
 						type="email"
 						value={fields.email}
@@ -71,10 +94,12 @@ export function ContactForm() {
 				<ContactTextareaField
 					id="contact-message"
 					label={t("messageLabel")}
+					labelVisible={page}
+					className={page ? FIELD_PAGE : undefined}
 					placeholder={t("messagePlaceholder")}
 					value={fields.message}
 					onChange={(e) => setField("message")(e.target.value)}
-					rows={4}
+					rows={page ? 7 : 4}
 					disabled={busy}
 					maxLength={CONTACT_LIMITS.message}
 					required
@@ -128,7 +153,10 @@ export function ContactForm() {
 					type="submit"
 					disabled={!canSubmit}
 					className={cn(
-						"w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed",
+						"w-full flex items-center justify-center gap-2 font-semibold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed",
+						page
+							? "h-11 rounded-lg text-[0.95rem]"
+							: "py-2.5 rounded-xl text-sm",
 						status === "sent"
 							? "bg-[#10b981]"
 							: status === "error"
