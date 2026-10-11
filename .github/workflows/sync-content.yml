@@ -16,8 +16,9 @@ jobs:
 
       - uses: ./.github/actions/setup
 
+      # `pnpm add -g` fails on runners (no global bin dir); npm's global works.
       - name: Install Wrangler
-        run: pnpm add -g wrangler
+        run: npm install -g wrangler
 
       - name: Upload content to R2
         run: node scripts/upload-content.mjs
