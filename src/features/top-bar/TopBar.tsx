@@ -6,6 +6,7 @@ import { useSpotify } from "./hooks/useSpotify";
 import { SystemStatus } from "./SystemStatus";
 import { SettingsMenu } from "./setting/SettingsMenu";
 import { SpotifyBadge } from "./spotify/SpotifyBadge";
+import { WebsiteLink } from "./WebsiteLink";
 
 /** GNOME-style top bar — always dark, like the real Ubuntu panel. */
 export default function TopBar() {
@@ -23,6 +24,7 @@ export default function TopBar() {
 			</div>
 
 			<div className="flex items-center gap-0.5">
+				<WebsiteLink />
 				{track && <SpotifyBadge track={track} updatedAt={updatedAt} />}
 				<SystemStatus />
 				<SettingsMenu />

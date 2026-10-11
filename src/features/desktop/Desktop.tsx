@@ -6,6 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 import { BootScreen } from "@/features/boot/BootScreen";
 import { CommandPalette } from "@/features/command-palette/CommandPalette";
 import { DesktopBackground } from "@/features/desktop/DesktopBackground";
+import { useDeepLink } from "@/features/desktop/useDeepLink";
 import { Dock } from "@/features/dock/Dock";
 import { OnboardingTour } from "@/features/onboarding/OnboardingTour";
 import { Screensaver } from "@/features/screensaver/Screensaver";
@@ -33,6 +34,7 @@ const dragCallbacks = {
 export function Desktop() {
 	// null = not known yet (SSR / first paint): render nothing to avoid a flash.
 	const [booting, setBooting] = useState<boolean | null>(null);
+	useDeepLink();
 
 	useEffect(() => {
 		setBooting(!storage.get("session", BOOTED_KEY));

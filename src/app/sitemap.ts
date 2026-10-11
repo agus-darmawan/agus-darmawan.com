@@ -37,6 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	return [
 		...localized("", { changeFrequency: "monthly", priority: 1 }),
 		...localized("/about", { changeFrequency: "monthly", priority: 0.9 }),
+		...localized("/experience", { changeFrequency: "monthly", priority: 0.8 }),
 		...localized(listingPath("project"), {
 			changeFrequency: "weekly",
 			priority: 0.8,
@@ -45,6 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 			changeFrequency: "weekly",
 			priority: 0.8,
 		}),
+		...localized("/contact", { changeFrequency: "yearly", priority: 0.5 }),
 		...projects.flatMap((p) =>
 			localized(contentPath(p), {
 				lastModified: lastModified(p.date),

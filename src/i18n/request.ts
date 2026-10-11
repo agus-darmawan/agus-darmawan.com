@@ -13,6 +13,7 @@ const MESSAGE_FILES = [
 	"onboarding",
 	"content",
 	"seo",
+	"site",
 ] as const;
 
 async function loadMessages(locale: string) {

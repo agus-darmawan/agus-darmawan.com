@@ -93,7 +93,7 @@ test("a project opens inside the Projects window, not a new tab", async ({
 	await win.getByRole("link").first().click();
 	await expect(win.getByRole("button", { name: "All projects" })).toBeVisible();
 	await expect(win.getByRole("heading", { level: 2 }).first()).toBeVisible();
-	expect(page.url()).toMatch(/\/en$/);
+	expect(page.url()).toMatch(/\/en\/desktop$/);
 	expect(context.pages()).toHaveLength(pages);
 });
 
@@ -108,6 +108,9 @@ test("command palette launches apps", async ({ page }) => {
 		if (!(await palette.isVisible())) await page.keyboard.press("Control+k");
 		await expect(palette).toBeVisible({ timeout: 1_000 });
 	}).toPass();
+	// The search box takes focus a frame after the dialog paints; typing
+	// before that would land in the terminal.
+	await expect(palette.getByRole("combobox")).toBeFocused();
 	await page.keyboard.type("blog");
 	await page.keyboard.press("Enter");
 	await expect(windowNamed(page, "Blog")).toBeVisible();

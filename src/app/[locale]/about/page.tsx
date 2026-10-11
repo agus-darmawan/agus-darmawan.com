@@ -1,21 +1,21 @@
-import { Download, FolderGit2, Mail } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { PageShell } from "@/components/seo/PageShell";
-import { resumeUrl, SITE } from "@/config/site";
-import { AboutContent } from "@/features/about/AboutContent";
-import { AboutSection } from "@/features/about/AboutSection";
+import { SITE } from "@/config/site";
 import {
 	AWARDS,
 	EDUCATION,
 	PUBLICATIONS,
 	SKILL_GROUPS,
 } from "@/features/about/about.data";
-import { ExperienceTimeline } from "@/features/experience/ExperienceCard";
-import { EXPERIENCES } from "@/features/experience/experience.data";
-import { Link } from "@/i18n/navigation";
-import { listingPath } from "@/lib/content/paths";
+import { AwardsList } from "@/features/site/about/AwardsList";
+import { EducationList } from "@/features/site/about/EducationList";
+import { ProfileHeader } from "@/features/site/about/ProfileHeader";
+import { PublicationsList } from "@/features/site/about/PublicationsList";
+import { SkillGroups } from "@/features/site/about/SkillGroups";
+import { Container } from "@/features/site/Container";
+import { Section } from "@/features/site/Section";
+import { SiteShell } from "@/features/site/SiteShell";
 import { aboutJsonLd, toJsonLdCrumbs } from "@/lib/seo/jsonld";
 import { pageMetadata } from "@/lib/seo/metadata";
 
@@ -37,27 +37,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 /**
- * Crawlable, visible version of the About + Experience windows — the page
- * that should rank for "Agus Darmawan". Same components as the desktop.
+ * The page that should rank for "Agus Darmawan": who he is, what he knows,
+ * where he studied, awards and papers. Work history has its own page.
  */
 export default async function AboutPage({ params }: Props) {
 	const { locale } = await params;
 	setRequestLocale(locale);
 
-	const [t, about, tExp] = await Promise.all([
+	const [t, about] = await Promise.all([
 		getTranslations({ locale, namespace: "Seo" }),
 		getTranslations({ locale, namespace: "AboutWindow" }),
-		getTranslations({ locale, namespace: "ExperienceWindow" }),
 	]);
 
 	const crumbs = [
 		{ name: SITE.shortName, href: "/" },
 		{ name: t("aboutTitle"), href: PATH },
 	];
-	const cv = resumeUrl(locale);
 
 	return (
-		<PageShell path={PATH} breadcrumbs={crumbs}>
+		<SiteShell>
 			<JsonLd
 				data={aboutJsonLd({
 					locale,
@@ -77,40 +75,28 @@ export default async function AboutPage({ params }: Props) {
 					breadcrumbs: toJsonLdCrumbs(locale, crumbs),
 				})}
 			/>
-
-			<article className="rounded-2xl overflow-hidden border border-(--border) bg-(--surface)">
-				<AboutContent>
-					<AboutSection title={tExp("title")}>
-						<ExperienceTimeline entries={EXPERIENCES} headingLevel={3} />
-					</AboutSection>
-				</AboutContent>
-
-				<footer className="flex flex-wrap gap-2 px-6 py-5">
-					{cv && (
-						<a
-							href={cv}
-							className="inline-flex items-center gap-1.5 rounded-lg bg-[#e95420] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
-						>
-							<Download size={13} aria-hidden="true" />
-							{t("downloadCv")}
-						</a>
-					)}
-					<a
-						href={`mailto:${SITE.email}`}
-						className="inline-flex items-center gap-1.5 rounded-lg border border-(--border) px-3 py-1.5 text-xs font-medium text-(--text-secondary) hover:border-[#e95420] hover:text-[#e95420]"
+			<Container className="pb-8">
+				<ProfileHeader />
+				<Section id="skills" title={about("skills")}>
+					<SkillGroups />
+				</Section>
+				<Section id="education" title={about("education")}>
+					<EducationList />
+				</Section>
+				{/* One rule across both columns; stacked, publications get their own. */}
+				<div className="grid gap-x-16 border-t border-(--site-line) lg:grid-cols-2">
+					<Section id="awards" title={about("awards")} className="border-t-0">
+						<AwardsList />
+					</Section>
+					<Section
+						id="publications"
+						title={about("publications")}
+						className="lg:border-t-0"
 					>
-						<Mail size={13} aria-hidden="true" />
-						{t("emailMe")}
-					</a>
-					<Link
-						href={listingPath("project")}
-						className="inline-flex items-center gap-1.5 rounded-lg border border-(--border) px-3 py-1.5 text-xs font-medium text-(--text-secondary) hover:border-[#e95420] hover:text-[#e95420]"
-					>
-						<FolderGit2 size={13} aria-hidden="true" />
-						{t("projectsTitle")}
-					</Link>
-				</footer>
-			</article>
-		</PageShell>
+						<PublicationsList />
+					</Section>
+				</div>
+			</Container>
+		</SiteShell>
 	);
 }

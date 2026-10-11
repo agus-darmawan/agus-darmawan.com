@@ -1,7 +1,38 @@
+import type { NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
+import { UI_MODE_COOKIE, UI_MODE_MAX_AGE } from "./lib/ui-mode";
 
-export default createMiddleware(routing);
+const intl = createMiddleware(routing);
+
+export default function proxy(request: NextRequest) {
+	const response = intl(request);
+
+	// The bare domain reopens the view the visitor chose last. Only "/":
+	// explicit URLs always render what they name, and crawlers (no cookie)
+	// always get the website.
+	if (
+		request.nextUrl.pathname === "/" &&
+		request.cookies.get(UI_MODE_COOKIE)?.value === "desktop"
+	) {
+		const location = response.headers.get("location");
+		if (location) {
+			const target = new URL(location, request.url);
+			target.pathname = `${target.pathname.replace(/\/$/, "")}/desktop`;
+			response.headers.set("location", target.toString());
+			// Safari expires cookies written by JavaScript after 7 days;
+			// re-issuing it from the server keeps the choice for regulars.
+			response.cookies.set(UI_MODE_COOKIE, "desktop", {
+				path: "/",
+				maxAge: UI_MODE_MAX_AGE,
+				sameSite: "lax",
+				secure: request.nextUrl.protocol === "https:",
+			});
+		}
+	}
+
+	return response;
+}
 
 export const config = {
 	// Skip API routes, Next internals, files with an extension, and

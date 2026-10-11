@@ -1,0 +1,59 @@
+name: Dependabot auto-merge
+
+# Turns on GitHub auto-merge for Dependabot PRs: the PR merges itself only
+# when every required check on main has passed. Patch and minor npm updates
+# and GitHub Actions updates qualify; major npm updates get a comment and
+# wait for a review.
+#
+# One-time repository setup (otherwise nothing waits for CI):
+#   Settings → General → Pull Requests → "Allow auto-merge"
+#   Settings → Rules → Rulesets → main: require a pull request and the status
+#   checks "Lint, types, unit tests" and "Build + end-to-end"
+
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    name: Auto-merge Dependabot
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'agus-darmawan/agus-darmawan.com'
+    steps:
+      - name: Read the update
+        id: metadata
+        # Pinned to a commit: this job holds a write token. Dependabot bumps it.
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Decide
+        id: decide
+        env:
+          ECOSYSTEM: ${{ steps.metadata.outputs.package-ecosystem }}
+          UPDATE: ${{ steps.metadata.outputs.update-type }}
+        run: |
+          case "$ECOSYSTEM/$UPDATE" in
+            github_actions/* | */version-update:semver-patch | */version-update:semver-minor)
+              echo "merge=true" >> "$GITHUB_OUTPUT" ;;
+            *)
+              echo "merge=false" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - name: Merge once CI passes
+        if: steps.decide.outputs.merge == 'true'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Ask for a review
+        if: steps.decide.outputs.merge != 'true' && github.event.action == 'opened'
+        run: |
+          gh pr comment "$PR_URL" --body "This update (${DEPS}) needs a review: major versions aren't merged automatically. Read the changelog, check the preview deployment, then merge."
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          DEPS: ${{ steps.metadata.outputs.dependency-names }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -2,15 +2,10 @@
 	"Seo": {
 		"homeTitle": "Agus Darmawan — Robotics & Full-Stack Developer",
 		"homeDescription": "I Wayan Agus Darmawan (Agus Darmawan) — robotics software engineer & full-stack developer from Bali. ROS2 autonomous robots, quadruped inspection, Next.js.",
-		"skipToProfile": "Skip to text version of this portfolio",
-		"profileHeading": "About {name}",
 		"projectsTitle": "Projects",
 		"projectsDescription": "Robotics, autonomous systems and web projects by Agus Darmawan — ROS2 navigation, quadruped inspection robots, dashboards and research.",
 		"blogTitle": "Blog",
 		"blogDescription": "Articles by Agus Darmawan on robotics, ROS2, full-stack web development and building things that actually work.",
-		"home": "Home",
-		"elsewhere": "Find me on",
-		"language": "Language",
 		"projectBy": "Project by {name}",
 		"postBy": "Article by {name}",
 		"aboutTitle": "About",
@@ -20,6 +15,15 @@
 		"emailMe": "Email me",
 		"notFoundTitle": "Page not found",
 		"notFoundBody": "The page you're looking for doesn't exist or has moved.",
-		"backHome": "Back to home"
+		"backHome": "Back to home",
+		"experienceTitle": "Experience",
+		"experienceDescription": "Agus Darmawan's work experience: robotics engineer at PT Ezra Robotics Teknologi, autonomous vehicles at ITS, the Barunastra roboboat team and full-stack web roles.",
+		"contactTitle": "Contact",
+		"contactDescription": "Get in touch with Agus Darmawan about robotics or full-stack work, collaborations and research, by email, LinkedIn, GitHub or the contact form.",
+		"desktopTitle": "Desktop",
+		"desktopDescription": "Agus Darmawan's portfolio as an interactive Ubuntu-style desktop, with windows, a terminal, a dock and a command palette.",
+		"desktopHeading": "{name}'s portfolio desktop",
+		"desktopNoScript": "The desktop needs JavaScript. The website has everything without it.",
+		"desktopNoScriptLink": "Open the website"
 	}
 }
