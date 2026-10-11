@@ -3,7 +3,7 @@
 > Portfolio of **I Wayan Agus Darmawan** — an interactive Ubuntu 22.04 GNOME desktop in the browser, plus fast, crawlable pages for every project and post.
 
 [![CI](https://github.com/agus-darmawan/agus-darmawan.com/actions/workflows/ci.yml/badge.svg)](https://github.com/agus-darmawan/agus-darmawan.com/actions)
-[![Live](https://img.shields.io/badge/live-agus--darmawan.com-e95420)](https://agus-darmawan.com)
+[![Live](https://img.shields.io/badge/live-agus--darmawan.com-e95420)](https://www.agus-darmawan.com)
 
 Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · Zustand · TanStack Query · Framer Motion · next-intl · Zod · Vitest · Biome
 
@@ -92,7 +92,7 @@ integration simply turns its feature off.
 | `SMTP_*`, `CONTACT_EMAIL` | Contact form delivery (logs in dev otherwise) |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Bot protection |
 | `GITHUB_TOKEN` | GitHub API 60 → 5000 req/h (recommended in prod) |
-| `NEXT_PUBLIC_APP_URL` | Canonical base URL (defaults to `https://agus-darmawan.com`) |
+| `NEXT_PUBLIC_APP_URL` | Canonical base URL (defaults to `https://www.agus-darmawan.com`) |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Search Console ownership meta tag |
 | `NEXT_PUBLIC_CONTENT_URL` | R2 CDN for the resume PDFs |
 | `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN` | Error tracking |
@@ -154,4 +154,4 @@ src/
 
 ## License
 
-MIT © [I Wayan Agus Darmawan](https://agus-darmawan.com)
+MIT © [I Wayan Agus Darmawan](https://www.agus-darmawan.com)

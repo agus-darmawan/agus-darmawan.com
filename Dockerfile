@@ -32,7 +32,7 @@ COPY . .
 
 # Build args — only NEXT_PUBLIC_* are inlined at build time. Runtime secrets
 # (Spotify, SMTP, GitHub…) belong in `docker run --env-file`, not in layers.
-ARG NEXT_PUBLIC_APP_URL=https://agus-darmawan.com
+ARG NEXT_PUBLIC_APP_URL=https://www.agus-darmawan.com
 ARG NEXT_PUBLIC_SENTRY_DSN
 ARG SENTRY_AUTH_TOKEN
 
