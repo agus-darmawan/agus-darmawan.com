@@ -6,14 +6,16 @@ export function TogglePill({ active }: { active: boolean }) {
 		<span
 			aria-hidden
 			className={cn(
-				"relative w-10 h-5 rounded-full transition-colors duration-200",
+				"relative block w-10 h-5 shrink-0 rounded-full transition-colors duration-200",
 				active ? "bg-ubuntu-orange" : "bg-white/20",
 			)}
 		>
+			{/* Explicit `left`: an absolute box without one sits at its static
+			    position, which pushed the knob past the right edge. */}
 			<span
 				className={cn(
-					"absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200",
-					active ? "translate-x-5" : "translate-x-0.5",
+					"absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow transition-transform duration-200",
+					active ? "translate-x-5" : "translate-x-0",
 				)}
 			/>
 		</span>
