@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { SITE } from "@/config/site";
 
 /**
  * Server-side environment.
@@ -28,7 +29,10 @@ const envSchema = z.object({
 		.transform((v) => v === "true" || v === "1"),
 	SMTP_USER: optional,
 	SMTP_PASS: optional,
-	CONTACT_EMAIL: z.email().default("darmawandeveloper@gmail.com"),
+	// An empty value (as copied from .env.example) falls back to SITE.email.
+	CONTACT_EMAIL: optional
+		.pipe(z.email().optional())
+		.transform((v) => v ?? SITE.email),
 
 	// ── Cloudflare Turnstile (skips verification if not set) ──────────────────
 	TURNSTILE_SECRET_KEY: optional,
