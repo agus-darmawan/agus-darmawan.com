@@ -17,7 +17,7 @@ import { homeJsonLd } from "@/lib/seo/jsonld";
 // Re-generate hourly so GitHub stars / auto-discovered repos stay fresh.
 export const revalidate = 3600;
 
-const SUBHEADING = "mb-5 text-lg font-medium text-(--site-ink)";
+const SUBHEADING = "mb-4 text-base font-medium text-(--site-ink)";
 
 /**
  * The classic home page: who, proof, contact. The interactive desktop lives
@@ -55,7 +55,7 @@ export default async function HomePage({
 						</Link>
 					}
 				>
-					<ContentRows items={selected} headingLevel={3} />
+					<ContentRows items={selected} headingLevel={3} trailingRule={false} />
 				</Section>
 
 				<Section
@@ -93,7 +93,11 @@ export default async function HomePage({
 							</Link>
 						}
 					>
-						<ContentRows items={posts.slice(0, 3)} headingLevel={3} />
+						<ContentRows
+							items={posts.slice(0, 3)}
+							headingLevel={3}
+							trailingRule={false}
+						/>
 					</Section>
 				)}
 

@@ -31,7 +31,7 @@ export function ProjectIndex({ projects }: { projects: ProjectMeta[] }) {
 
 	return (
 		<>
-			<fieldset className="flex flex-wrap gap-2 pb-6">
+			<fieldset className="flex flex-wrap gap-2 pb-5">
 				<legend className="sr-only">{site("filter")}</legend>
 				{options.map(({ value, label, count }) => {
 					const active = value === category;
@@ -42,7 +42,7 @@ export function ProjectIndex({ projects }: { projects: ProjectMeta[] }) {
 							aria-pressed={active}
 							onClick={() => setCategory(value)}
 							className={cn(
-								"inline-flex h-9 items-center gap-2 rounded-full border px-4 text-sm transition-colors",
+								"inline-flex h-8 items-center gap-2 rounded-full border px-3.5 text-[0.8125rem] transition-colors",
 								active
 									? "border-transparent bg-(--site-primary) text-(--site-on-primary)"
 									: "border-(--site-line) text-(--site-text) hover:border-(--site-ink)",

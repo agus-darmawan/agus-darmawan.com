@@ -15,27 +15,29 @@ export function ProfileHeader() {
 	const cv = resumeUrl(useLocale());
 
 	return (
-		<header className="grid gap-8 pb-14 pt-14 sm:pt-20 md:grid-cols-[auto_1fr] md:gap-12">
+		<header className="grid gap-7 pb-12 pt-12 sm:pt-16 md:grid-cols-[auto_1fr] md:gap-10">
 			<Image
 				src="/avatar.png"
 				alt={about("name")}
-				width={160}
-				height={160}
+				width={128}
+				height={128}
 				priority
-				sizes="(min-width: 640px) 160px, 112px"
-				className="size-28 rounded-full object-cover ring-1 ring-(--site-line) sm:size-40"
+				sizes="(min-width: 640px) 128px, 96px"
+				className="size-24 rounded-full object-cover ring-1 ring-(--site-line) sm:size-32"
 			/>
 			<div className="min-w-0">
 				<h1 className={DISPLAY_HEADING}>{about("name")}</h1>
-				<p className="mt-3 text-xl text-(--site-ink)">{t("hero.role")}</p>
-				<p className="mt-2 flex items-center gap-1.5 text-(--site-muted)">
-					<MapPin className="size-4 shrink-0" aria-hidden />
+				<p className="mt-3 text-[1.0625rem] text-(--site-ink)">
+					{t("hero.role")}
+				</p>
+				<p className="mt-1.5 flex items-center gap-1.5 text-(--site-muted)">
+					<MapPin className="size-3.5 shrink-0" aria-hidden />
 					{about("location")}
 				</p>
-				<p className="mt-6 max-w-[65ch] text-lg leading-relaxed">
+				<p className="mt-5 max-w-[64ch] text-base leading-relaxed">
 					{about("bio")}
 				</p>
-				<div className="mt-8 flex flex-wrap items-center gap-3">
+				<div className="mt-7 flex flex-wrap items-center gap-2.5">
 					{cv && (
 						<a href={cv} className={buttonClass("primary")}>
 							<Download className="size-4" aria-hidden />

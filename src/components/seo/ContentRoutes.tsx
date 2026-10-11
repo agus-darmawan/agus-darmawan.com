@@ -94,7 +94,7 @@ export async function ListingPage({
 					toJsonLdCrumbs(locale, crumbs),
 				)}
 			/>
-			<Container className="pb-24">
+			<Container className="pb-20">
 				<PageHeader title={title} lede={t(listingKeys[kind].description)} />
 				{kind === "project" ? (
 					<ProjectIndex projects={items as ProjectMeta[]} />
@@ -177,7 +177,7 @@ export async function DetailPage({
 				<Breadcrumbs items={crumbs} />
 				<article>
 					<DetailHeader item={stripBody(item)} />
-					<div className="border-t border-(--site-line) pt-12 pb-16">
+					<div className="border-t border-(--site-line) pt-10 pb-14">
 						<MarkdownRenderer
 							content={item.body}
 							accentColor={item.color}

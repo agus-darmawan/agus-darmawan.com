@@ -38,7 +38,7 @@ export function ContactChannels() {
 			{channels.map(({ label, value, href, external }) => (
 				<div
 					key={label}
-					className="grid grid-cols-[6.5rem_1fr] gap-4 border-t border-(--site-line) py-4 first:border-t-0 sm:grid-cols-[8rem_1fr]"
+					className="grid grid-cols-[6rem_1fr] gap-4 border-t border-(--site-line) py-3.5 first:border-t-0 sm:grid-cols-[7rem_1fr]"
 				>
 					<dt className="text-(--site-muted)">{label}</dt>
 					<dd className="min-w-0 break-words">

@@ -40,34 +40,39 @@ export function SiteHeader() {
 
 	return (
 		<header className="sticky top-0 z-40 border-b border-(--site-line) bg-(--site-bg)/85 backdrop-blur-md">
-			<Container className="flex h-16 items-center gap-8">
+			<Container className="flex h-14 items-center gap-6">
 				<SiteLogo />
 
-				<nav aria-label={t("primaryNav")} className="hidden lg:block">
-					<ul className="flex items-center gap-1">
-						{links.map(({ href, label, active }) => (
-							<li key={href}>
-								<Link
-									href={href}
-									aria-current={active ? "page" : undefined}
-									className={cn(
-										"rounded-md px-3 py-2 text-[0.95rem] transition-colors",
-										active
-											? "text-(--site-ink) underline decoration-ubuntu-orange decoration-2 underline-offset-8"
-											: "text-(--site-muted) hover:text-(--site-ink)",
-									)}
-								>
-									{label}
-								</Link>
-							</li>
-						))}
-					</ul>
-				</nav>
-
-				<div className="ml-auto flex items-center gap-1 sm:gap-2">
+				{/* Pages and preferences share the right edge, logo alone on the left. */}
+				<div className="ml-auto flex items-center gap-1">
+					<nav aria-label={t("primaryNav")} className="hidden lg:block">
+						<ul className="flex items-center">
+							{links.map(({ href, label, active }) => (
+								<li key={href}>
+									<Link
+										href={href}
+										aria-current={active ? "page" : undefined}
+										className={cn(
+											"relative rounded-md px-3 py-1.5 text-sm transition-colors",
+											"after:absolute after:inset-x-3 after:-bottom-[0.6rem] after:h-0.5 after:rounded-full after:bg-ubuntu-orange after:transition-opacity",
+											active
+												? "font-medium text-(--site-ink) after:opacity-100"
+												: "text-(--site-muted) after:opacity-0 hover:text-(--site-ink)",
+										)}
+									>
+										{label}
+									</Link>
+								</li>
+							))}
+						</ul>
+					</nav>
+					<span
+						aria-hidden="true"
+						className="mx-2 hidden h-4 w-px bg-(--site-line) lg:block"
+					/>
 					<LocaleSwitch className="max-sm:hidden" />
 					<ThemeToggle className="max-sm:hidden" />
-					<OpenDesktopLink compact />
+					<OpenDesktopLink compact className="ml-1" />
 					<button
 						ref={toggleRef}
 						type="button"
@@ -75,12 +80,12 @@ export function SiteHeader() {
 						aria-expanded={open}
 						aria-controls="site-menu"
 						aria-label={open ? t("closeMenu") : t("menu")}
-						className="inline-flex size-9 items-center justify-center rounded-lg text-(--site-ink) hover:bg-(--site-raised) lg:hidden"
+						className="inline-flex size-8 items-center justify-center rounded-lg text-(--site-ink) hover:bg-(--site-raised) lg:hidden"
 					>
 						{open ? (
-							<X className="size-5" aria-hidden />
+							<X className="size-[1.125rem]" aria-hidden />
 						) : (
-							<Menu className="size-5" aria-hidden />
+							<Menu className="size-[1.125rem]" aria-hidden />
 						)}
 					</button>
 				</div>
@@ -100,7 +105,7 @@ export function SiteHeader() {
 											href={href}
 											aria-current={active ? "page" : undefined}
 											className={cn(
-												"block py-3.5 text-lg",
+												"block py-3 text-base",
 												active
 													? "font-medium text-(--site-ink)"
 													: "text-(--site-text)",

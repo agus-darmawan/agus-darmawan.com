@@ -17,7 +17,7 @@ export function SkillGroups() {
 						/>
 						{t(group.labelKey)}
 					</h3>
-					<ul className="mt-4 space-y-2 border-l border-(--site-line) pl-5">
+					<ul className="mt-3 space-y-1.5 border-l border-(--site-line) pl-4">
 						{group.skills.map((skill) => (
 							<li key={skill}>{skill}</li>
 						))}

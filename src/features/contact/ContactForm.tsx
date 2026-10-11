@@ -10,7 +10,7 @@ import { useContactForm } from "./hooks/useContactForm";
 
 /** Roomier fields for the contact page, with outlines that pass 3:1. */
 const FIELD_PAGE =
-	"px-3.5 py-2.5 text-base rounded-lg bg-(--surface) border-(--site-field)";
+	"px-3.5 py-2.5 text-[0.9375rem] rounded-lg bg-(--surface) border-(--site-field)";
 
 /**
  * Status colours. The desktop keeps its own; on the website every text and
@@ -185,9 +185,7 @@ export function ContactForm({ variant = "window" }: ContactFormProps) {
 					disabled={!canSubmit}
 					className={cn(
 						"w-full flex items-center justify-center gap-2 font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed",
-						page
-							? "h-11 rounded-lg text-[0.95rem]"
-							: "py-2.5 rounded-xl text-sm",
+						page ? "h-10 rounded-lg text-sm" : "py-2.5 rounded-xl text-sm",
 						status === "sent"
 							? tone.sentButton
 							: status === "error"

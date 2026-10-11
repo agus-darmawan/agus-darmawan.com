@@ -13,7 +13,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
 	return (
 		<nav
 			aria-label={t("breadcrumb")}
-			className="pt-8 text-sm text-(--site-muted)"
+			className="pt-6 text-[0.8125rem] text-(--site-muted)"
 		>
 			<ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
 				{items.map((crumb, i) => {

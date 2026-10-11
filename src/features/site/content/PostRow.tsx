@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { contentPath } from "@/lib/content/paths";
 import type { BlogMeta } from "@/lib/content/types";
 import { formatDate } from "@/lib/format";
+import { ITEM_TITLE } from "../typography";
 
 /** A post in the writing list: date column, title, summary, reading time. */
 export function PostRow({
@@ -17,14 +18,14 @@ export function PostRow({
 	const Heading = headingLevel === 2 ? "h2" : "h3";
 
 	return (
-		<article className="group relative grid gap-x-10 gap-y-2 py-7 sm:grid-cols-[10rem_1fr]">
-			<p className="text-(--site-muted) tabular-nums">
+		<article className="group relative grid gap-x-10 gap-y-1.5 py-6 sm:grid-cols-[9rem_1fr]">
+			<p className="text-[0.875rem] text-(--site-muted) tabular-nums sm:pt-0.5">
 				<time dateTime={post.date}>
 					{formatDate(post.date, locale, "long")}
 				</time>
 			</p>
 			<div className="min-w-0">
-				<Heading className="text-xl font-medium leading-snug text-(--site-ink)">
+				<Heading className={ITEM_TITLE}>
 					<Link
 						href={contentPath(post)}
 						className="decoration-ubuntu-orange decoration-2 underline-offset-[5px] after:absolute after:inset-0 after:content-[''] group-hover:underline"
@@ -32,8 +33,10 @@ export function PostRow({
 						{post.title}
 					</Link>
 				</Heading>
-				<p className="mt-2 max-w-[65ch] leading-relaxed">{post.description}</p>
-				<p className="mt-3 text-sm text-(--site-muted)">
+				<p className="mt-1.5 max-w-[65ch] leading-relaxed">
+					{post.description}
+				</p>
+				<p className="mt-2.5 text-[0.8125rem] text-(--site-muted)">
 					{t("readTime", { min: post.readingTime })}
 				</p>
 			</div>

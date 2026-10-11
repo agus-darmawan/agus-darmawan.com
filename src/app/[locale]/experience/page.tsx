@@ -56,9 +56,9 @@ export default async function ExperiencePage({ params }: Props) {
 					breadcrumbs: toJsonLdCrumbs(locale, crumbs),
 				})}
 			/>
-			<Container className="pb-24">
+			<Container className="pb-20">
 				<PageHeader title={t("experienceTitle")} lede={exp("headerDesc")}>
-					<div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+					<div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-4">
 						<p className="text-(--site-ink)">
 							{site("experience.summary", {
 								roles: summary.roles,
@@ -74,7 +74,7 @@ export default async function ExperiencePage({ params }: Props) {
 						)}
 					</div>
 				</PageHeader>
-				<div className="border-t border-(--site-line) pt-12">
+				<div className="border-t border-(--site-line) pt-10">
 					<CareerTimeline />
 				</div>
 			</Container>

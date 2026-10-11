@@ -108,6 +108,9 @@
 
 	background-color: var(--site-bg);
 	color: var(--site-text);
+	/* Ubuntu runs large: 15px body text reads like 16px elsewhere. */
+	font-size: 0.9375rem;
+	line-height: 1.6;
 }
 
 .dark .site {

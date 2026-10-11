@@ -16,7 +16,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
 			<main
 				id="content"
 				tabIndex={-1}
-				className="flex-1 scroll-mt-16 outline-none"
+				className="flex-1 scroll-mt-14 outline-none"
 			>
 				{children}
 			</main>

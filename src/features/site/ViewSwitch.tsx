@@ -8,7 +8,7 @@ export function ViewSwitch() {
 	const t = useTranslations("Site.footer");
 
 	return (
-		<div className="inline-flex rounded-lg border border-(--site-line) p-0.5 text-sm">
+		<div className="inline-flex rounded-lg border border-(--site-line) p-0.5 text-[0.8125rem]">
 			<span
 				aria-current="true"
 				className="rounded-md bg-(--site-bg) px-2.5 py-1 font-medium text-(--site-ink) shadow-sm"

@@ -12,7 +12,9 @@ import { ViewSwitch } from "./ViewSwitch";
 const SOURCE_URL = `https://github.com/${SITE.github.username}/agus-darmawan.com`;
 
 const LINK =
-	"text-(--site-text) transition-colors hover:text-(--site-ink) hover:underline decoration-ubuntu-orange underline-offset-4";
+	"text-sm text-(--site-text) transition-colors hover:text-(--site-ink) hover:underline decoration-ubuntu-orange underline-offset-4";
+
+const COLUMN_TITLE = "text-sm font-medium text-(--site-ink)";
 
 function FooterColumn({
 	title,
@@ -23,8 +25,8 @@ function FooterColumn({
 }) {
 	return (
 		<div>
-			<h2 className="text-[0.95rem] font-medium text-(--site-ink)">{title}</h2>
-			<ul className="mt-4 space-y-2.5">{children}</ul>
+			<h2 className={COLUMN_TITLE}>{title}</h2>
+			<ul className="mt-3.5 space-y-2">{children}</ul>
 		</div>
 	);
 }
@@ -42,15 +44,15 @@ export function SiteFooter() {
 
 	return (
 		<footer className="border-t border-(--site-line) bg-(--site-raised)/50">
-			<Container className="grid grid-cols-2 gap-x-6 gap-y-10 py-14 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr]">
+			<Container className="grid grid-cols-2 gap-x-6 gap-y-10 py-12 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr]">
 				<div className="col-span-2 lg:col-span-1">
 					<SiteLogo />
-					<p className="mt-4 max-w-[32ch] leading-relaxed text-(--site-muted)">
+					<p className="mt-3.5 max-w-[32ch] text-sm leading-relaxed text-(--site-muted)">
 						{t("footer.tagline")}
 					</p>
 					<a
 						href={`mailto:${SITE.email}`}
-						className="mt-4 inline-block break-all text-(--site-link) underline-offset-4 hover:underline"
+						className="mt-3 inline-block break-all text-sm text-(--site-link) underline-offset-4 hover:underline"
 					>
 						{SITE.email}
 					</a>
@@ -87,10 +89,8 @@ export function SiteFooter() {
 				</FooterColumn>
 
 				<div className="col-span-2 lg:col-span-1">
-					<h2 className="text-[0.95rem] font-medium text-(--site-ink)">
-						{t("footer.preferences")}
-					</h2>
-					<dl className="mt-3 space-y-2">
+					<h2 className={COLUMN_TITLE}>{t("footer.preferences")}</h2>
+					<dl className="mt-2.5 space-y-1.5 text-sm">
 						<div className="flex items-center justify-between gap-4">
 							<dt className="text-(--site-muted)">{t("language")}</dt>
 							<dd>
@@ -114,7 +114,7 @@ export function SiteFooter() {
 			</Container>
 
 			<Container>
-				<div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-(--site-line) py-6 text-sm text-(--site-muted)">
+				<div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-(--site-line) py-5 text-[0.8125rem] text-(--site-muted)">
 					<p>
 						{t("footer.copyright", {
 							year: new Date().getFullYear(),

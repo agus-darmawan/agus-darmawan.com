@@ -10,7 +10,7 @@ export function PublicationsList() {
 			{PUBLICATIONS.map((pub) => (
 				<li
 					key={pub.id}
-					className="grid grid-cols-[3.5rem_1fr] gap-x-5 border-t border-(--site-line) py-4 first:border-t-0 first:pt-0"
+					className="grid grid-cols-[3rem_1fr] gap-x-5 border-t border-(--site-line) py-3.5 first:border-t-0 first:pt-0"
 				>
 					<p className="tabular-nums text-(--site-muted)">{pub.year}</p>
 					<div>
@@ -23,7 +23,9 @@ export function PublicationsList() {
 							{t(pub.titleKey)}
 						</a>
 						<p className="mt-1 text-(--site-muted)">{t(pub.authorsKey)}</p>
-						<p className="text-sm text-(--site-muted)">{t(pub.venueKey)}</p>
+						<p className="text-[0.8125rem] text-(--site-muted)">
+							{t(pub.venueKey)}
+						</p>
 					</div>
 				</li>
 			))}

@@ -50,13 +50,13 @@ export default async function ContactPage({ params }: Props) {
 					breadcrumbs: toJsonLdCrumbs(locale, crumbs),
 				})}
 			/>
-			<Container className="pb-24">
+			<Container className="pb-20">
 				<PageHeader title={t("contactTitle")} lede={contact("headerDesc")} />
 				<div className="grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
 					<section aria-labelledby="direct">
 						<h2
 							id="direct"
-							className="mb-5 text-xl font-medium text-(--site-ink)"
+							className="mb-4 text-lg font-medium text-(--site-ink)"
 						>
 							{site("contact.direct")}
 						</h2>
@@ -64,12 +64,12 @@ export default async function ContactPage({ params }: Props) {
 					</section>
 					<section
 						aria-labelledby="message"
-						className="rounded-2xl border border-(--site-line) bg-(--site-raised)/60 p-5 sm:p-8"
+						className="rounded-2xl border border-(--site-line) bg-(--site-raised)/60 p-5 sm:p-7"
 					>
-						<h2 id="message" className="text-xl font-medium text-(--site-ink)">
+						<h2 id="message" className="text-lg font-medium text-(--site-ink)">
 							{site("contact.formTitle")}
 						</h2>
-						<p className="mb-6 mt-1.5 text-(--site-muted)">
+						<p className="mb-5 mt-1 text-(--site-muted)">
 							{site("contact.formNote")}
 						</p>
 						<ContactForm variant="page" />

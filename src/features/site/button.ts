@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 const BASE =
-	"inline-flex h-11 items-center justify-center gap-2 rounded-lg px-5 text-[0.95rem] font-medium whitespace-nowrap transition-[background-color,border-color,color,opacity] duration-150";
+	"inline-flex h-10 items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium whitespace-nowrap transition-[background-color,border-color,color,opacity] duration-150";
 
 const VARIANTS = {
 	/** Inverted ink: aubergine on light, pale on dark. */

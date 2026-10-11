@@ -26,7 +26,7 @@ export function LocaleSwitch({ className }: { className?: string }) {
 						hrefLang={code}
 						aria-current={current ? "true" : undefined}
 						className={cn(
-							"rounded-md px-2 py-1.5 text-sm uppercase transition-colors",
+							"rounded-md px-1.5 py-1 text-[0.8125rem] uppercase transition-colors",
 							current
 								? "font-medium text-(--site-ink)"
 								: "text-(--site-muted) hover:text-(--site-ink)",
