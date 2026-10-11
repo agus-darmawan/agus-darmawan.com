@@ -4,10 +4,9 @@
  * change it here, not in five different files.
  */
 export const SITE = {
-	url: (process.env.NEXT_PUBLIC_APP_URL ?? "https://agus-darmawan.com").replace(
-		/\/$/,
-		"",
-	),
+	url: (
+		process.env.NEXT_PUBLIC_APP_URL || "https://www.agus-darmawan.com"
+	).replace(/\/$/, ""),
 	name: "I Wayan Agus Darmawan",
 	shortName: "Agus Darmawan",
 	alternateNames: ["Agus Darmawan", "Wayan Agus Darmawan", "agus-darmawan"],
