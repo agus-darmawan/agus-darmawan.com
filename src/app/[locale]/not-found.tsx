@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { buttonClass } from "@/features/site/button";
 import { Container } from "@/features/site/Container";
 import { SiteShell } from "@/features/site/SiteShell";
 import { Link } from "@/i18n/navigation";
@@ -14,27 +15,21 @@ export default function NotFound() {
 				<p aria-hidden="true" className="text-6xl mb-4">
 					🤖
 				</p>
-				<h1 className="text-2xl font-bold">{t("notFoundTitle")}</h1>
-				<p className="mt-2 text-sm text-(--text-secondary)">
-					{t("notFoundBody")}
-				</p>
-				<div className="mt-6 flex flex-wrap justify-center gap-2 text-sm">
-					<Link
-						href="/"
-						className="rounded-lg bg-[#e95420] px-3 py-1.5 font-medium text-white hover:opacity-90"
-					>
+				<h1 className="text-[clamp(1.75rem,4vw,2.5rem)] font-light text-(--site-ink)">
+					{t("notFoundTitle")}
+				</h1>
+				<p className="mt-3 text-(--site-muted)">{t("notFoundBody")}</p>
+				<div className="mt-8 flex flex-wrap justify-center gap-3">
+					<Link href="/" className={buttonClass("primary")}>
 						{t("backHome")}
 					</Link>
 					<Link
 						href={listingPath("project")}
-						className="rounded-lg border border-(--border) px-3 py-1.5 hover:border-[#e95420]"
+						className={buttonClass("secondary")}
 					>
 						{t("projectsTitle")}
 					</Link>
-					<Link
-						href={listingPath("blog")}
-						className="rounded-lg border border-(--border) px-3 py-1.5 hover:border-[#e95420]"
-					>
+					<Link href={listingPath("blog")} className={buttonClass("secondary")}>
 						{t("blogTitle")}
 					</Link>
 				</div>

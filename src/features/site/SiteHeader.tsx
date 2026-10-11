@@ -2,7 +2,7 @@
 
 import { Menu, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { Container } from "./Container";
@@ -18,11 +18,15 @@ export function SiteHeader() {
 	// The menu belongs to the page it was opened on: navigating closes it.
 	const [menuFor, setMenuFor] = useState<string | null>(null);
 	const open = menuFor === pathname;
+	const toggleRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
 		if (!open) return;
 		const onKey = (e: KeyboardEvent) => {
-			if (e.key === "Escape") setMenuFor(null);
+			if (e.key !== "Escape") return;
+			setMenuFor(null);
+			// Focus was probably inside the menu that just disappeared.
+			toggleRef.current?.focus();
 		};
 		window.addEventListener("keydown", onKey);
 		return () => window.removeEventListener("keydown", onKey);
@@ -65,6 +69,7 @@ export function SiteHeader() {
 					<ThemeToggle className="max-sm:hidden" />
 					<OpenDesktopLink compact />
 					<button
+						ref={toggleRef}
 						type="button"
 						onClick={() => setMenuFor(open ? null : pathname)}
 						aria-expanded={open}

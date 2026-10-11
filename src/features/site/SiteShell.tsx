@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
+import { SkipLink } from "./SkipLink";
 
 /** Frame of every classic-site page: skip link, header, content, footer. */
 export function SiteShell({ children }: { children: ReactNode }) {
@@ -9,14 +10,14 @@ export function SiteShell({ children }: { children: ReactNode }) {
 
 	return (
 		<div className="site flex min-h-dvh flex-col">
-			<a
-				href="#content"
-				className="sr-only rounded-lg bg-(--site-primary) px-4 py-2 text-sm font-medium text-(--site-on-primary) focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50"
-			>
-				{t("skipToContent")}
-			</a>
+			<SkipLink target="content">{t("skipToContent")}</SkipLink>
 			<SiteHeader />
-			<main id="content" tabIndex={-1} className="flex-1 outline-none">
+			{/* scroll-mt: lands below the sticky header, not under it. */}
+			<main
+				id="content"
+				tabIndex={-1}
+				className="flex-1 scroll-mt-16 outline-none"
+			>
 				{children}
 			</main>
 			<SiteFooter />

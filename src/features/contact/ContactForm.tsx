@@ -8,8 +8,28 @@ import { cn } from "@/lib/utils";
 import { ContactInputField, ContactTextareaField } from "./ContactFormField";
 import { useContactForm } from "./hooks/useContactForm";
 
-/** Roomier fields for the contact page. */
-const FIELD_PAGE = "px-3.5 py-2.5 text-base rounded-lg bg-(--surface)";
+/** Roomier fields for the contact page, with outlines that pass 3:1. */
+const FIELD_PAGE =
+	"px-3.5 py-2.5 text-base rounded-lg bg-(--surface) border-(--site-field)";
+
+/**
+ * Status colours. The desktop keeps its own; on the website every text and
+ * button colour passes WCAG AA in both themes.
+ */
+const TONES = {
+	window: {
+		error: "text-[#c7162b]",
+		sent: "text-[#10b981]",
+		idle: "bg-[#e95420] text-white",
+		sentButton: "bg-[#10b981] text-white",
+	},
+	page: {
+		error: "text-[#c7162b] dark:text-[#f87171]",
+		sent: "text-[#0e8420] dark:text-[#34d399]",
+		idle: "bg-(--site-primary) text-(--site-on-primary)",
+		sentButton: "bg-[#0e8420] text-white",
+	},
+} as const;
 
 interface ContactFormProps {
 	/**
@@ -22,6 +42,7 @@ interface ContactFormProps {
 export function ContactForm({ variant = "window" }: ContactFormProps) {
 	const t = useTranslations("ContactWindow");
 	const page = variant === "page";
+	const tone = TONES[variant];
 	const {
 		fields,
 		setField,
@@ -136,13 +157,23 @@ export function ContactForm({ variant = "window" }: ContactFormProps) {
 
 				<div aria-live="polite" role="status">
 					{status === "error" && failure && (
-						<p className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs bg-[#c7162b]/10 border border-[#c7162b]/20 text-[#c7162b]">
+						<p
+							className={cn(
+								"flex items-center gap-2 px-3 py-2 rounded-xl text-xs bg-[#c7162b]/10 border border-[#c7162b]/20",
+								tone.error,
+							)}
+						>
 							<AlertCircle size={13} className="shrink-0" aria-hidden="true" />
 							{t(`errors.${failure}`)}
 						</p>
 					)}
 					{status === "sent" && (
-						<p className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs bg-[#10b981]/10 border border-[#10b981]/20 text-[#10b981]">
+						<p
+							className={cn(
+								"flex items-center gap-2 px-3 py-2 rounded-xl text-xs bg-[#10b981]/10 border border-[#10b981]/20",
+								tone.sent,
+							)}
+						>
 							<CheckCircle2 size={13} className="shrink-0" aria-hidden="true" />
 							{t("sent")}
 						</p>
@@ -153,15 +184,15 @@ export function ContactForm({ variant = "window" }: ContactFormProps) {
 					type="submit"
 					disabled={!canSubmit}
 					className={cn(
-						"w-full flex items-center justify-center gap-2 font-semibold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed",
+						"w-full flex items-center justify-center gap-2 font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed",
 						page
 							? "h-11 rounded-lg text-[0.95rem]"
 							: "py-2.5 rounded-xl text-sm",
 						status === "sent"
-							? "bg-[#10b981]"
+							? tone.sentButton
 							: status === "error"
-								? "bg-[#c7162b]"
-								: "bg-[#e95420]",
+								? "bg-[#c7162b] text-white"
+								: tone.idle,
 					)}
 				>
 					{busy ? (
