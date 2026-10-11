@@ -1,32 +1,8 @@
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { accentStyle } from "@/components/content/primitives";
 import { EXPERIENCES } from "@/features/experience/experience.data";
 import { companySpan } from "@/features/experience/experience.utils";
-import { formatYearMonth } from "@/lib/format";
-
-function Period({
-	start,
-	end,
-	present,
-	locale,
-}: {
-	start: string;
-	end: string | null;
-	present: string;
-	locale: string;
-}) {
-	return (
-		<>
-			<time dateTime={start}>{formatYearMonth(start, locale)}</time>
-			{" – "}
-			{end ? (
-				<time dateTime={end}>{formatYearMonth(end, locale)}</time>
-			) : (
-				present
-			)}
-		</>
-	);
-}
+import { Period } from "./Period";
 
 /**
  * Every organization with its roles on one rail — promotions read as
@@ -35,8 +11,6 @@ function Period({
 export function CareerTimeline() {
 	const t = useTranslations("ExperienceWindow");
 	const tExp = useTranslations("Experience");
-	const locale = useLocale();
-	const present = t("present");
 
 	return (
 		<ol>
@@ -56,12 +30,7 @@ export function CareerTimeline() {
 								{tExp(`${entry.i18nKey}.location`)}
 							</p>
 							<p className="mt-1 text-sm tabular-nums text-(--site-muted)">
-								<Period
-									start={span.start}
-									end={span.end}
-									present={present}
-									locale={locale}
-								/>
+								<Period start={span.start} end={span.end} />
 							</p>
 						</div>
 
@@ -85,8 +54,6 @@ export function CareerTimeline() {
 												<Period
 													start={role.period.start}
 													end={role.period.end}
-													present={present}
-													locale={locale}
 												/>
 											</p>
 										</div>

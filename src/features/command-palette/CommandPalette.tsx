@@ -1,6 +1,6 @@
 "use client";
 
-import { Languages, Moon, Search, Sun, X } from "lucide-react";
+import { Languages, Moon, PanelsTopLeft, Search, Sun, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import {
@@ -14,6 +14,7 @@ import {
 	useState,
 } from "react";
 import { APPS } from "@/config/apps";
+import { useOpenWebsite } from "@/features/desktop/website";
 import { useSwitchLocale } from "@/hooks/useSwitchLocale";
 import { cn } from "@/lib/utils";
 import { useWindowStore } from "@/store/useWindowStore";
@@ -40,6 +41,7 @@ export function CommandPalette() {
 	const { resolvedTheme, setTheme } = useTheme();
 	const { locale, switchLocale } = useSwitchLocale();
 	const openWindow = useWindowStore((s) => s.openWindow);
+	const openWebsite = useOpenWebsite();
 	const isDark = resolvedTheme !== "light";
 
 	const commands = useMemo<Command[]>(
@@ -72,8 +74,16 @@ export function CommandPalette() {
 				action: () => switchLocale(),
 				keywords: ["language", "lang", "bahasa", "english", "indonesia"],
 			},
+			{
+				id: "website",
+				label: t("website"),
+				sublabel: t("websiteHint"),
+				icon: <PanelsTopLeft size={14} aria-hidden />,
+				action: openWebsite,
+				keywords: ["website", "classic", "web", "page", "situs", "klasik"],
+			},
 		],
-		[isDark, locale, openWindow, setTheme, switchLocale, t, tApps],
+		[isDark, locale, openWebsite, openWindow, setTheme, switchLocale, t, tApps],
 	);
 
 	const filtered = useMemo(() => {

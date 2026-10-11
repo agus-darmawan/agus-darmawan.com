@@ -5,10 +5,9 @@ import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { SITE } from "@/config/site";
 import { Breadcrumbs } from "@/features/site/Breadcrumbs";
 import { Container } from "@/features/site/Container";
+import { ContentRows } from "@/features/site/content/ContentRows";
 import { DetailHeader } from "@/features/site/content/DetailHeader";
-import { PostRow } from "@/features/site/content/PostRow";
 import { ProjectIndex } from "@/features/site/content/ProjectIndex";
-import { ProjectRow } from "@/features/site/content/ProjectRow";
 import { PageHeader } from "@/features/site/PageHeader";
 import { Section } from "@/features/site/Section";
 import { SiteShell } from "@/features/site/SiteShell";
@@ -53,29 +52,6 @@ const listingKeys = {
 
 const stripBody = ({ body: _, ...meta }: WithBody<ContentMeta>) =>
 	meta as ContentMeta;
-
-/** Rows for a list of mixed items; one component per kind. */
-function ContentRows({
-	items,
-	headingLevel = 2,
-}: {
-	items: ContentMeta[];
-	headingLevel?: 2 | 3;
-}) {
-	return (
-		<ul className="border-t border-(--site-line)">
-			{items.map((item) => (
-				<li key={item.slug} className="border-b border-(--site-line)">
-					{item.kind === "project" ? (
-						<ProjectRow project={item} headingLevel={headingLevel} />
-					) : (
-						<PostRow post={item} headingLevel={headingLevel} />
-					)}
-				</li>
-			))}
-		</ul>
-	);
-}
 
 // ── Listing (/projects, /blog) ───────────────────────────────────────────────
 

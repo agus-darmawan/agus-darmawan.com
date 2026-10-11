@@ -50,7 +50,7 @@ test("open/close drive other windows; close never closes the terminal", async ({
 test("the session survives a language switch", async ({ page }) => {
 	await run(page, "echo persistent");
 	await run(page, "lang id");
-	await expect(page).toHaveURL(/\/id$/);
+	await expect(page).toHaveURL(/\/id\/desktop$/);
 	await expect(page.getByRole("log")).toContainText("persistent");
 	await run(page, "exit", "Perintah");
 	await expect(windowNamed(page, "Terminal")).toHaveCount(0);

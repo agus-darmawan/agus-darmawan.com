@@ -6,7 +6,7 @@ export async function openDesktop(page: Page, locale: "en" | "id" = "en") {
 		sessionStorage.setItem("hasBooted", "1");
 		localStorage.setItem("onboardingSeen", "1");
 	});
-	await page.goto(`/${locale}`);
+	await page.goto(`/${locale}/desktop`);
 	await page.getByRole("navigation", { name: "Dock" }).waitFor();
 }
 

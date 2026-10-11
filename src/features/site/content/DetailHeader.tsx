@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import {
 	ContentLinks,
 	useMetaLabels,
@@ -6,14 +5,8 @@ import {
 import { accentStyle, MetaRow } from "@/components/content/primitives";
 import type { ContentMeta } from "@/lib/content/types";
 
-/** Title block of a project or post page. `actions` sits beside the links. */
-export function DetailHeader({
-	item,
-	actions,
-}: {
-	item: ContentMeta;
-	actions?: ReactNode;
-}) {
+/** Title block of a project or post page. */
+export function DetailHeader({ item }: { item: ContentMeta }) {
 	const labels = useMetaLabels(item, "long");
 
 	return (
@@ -45,11 +38,9 @@ export function DetailHeader({
 					</li>
 				))}
 			</ul>
-			{(actions ||
-				(item.kind === "project" && (item.repoUrl || item.demo))) && (
-				<div className="mt-7 flex flex-wrap items-center gap-3">
+			{item.kind === "project" && (item.repoUrl || item.demo) && (
+				<div className="mt-7">
 					<ContentLinks item={item} size="lg" />
-					{actions}
 				</div>
 			)}
 		</header>

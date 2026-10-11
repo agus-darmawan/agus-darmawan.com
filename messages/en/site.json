@@ -22,7 +22,6 @@
 			"light": "Light"
 		},
 		"openDesktop": "Open desktop",
-		"openInDesktop": "Open in the desktop",
 		"hero": {
 			"role": "Robotics engineer and full-stack developer",
 			"lede": "I write the software that lets quadruped robots inspect electrical substations, and the web dashboards their operators rely on. Before that, I built autonomous boats that won an international competition.",
@@ -41,14 +40,12 @@
 		"experience": {
 			"title": "Experience",
 			"all": "Full experience",
-			"summary": "{roles, plural, one {# role} other {# roles}} at {orgs, plural, one {# organization} other {# organizations}} since {year}.",
-			"current": "Current"
+			"summary": "{roles, plural, one {# role} other {# roles}} at {orgs, plural, one {# organization} other {# organizations}} since {year}."
 		},
 		"recognition": {
 			"title": "Recognition",
 			"awards": "Awards",
-			"publications": "Publications",
-			"read": "Read the paper"
+			"publications": "Publications"
 		},
 		"writing": {
 			"title": "Writing",

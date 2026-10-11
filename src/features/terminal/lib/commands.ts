@@ -29,6 +29,7 @@ export type Effect =
 	| { type: "close"; app?: AppId }
 	| { type: "theme"; mode: "dark" | "light" }
 	| { type: "lang"; locale: Locale }
+	| { type: "website" }
 	| { type: "vim"; dir: string; filename: string; content: string };
 
 export interface Context {
@@ -485,6 +486,14 @@ const COMMANDS: Record<string, Command> = {
 					}
 				: err("Usage: lang <en|id>"),
 	},
+	website: {
+		usage: "website",
+		description: "switch to the classic website (also: classic)",
+		run: () => ({
+			...out("Opening the website…"),
+			effect: { type: "website" },
+		}),
+	},
 	exit: {
 		usage: "exit",
 		description: "close the terminal",
@@ -492,7 +501,11 @@ const COMMANDS: Record<string, Command> = {
 	},
 };
 
-const ALIASES: Record<string, string> = { nano: "vim", gs: "git status" };
+const ALIASES: Record<string, string> = {
+	nano: "vim",
+	gs: "git status",
+	classic: "website",
+};
 
 function helpText() {
 	const rows = Object.values(COMMANDS).map((c) => [c.usage, c.description]);

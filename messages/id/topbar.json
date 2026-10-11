@@ -10,7 +10,9 @@
 		"charging": "Mengisi Daya",
 		"offline": "Offline",
 		"settings": "Menu sistem",
-		"albumCover": "Sampul album {album}"
+		"albumCover": "Sampul album {album}",
+		"website": "Website",
+		"websiteHint": "Beralih ke website klasik"
 	},
 	"CommandPalette": {
 		"title": "Palet perintah",
@@ -24,6 +26,8 @@
 		"navigate": "navigasi",
 		"select": "pilih",
 		"close": "Tutup",
+		"website": "Tampilan website",
+		"websiteHint": "Beralih ke website klasik",
 		"keywords": {
 			"about": "saya,bio,profil",
 			"terminal": "cli,bash,shell",
