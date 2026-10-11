@@ -101,6 +101,17 @@ test("Back still works after landing on a desktop deep link", async ({
 	await expect(windowNamed(page, "Projects")).toBeVisible();
 });
 
+test("the skip link moves focus without adding history", async ({ page }) => {
+	await page.goto("/en/projects");
+	await page.keyboard.press("Tab");
+	await expect(
+		page.getByRole("link", { name: "Skip to content" }),
+	).toBeFocused();
+	await page.keyboard.press("Enter");
+	await expect(page.getByRole("main")).toBeFocused();
+	await expect(page).toHaveURL(/\/en\/projects$/);
+});
+
 test("the terminal can leave for the website", async ({ page }) => {
 	await page.goto("/en/desktop?open=terminal");
 	const input = page.getByRole("textbox", { name: "Command" });

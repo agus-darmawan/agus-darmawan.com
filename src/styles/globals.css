@@ -95,6 +95,8 @@
 	--site-link: #c2421a;
 	--site-primary: #2c001e;
 	--site-on-primary: #ffffff;
+	/* Form field outlines: 3:1 against the page and the raised panels. */
+	--site-field: #8f8984;
 
 	--surface: var(--site-bg);
 	--surface-secondary: var(--site-raised);
@@ -118,6 +120,7 @@
 	--site-link: #f47c4c;
 	--site-primary: #fbf4f8;
 	--site-on-primary: #190a16;
+	--site-field: #6f5f69;
 }
 
 /* Anchored headings clear the sticky header. */
