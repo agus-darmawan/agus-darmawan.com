@@ -5,11 +5,13 @@ import type { RefObject } from "react";
 import type { PDFDocumentProxy } from "./hooks/usePdfLoader";
 import { ResumePageCanvas } from "./ResumePageCanvas";
 
+const pageNumbers = (count: number) =>
+	Array.from({ length: count }, (_, i) => i + 1);
+
 interface ResumeViewerProps {
 	pdf: PDFDocumentProxy | null;
-	numPages: number;
 	isLoading: boolean;
-	error: string | null;
+	failed: boolean;
 	zoom: number;
 	containerRef: RefObject<HTMLDivElement | null>;
 	canvasRefs: RefObject<(HTMLCanvasElement | null)[]>;
@@ -19,49 +21,56 @@ interface ResumeViewerProps {
 
 export function ResumeViewer({
 	pdf,
-	numPages,
 	isLoading,
-	error,
+	failed,
 	zoom,
 	containerRef,
 	canvasRefs,
 	loadingText,
 	errorText,
 }: ResumeViewerProps) {
-	// Cast to any so Array.from can render pages — PDFDocumentProxy is `unknown`
-	// at compile time to avoid importing pdfjs-dist at module level (SSR crash).
-	// biome-ignore lint/suspicious/noExplicitAny: intentional SSR workaround
-	const doc = pdf as any;
-
 	return (
-		<div ref={containerRef} className="flex-1 overflow-auto bg-[#525659]">
+		<div
+			ref={containerRef}
+			className="relative flex-1 overflow-auto bg-slate-500 dark:bg-[#525659]"
+		>
 			<div className="py-6 px-4 flex flex-col items-center gap-5">
-				{isLoading && (
-					<div className="flex flex-col items-center justify-center gap-3 mt-24">
-						<Loader2 size={28} className="animate-spin text-zinc-400" />
-						<p className="text-sm text-zinc-300">{loadingText}</p>
-					</div>
-				)}
+				{isLoading && <PdfLoading text={loadingText} />}
 
-				{error && !isLoading && (
-					<div className="mt-24 px-6 py-4 rounded text-sm text-center max-w-sm bg-red-950 text-red-400">
+				{failed && (
+					<p
+						role="alert"
+						className="mt-24 px-6 py-4 rounded text-sm text-center max-w-sm bg-red-950 text-red-400"
+					>
 						{errorText}
-					</div>
+					</p>
 				)}
 
-				{doc !== null &&
-					Array.from({ length: numPages }, (_, i) => (
+				{pdf &&
+					pageNumbers(pdf.numPages).map((page) => (
 						<ResumePageCanvas
-							key={`page-${i + 1}`}
-							pdf={doc}
-							pageNumber={i + 1}
+							key={page}
+							pdf={pdf}
+							pageNumber={page}
 							zoom={zoom}
 							canvasRef={(el) => {
-								canvasRefs.current[i] = el;
+								canvasRefs.current[page - 1] = el;
 							}}
 						/>
 					))}
 			</div>
+		</div>
+	);
+}
+
+export function PdfLoading({ text }: { text: string }) {
+	return (
+		<div
+			role="status"
+			className="flex flex-col items-center justify-center gap-3 mt-24"
+		>
+			<Loader2 size={28} className="animate-spin text-zinc-300" aria-hidden />
+			<p className="text-sm text-zinc-200">{text}</p>
 		</div>
 	);
 }

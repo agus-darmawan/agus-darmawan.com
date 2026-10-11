@@ -3,17 +3,18 @@
 		"title": "Resume",
 		"download": "Download PDF",
 		"loading": "Loading PDF…",
-		"errorLoad": "Failed to load PDF. Make sure the file exists in /public.",
+		"errorLoad": "Couldn't load the resume. Please try again later.",
 		"zoomIn": "Zoom in",
 		"zoomOut": "Zoom out",
 		"resetZoom": "Reset zoom",
 		"prevPage": "Previous page",
 		"nextPage": "Next page",
-		"pageOf": "of"
+		"pageOf": "of",
+		"loadingViewer": "Loading PDF viewer…"
 	},
 	"TerminalWindow": {
 		"title": "Terminal",
-		"welcome": "Ubuntu 22.04.3 LTS — darm@wan — portfolio terminal",
+		"welcome": "Ubuntu 22.04.3 LTS — agus@ubuntu — portfolio terminal",
 		"helpHint": "Type \"help\" for available commands.",
 		"placeholder": "Type a command...",
 		"hintTab": "Tab",
@@ -32,7 +33,13 @@
 		"vimQuitDesc": "=quit",
 		"vimSaveQuit": ":wq",
 		"vimSaveQuitDesc": "=save & quit",
-		"sessionClosed": "Session closed. Goodbye!"
+		"label": "Terminal",
+		"outputLabel": "Terminal output",
+		"inputLabel": "Command",
+		"vimLabel": "Vim editor",
+		"fetching": "Fetching stats…",
+		"noWindow": "close: no other window to close",
+		"closed": "Closed {app}."
 	},
 	"ContactWindow": {
 		"title": "Contact",
@@ -44,6 +51,19 @@
 		"emailPlaceholder": "your@email.com",
 		"messagePlaceholder": "Tell me about your project or idea…",
 		"send": "Send Message",
-		"sent": "Message sent!"
+		"sent": "Message sent!",
+		"sending": "Sending…",
+		"nameLabel": "Name",
+		"emailLabel": "Email",
+		"messageLabel": "Message",
+		"locationLabel": "Location",
+		"errors": {
+			"invalid_input": "Please check your name, email and message.",
+			"rate_limited": "Too many messages — please try again in a few minutes.",
+			"verification_failed": "Bot verification failed — please try again.",
+			"not_configured": "The contact form is offline right now — please email me directly.",
+			"send_failed": "Couldn't send your message — please try again or email me.",
+			"network": "Network error — please try again."
+		}
 	}
 }

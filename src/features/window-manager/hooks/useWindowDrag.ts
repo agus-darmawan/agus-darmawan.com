@@ -1,65 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { WindowState } from "@/types/app";
+import {
+	DRAG_THRESHOLD,
+	floatingWidth,
+	SNAP_THRESHOLD,
+	TOP_BAR_HEIGHT,
+} from "@/constants/window";
+import type { SnapZone, WindowState } from "@/types/app";
 
-// ── Snap config ───────────────────────────────────────────────────────────────
-
-const SNAP_THRESHOLD = 48; // px from edge to trigger snap
-const TOP_BAR_HEIGHT = 32; // height of the top bar
-
-type SnapZone = "left" | "right" | "full" | null;
-
-interface SnapResult {
-	snapped: boolean;
-	zone: SnapZone;
-	x: number;
-	y: number;
-	width?: string;
-	height?: string;
+/** Which zone (if any) the pointer is over, in viewport coordinates. */
+function getSnapZone(clientX: number, clientY: number): SnapZone {
+	if (clientX < SNAP_THRESHOLD) return "left";
+	if (clientX > window.innerWidth - SNAP_THRESHOLD) return "right";
+	if (clientY < TOP_BAR_HEIGHT + SNAP_THRESHOLD) return "full";
+	return null;
 }
-
-function getSnapPosition(x: number, y: number): SnapResult {
-	const vw = window.innerWidth;
-
-	// Snap left — drag to left edge
-	if (x < SNAP_THRESHOLD) {
-		return {
-			snapped: true,
-			zone: "left",
-			x: 0,
-			y: TOP_BAR_HEIGHT,
-			width: "50vw",
-			height: `calc(100vh - ${TOP_BAR_HEIGHT}px)`,
-		};
-	}
-
-	// Snap right — drag to right edge
-	if (x > vw - SNAP_THRESHOLD) {
-		return {
-			snapped: true,
-			zone: "right",
-			x: vw / 2,
-			y: TOP_BAR_HEIGHT,
-			width: "50vw",
-			height: `calc(100vh - ${TOP_BAR_HEIGHT}px)`,
-		};
-	}
-
-	// Snap top — maximize
-	if (y < TOP_BAR_HEIGHT + SNAP_THRESHOLD) {
-		return {
-			snapped: true,
-			zone: "full",
-			x: 0,
-			y: TOP_BAR_HEIGHT,
-			width: "100vw",
-			height: `calc(100vh - ${TOP_BAR_HEIGHT}px)`,
-		};
-	}
-
-	return { snapped: false, zone: null, x, y };
-}
-
-// ── Types ─────────────────────────────────────────────────────────────────────
 
 interface UseWindowDragOptions {
 	getWindows: () => WindowState[];
@@ -68,65 +22,118 @@ interface UseWindowDragOptions {
 	onSnap: (id: string, zone: SnapZone) => void;
 }
 
-// ── Hook ──────────────────────────────────────────────────────────────────────
+interface PressState {
+	id: string;
+	startX: number;
+	startY: number;
+	/** Pointer → window position offset, in the same space as `win.position`. */
+	offsetX: number;
+	offsetY: number;
+	/** Where the pointer grabbed the window and how wide it was (for unsnapping). */
+	grabX: number;
+	rectWidth: number;
+	wasSnapped: boolean;
+	/** Floating position before the drag, restored when the drop snaps again. */
+	origin: { x: number; y: number };
+	started: boolean;
+}
 
+/**
+ * Title-bar dragging with edge snapping.
+ *
+ * A press only becomes a drag after the pointer moves DRAG_THRESHOLD px, and
+ * presses on title-bar controls are ignored. Previously mousedown alone
+ * un-snapped the window, so clicking ✕ on a window snapped to full screen
+ * shrank it to a half-screen snap (the click never reached the button)
+ * instead of closing it.
+ */
 export function useWindowDrag({
 	getWindows,
 	onBringToFront,
 	onPositionChange,
 	onSnap,
 }: UseWindowDragOptions) {
+	const [armed, setArmed] = useState<string | null>(null);
 	const [dragging, setDragging] = useState<string | null>(null);
-	const [snapPreview, setSnapPreview] = useState<SnapResult | null>(null);
-	const dragOffset = useRef({ x: 0, y: 0 });
+	const [snapPreview, setSnapPreview] = useState<SnapZone>(null);
+	const press = useRef<PressState | null>(null);
 
 	const handleMouseDown = useCallback(
 		(e: React.MouseEvent, id: string) => {
-			const win = getWindows().find((w) => w.id === id);
-			if (!win || win.maximized) return;
+			if (e.button !== 0) return;
+			// Mobile windows are always full screen and never draggable.
+			if (window.innerWidth < 768) return;
 
 			const target = e.target as HTMLElement;
 			if (!target.closest(".window-titlebar")) return;
+			if (target.closest("button, a, input, select, textarea")) return;
 
-			onBringToFront(id);
-			setDragging(id);
+			const win = getWindows().find((w) => w.id === id);
+			if (!win || win.maximized) return;
 
-			// Kalau window lagi snapped (half-screen), lepas dulu jadi floating
-			// sebelum mulai drag — biar user bisa narik dari posisi split.
-			if (win.snapZone) {
-				onSnap(id, null);
-			}
-
-			dragOffset.current = {
-				x: e.clientX - win.position.x,
-				y: e.clientY - win.position.y,
+			const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+			press.current = {
+				id,
+				startX: e.clientX,
+				startY: e.clientY,
+				offsetX: e.clientX - win.position.x,
+				offsetY: e.clientY - win.position.y,
+				grabX: e.clientX - rect.left,
+				rectWidth: rect.width,
+				wasSnapped: win.snapZone !== null,
+				origin: { ...win.position },
+				started: false,
 			};
+			setArmed(id);
 		},
-		[getWindows, onBringToFront, onSnap],
+		[getWindows],
 	);
 
 	useEffect(() => {
-		if (!dragging) return;
+		if (!armed) return;
 
 		const onMove = (e: MouseEvent) => {
-			const x = Math.max(0, e.clientX - dragOffset.current.x);
-			const y = Math.max(0, e.clientY - dragOffset.current.y);
+			const p = press.current;
+			if (!p) return;
 
-			onPositionChange(dragging, x, y);
+			if (!p.started) {
+				const moved = Math.hypot(e.clientX - p.startX, e.clientY - p.startY);
+				if (moved < DRAG_THRESHOLD) return;
+				p.started = true;
+				onBringToFront(p.id);
+				setDragging(p.id);
 
-			// Show snap preview
-			const snap = getSnapPosition(e.clientX, e.clientY);
-			setSnapPreview(snap.snapped ? snap : null);
+				if (p.wasSnapped) {
+					// Un-snap under the cursor: keep the grab point at the same
+					// relative x on the (narrower) floating window. Snapped windows
+					// sit at the container's top (y = 0), so y just follows the delta.
+					onSnap(p.id, null);
+					const ratio = floatingWidth(window.innerWidth) / p.rectWidth;
+					p.offsetX = p.grabX * ratio;
+					p.offsetY = p.startY;
+				}
+			}
+
+			onPositionChange(
+				p.id,
+				Math.max(0, e.clientX - p.offsetX),
+				Math.max(0, e.clientY - p.offsetY),
+			);
+			setSnapPreview(getSnapZone(e.clientX, e.clientY));
 		};
 
 		const onUp = (e: MouseEvent) => {
-			// Apply snap on release
-			const snap = getSnapPosition(e.clientX, e.clientY);
-			if (snap.snapped) {
-				onPositionChange(dragging, snap.x, snap.y);
-				onSnap(dragging, snap.zone);
+			const p = press.current;
+			if (p?.started) {
+				const zone = getSnapZone(e.clientX, e.clientY);
+				if (zone) {
+					onSnap(p.id, zone);
+					// Remember the pre-drag floating spot for when it's un-snapped.
+					onPositionChange(p.id, p.origin.x, p.origin.y);
+				}
 			}
-
+			press.current = null;
+			setArmed(null);
 			setDragging(null);
 			setSnapPreview(null);
 		};
@@ -137,7 +144,7 @@ export function useWindowDrag({
 			window.removeEventListener("mousemove", onMove);
 			window.removeEventListener("mouseup", onUp);
 		};
-	}, [dragging, onPositionChange, onSnap]);
+	}, [armed, onBringToFront, onPositionChange, onSnap]);
 
 	return { dragging, snapPreview, handleMouseDown };
 }

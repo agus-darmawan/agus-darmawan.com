@@ -1,48 +1,45 @@
 import { type RefObject, useCallback, useEffect, useState } from "react";
 
-interface UsePdfPageTrackerResult {
-	currentPage: number;
-	goToPage: (page: number) => void;
-	setCurrentPage: (page: number) => void;
-}
-
+/** Tracks the page in view and scrolls the viewer (not the page) to one. */
 export function usePdfPageTracker(
 	containerRef: RefObject<HTMLDivElement | null>,
 	canvasRefs: RefObject<(HTMLCanvasElement | null)[]>,
-): UsePdfPageTrackerResult {
+) {
 	const [currentPage, setCurrentPage] = useState(1);
 
 	useEffect(() => {
 		const container = containerRef.current;
 		if (!container) return;
 
-		const handleScroll = () => {
+		const onScroll = () => {
 			const containerTop = container.getBoundingClientRect().top;
-			const refs = canvasRefs.current;
-			for (let i = 0; i < refs.length; i++) {
-				const canvas = refs[i];
-				if (!canvas) continue;
+			const index = canvasRefs.current.findIndex((canvas) => {
+				if (!canvas) return false;
 				const { top, height } = canvas.getBoundingClientRect();
-				if (top - containerTop > -(height / 2)) {
-					setCurrentPage(i + 1);
-					break;
-				}
-			}
+				return top - containerTop > -(height / 2);
+			});
+			if (index !== -1) setCurrentPage(index + 1);
 		};
 
-		container.addEventListener("scroll", handleScroll, { passive: true });
-		return () => container.removeEventListener("scroll", handleScroll);
+		container.addEventListener("scroll", onScroll, { passive: true });
+		return () => container.removeEventListener("scroll", onScroll);
 	}, [containerRef, canvasRefs]);
 
 	const goToPage = useCallback(
 		(page: number) => {
-			const refs = canvasRefs.current;
-			const target = Math.max(1, Math.min(page, refs.length));
-			refs[target - 1]?.scrollIntoView({ behavior: "smooth", block: "start" });
+			const container = containerRef.current;
+			const pages = canvasRefs.current;
+			const target = Math.max(1, Math.min(page, pages.length));
+			const canvas = pages[target - 1];
+			if (!container || !canvas) return;
+			container.scrollTo({
+				top: canvas.offsetTop - 24,
+				behavior: "smooth",
+			});
 			setCurrentPage(target);
 		},
-		[canvasRefs],
+		[containerRef, canvasRefs],
 	);
 
-	return { currentPage, goToPage, setCurrentPage };
+	return { currentPage, goToPage };
 }

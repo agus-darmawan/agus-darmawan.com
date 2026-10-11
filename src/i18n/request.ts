@@ -1,6 +1,6 @@
 import { hasLocale } from "next-intl";
 import { getRequestConfig } from "next-intl/server";
-import { routing } from "./routing";
+import { routing, TIME_ZONE } from "./routing";
 
 const MESSAGE_FILES = [
 	"topbar",
@@ -11,6 +11,8 @@ const MESSAGE_FILES = [
 	"terminal-contact-resume",
 	"blog",
 	"onboarding",
+	"content",
+	"seo",
 ] as const;
 
 async function loadMessages(locale: string) {
@@ -30,6 +32,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
 	return {
 		locale,
+		// Explicit zone avoids SSR/CSR markup mismatches (and the
+		// ENVIRONMENT_FALLBACK warning) when ICU messages format dates.
+		timeZone: TIME_ZONE,
 		messages: await loadMessages(locale),
 	};
 });

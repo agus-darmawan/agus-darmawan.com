@@ -1,81 +1,63 @@
-// src/app/api/visitors/route.ts
 import { NextResponse } from "next/server";
 import type { ApiResponse } from "@/types/api";
 
-// Cache in memory — refresh every hour
-let cache: { count: number; timestamp: number } | null = null;
-const CACHE_TTL = 60 * 60 * 1000;
+const CACHE_TTL_MS = 60 * 60 * 1000;
+const WINDOW_DAYS = 30;
 
-async function fetchVisitorCount(): Promise<number> {
-	const accountId = process.env.CF_ACCOUNT_ID;
-	const siteTag = process.env.CF_SITE_TAG;
-	const apiToken = process.env.CF_API_TOKEN;
+let cache: { count: number; expires: number } | null = null;
 
-	if (!accountId || !siteTag || !apiToken) {
-		return 0;
-	}
+/** Page loads over the last 30 days from Cloudflare Web Analytics. */
+async function fetchVisitorCount(): Promise<number | null> {
+	const { CF_ACCOUNT_ID, CF_SITE_TAG, CF_API_TOKEN } = process.env;
+	if (!CF_ACCOUNT_ID || !CF_SITE_TAG || !CF_API_TOKEN) return null;
 
-	const query = `
-		query {
-			viewer {
-				accounts(filter: { accountTag: "${accountId}" }) {
-					total: rumPageloadEventsAdaptiveGroups(
-						filter: { siteTag: "${siteTag}" }
-						limit: 1
-						orderBy: [date_DESC]
-					) {
-						count
-					}
-				}
-			}
-		}
-	`;
+	const since = new Date(Date.now() - WINDOW_DAYS * 86_400_000)
+		.toISOString()
+		.slice(0, 10);
 
 	const res = await fetch("https://api.cloudflare.com/client/v4/graphql", {
 		method: "POST",
 		headers: {
-			Authorization: `Bearer ${apiToken}`,
+			Authorization: `Bearer ${CF_API_TOKEN}`,
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify({ query }),
+		body: JSON.stringify({
+			query: `query ($account: String!, $site: String!, $since: Date!) {
+				viewer {
+					accounts(filter: { accountTag: $account }) {
+						total: rumPageloadEventsAdaptiveGroups(
+							filter: { siteTag: $site, date_geq: $since }
+							limit: 1
+						) { count }
+					}
+				}
+			}`,
+			variables: { account: CF_ACCOUNT_ID, site: CF_SITE_TAG, since },
+		}),
+		signal: AbortSignal.timeout(5_000),
 	});
+	if (!res.ok) return null;
 
-	if (!res.ok) return 0;
-
-	const data = (await res.json()) as {
-		data?: {
-			viewer?: {
-				accounts?: Array<{
-					total?: Array<{ count: number }>;
-				}>;
-			};
-		};
+	const json = (await res.json()) as {
+		data?: { viewer?: { accounts?: { total?: { count: number }[] }[] } };
 	};
-
-	return data?.data?.viewer?.accounts?.[0]?.total?.[0]?.count ?? 0;
+	return json.data?.viewer?.accounts?.[0]?.total?.[0]?.count ?? null;
 }
 
 export async function GET() {
-	try {
-		// Return cached if fresh
-		if (cache && Date.now() - cache.timestamp < CACHE_TTL) {
-			return NextResponse.json<ApiResponse<{ count: number }>>({
+	if (!cache || Date.now() > cache.expires) {
+		const count = await fetchVisitorCount().catch(() => null);
+		// Only cache real answers — a failed lookup used to pin "0" for an hour.
+		if (count !== null) cache = { count, expires: Date.now() + CACHE_TTL_MS };
+	}
+
+	return cache
+		? NextResponse.json<ApiResponse<{ count: number }>>({
 				success: true,
 				data: { count: cache.count },
-			});
-		}
-
-		const count = await fetchVisitorCount();
-		cache = { count, timestamp: Date.now() };
-
-		return NextResponse.json<ApiResponse<{ count: number }>>({
-			success: true,
-			data: { count },
-		});
-	} catch {
-		return NextResponse.json<ApiResponse<{ count: number }>>({
-			success: true,
-			data: { count: 0 },
-		});
-	}
+			})
+		: NextResponse.json<ApiResponse<null>>(
+				{ success: false, data: null, error: "Visitor count unavailable" },
+				{ status: 503 },
+			);
 }

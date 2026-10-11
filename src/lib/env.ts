@@ -1,29 +1,54 @@
+import "server-only";
 import { z } from "zod";
 
+/**
+ * Server-side environment.
+ *
+ * Every integration is optional: a missing Spotify / SMTP / Turnstile key
+ * disables that feature instead of crashing unrelated routes (or the build).
+ */
+const optional = z
+	.string()
+	.optional()
+	.transform((v) => (v?.trim() ? v.trim() : undefined));
+
 const envSchema = z.object({
-	// ── Spotify (required) ────────────────────────────────────────────────────
-	SPOTIFY_CLIENT_ID: z.string().min(1),
-	SPOTIFY_CLIENT_SECRET: z.string().min(1),
-	SPOTIFY_REFRESH_TOKEN: z.string().min(1),
+	// ── Spotify (now-playing widget) ──────────────────────────────────────────
+	SPOTIFY_CLIENT_ID: optional,
+	SPOTIFY_CLIENT_SECRET: optional,
+	SPOTIFY_REFRESH_TOKEN: optional,
 
-	// ── SMTP (optional — logs to console if not set) ──────────────────────────
-	SMTP_HOST: z.string().optional(),
+	// ── SMTP (contact form — logs to console if not set) ──────────────────────
+	SMTP_HOST: optional,
 	SMTP_PORT: z.coerce.number().default(587),
-	SMTP_SECURE: z.coerce.boolean().default(false),
-	SMTP_USER: z.string().optional(),
-	SMTP_PASS: z.string().optional(),
-	CONTACT_EMAIL: z.string().email().default("darmawandeveloper@gmail.com"),
+	// NOTE: z.coerce.boolean() turns the string "false" into `true` — parse explicitly.
+	SMTP_SECURE: z
+		.string()
+		.optional()
+		.transform((v) => v === "true" || v === "1"),
+	SMTP_USER: optional,
+	SMTP_PASS: optional,
+	CONTACT_EMAIL: z.email().default("darmawandeveloper@gmail.com"),
 
-	// ── Cloudflare Turnstile (optional — skips verification if not set) ───────
-	TURNSTILE_SECRET_KEY: z.string().optional(),
+	// ── Cloudflare Turnstile (skips verification if not set) ──────────────────
+	TURNSTILE_SECRET_KEY: optional,
+
+	// ── GitHub (project enrichment — 60 → 5000 req/h when set) ───────────────
+	GITHUB_TOKEN: optional,
 });
 
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
 	console.error("❌ Invalid environment variables:");
-	console.error(parsed.error.flatten().fieldErrors);
+	console.error(z.flattenError(parsed.error).fieldErrors);
 	throw new Error("Invalid environment variables — check .env.example");
 }
 
 export const env = parsed.data;
+
+export const isSpotifyConfigured = Boolean(
+	env.SPOTIFY_CLIENT_ID &&
+		env.SPOTIFY_CLIENT_SECRET &&
+		env.SPOTIFY_REFRESH_TOKEN,
+);

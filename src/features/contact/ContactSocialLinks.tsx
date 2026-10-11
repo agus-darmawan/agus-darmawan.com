@@ -1,95 +1,86 @@
-"use client";
-
 import { Mail, MapPin } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { accentStyle } from "@/components/content/primitives";
+import { SITE } from "@/config/site";
 import { GithubIcon, LinkedinIcon } from "@/features/icons/BrandIcons";
 
-export const SOCIAL_LINKS = [
-	{
-		icon: GithubIcon,
-		label: "GitHub",
-		href: "https://github.com/agus-darmawan",
-		value: "@agus-darmawan",
-		color: "#6366f1",
-	},
-	{
-		icon: LinkedinIcon,
-		label: "LinkedIn",
-		href: "https://www.linkedin.com/in/agusdarmawnn/",
-		value: "Agus Darmawan",
-		color: "#0ea5e9",
-	},
-	{
-		icon: Mail,
-		label: "Email",
-		href: "mailto:darmawandeveloper@gmail.com",
-		value: "darmawandeveloper@gmail.com",
-		color: "#e95420",
-	},
-	{
-		icon: MapPin,
-		label: "Location",
-		href: null,
-		value: "Denpasar, Bali, Indonesia",
-		color: "#10b981",
-	},
-] as const;
+const CARD =
+	"flex items-center gap-2.5 px-3 py-2.5 rounded-xl border bg-(--surface-secondary) border-(--border)";
 
 export function ContactSocialLinks() {
+	const t = useTranslations("ContactWindow");
+	const about = useTranslations("AboutWindow");
+
+	const links = [
+		{
+			icon: GithubIcon,
+			label: "GitHub",
+			href: SITE.socials.GitHub,
+			value: `@${SITE.github.username}`,
+			color: "#6366f1",
+		},
+		{
+			icon: LinkedinIcon,
+			label: "LinkedIn",
+			href: SITE.socials.LinkedIn,
+			value: SITE.shortName,
+			color: "#0ea5e9",
+		},
+		{
+			icon: Mail,
+			label: t("emailLabel"),
+			href: `mailto:${SITE.email}`,
+			value: SITE.email,
+			color: "#e95420",
+		},
+		{
+			icon: MapPin,
+			label: t("locationLabel"),
+			href: null,
+			value: about("location"),
+			color: "#10b981",
+		},
+	];
+
 	return (
-		<div className="grid grid-cols-2 gap-2">
-			{SOCIAL_LINKS.map(({ icon: Icon, label, href, value, color }) => {
+		<ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+			{links.map(({ icon: Icon, label, href, value, color }) => {
 				const inner = (
 					<>
-						<div
-							className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-							style={{ background: `${color}18` }}
+						<span
+							aria-hidden="true"
+							className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-(--accent)/10 text-(--accent)"
 						>
-							<Icon size={14} style={{ color }} />
-						</div>
-						<div className="min-w-0">
-							<p className="text-[10px] font-medium uppercase tracking-wide text-(--text-muted)">
+							<Icon size={14} />
+						</span>
+						<span className="min-w-0">
+							<span className="block text-[10px] font-medium uppercase tracking-wide text-(--text-muted)">
 								{label}
-							</p>
-							<p className="text-xs truncate font-medium text-(--text-secondary)">
+							</span>
+							<span className="block text-xs truncate font-medium text-(--text-secondary)">
 								{value}
-							</p>
-						</div>
+							</span>
+						</span>
 					</>
 				);
 
-				if (!href) {
-					return (
-						<div
-							key={label}
-							className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border bg-(--surface-secondary) border-(--border)"
-						>
-							{inner}
-						</div>
-					);
-				}
-
 				return (
-					<a
-						key={label}
-						href={href}
-						target={href.startsWith("mailto") ? undefined : "_blank"}
-						rel="noreferrer"
-						className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border bg-(--surface-secondary) border-(--border) transition-all hover:scale-[1.02]"
-						onMouseEnter={(e) => {
-							(e.currentTarget as HTMLElement).style.borderColor = `${color}50`;
-							(e.currentTarget as HTMLElement).style.background = `${color}08`;
-						}}
-						onMouseLeave={(e) => {
-							(e.currentTarget as HTMLElement).style.borderColor =
-								"var(--border)";
-							(e.currentTarget as HTMLElement).style.background =
-								"var(--surface-secondary)";
-						}}
-					>
-						{inner}
-					</a>
+					<li key={label} style={accentStyle(color)}>
+						{href ? (
+							<a
+								href={href}
+								target={href.startsWith("mailto:") ? undefined : "_blank"}
+								rel="noopener noreferrer me"
+								className={`${CARD} transition-all hover:scale-[1.02] hover:border-(--accent)/30 hover:bg-(--accent)/3`}
+							>
+								{inner}
+							</a>
+						) : (
+							<div className={CARD}>{inner}</div>
+						)}
+					</li>
 				);
 			})}
-		</div>
+		</ul>
 	);
 }

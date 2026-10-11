@@ -7,7 +7,7 @@ FROM node:22-bookworm-slim AS deps
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 # Enable pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10 --activate
 
 WORKDIR /app
 
@@ -23,25 +23,20 @@ FROM node:22-bookworm-slim AS builder
 
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10 --activate
 
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build args
-ARG SPOTIFY_CLIENT_ID
-ARG SPOTIFY_CLIENT_SECRET
-ARG SPOTIFY_REFRESH_TOKEN
+# Build args — only NEXT_PUBLIC_* are inlined at build time. Runtime secrets
+# (Spotify, SMTP, GitHub…) belong in `docker run --env-file`, not in layers.
 ARG NEXT_PUBLIC_APP_URL=https://agus-darmawan.com
 ARG NEXT_PUBLIC_SENTRY_DSN
 ARG SENTRY_AUTH_TOKEN
 
 # Env
-ENV SPOTIFY_CLIENT_ID=$SPOTIFY_CLIENT_ID
-ENV SPOTIFY_CLIENT_SECRET=$SPOTIFY_CLIENT_SECRET
-ENV SPOTIFY_REFRESH_TOKEN=$SPOTIFY_REFRESH_TOKEN
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN
 ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN

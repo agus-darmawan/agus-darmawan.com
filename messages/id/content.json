@@ -1,0 +1,37 @@
+{
+	"Content": {
+		"copy": "Salin",
+		"copied": "Tersalin!",
+		"copyCode": "Salin kode",
+		"tableOfContents": "Daftar isi",
+		"imageFailed": "Gagal memuat gambar: {alt}",
+		"code": "Kode",
+		"demo": "Demo langsung",
+		"viewOnGithub": "Lihat di GitHub",
+		"stars": "{count} bintang",
+		"forks": "{count} fork",
+		"readTime": "{min} menit baca",
+		"featured": "Unggulan",
+		"loadFailed": "Konten gagal dimuat. Coba lagi nanti.",
+		"backToProjects": "Semua proyek",
+		"backToBlog": "Semua tulisan",
+		"openDesktop": "Buka desktop interaktif",
+		"share": "Salin tautan",
+		"linkCopied": "Tautan disalin",
+		"autoFromGithub": "Sinkron dari GitHub",
+		"category": {
+			"all": "Semua",
+			"web": "Web",
+			"robotics": "Robotika",
+			"research": "Riset"
+		},
+		"categoryLabel": "Kategori",
+		"projectsSummary": "{count} proyek · {featured} unggulan",
+		"moreTags": "+{count} lainnya",
+		"morePosts": "Tulisan lainnya",
+		"moreProjects": "Proyek lainnya",
+		"clearSearch": "Hapus pencarian",
+		"video": "Video YouTube",
+		"playVideo": "Putar video: {title}"
+	}
+}

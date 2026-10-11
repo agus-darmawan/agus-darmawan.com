@@ -1,88 +1,88 @@
 "use client";
 
-import { useState } from "react";
+import type { TurnstileInstance } from "@marsidev/react-turnstile";
+import { useEffect, useRef, useState } from "react";
+import type { ContactErrorCode } from "@/lib/contact/schema";
 import type { ApiResponse } from "@/types/api";
 
-export type ContactStatus = "idle" | "sending" | "sent" | "error";
+type Status = "idle" | "sending" | "sent" | "error";
+export type ContactFailure = ContactErrorCode | "network";
 
-interface UseContactFormOptions {
-	onSuccess?: () => void;
-}
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+const FEEDBACK_MS = 5_000;
 
-export function useContactForm({ onSuccess }: UseContactFormOptions = {}) {
-	const [name, setName] = useState("");
-	const [email, setEmail] = useState("");
-	const [message, setMessage] = useState("");
-	const [status, setStatus] = useState<ContactStatus>("idle");
-	const [errorMsg, setErrorMsg] = useState<string | null>(null);
-	const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+export function useContactForm() {
+	const [fields, setFields] = useState({ name: "", email: "", message: "" });
+	const [website, setWebsite] = useState(""); // honeypot
+	const [status, setStatus] = useState<Status>("idle");
+	const [failure, setFailure] = useState<ContactFailure | null>(null);
+	const [token, setToken] = useState<string | null>(null);
+	const turnstileRef = useRef<TurnstileInstance | undefined>(undefined);
 
-	const reset = () => {
-		setName("");
-		setEmail("");
-		setMessage("");
-		setStatus("idle");
-		setErrorMsg(null);
-		setTurnstileToken(null);
-	};
+	// Success/error feedback fades back to idle; cleared if the form unmounts.
+	useEffect(() => {
+		if (status !== "sent" && status !== "error") return;
+		const id = setTimeout(() => setStatus("idle"), FEEDBACK_MS);
+		return () => clearTimeout(id);
+	}, [status]);
+
+	const setField = (key: keyof typeof fields) => (value: string) =>
+		setFields((prev) => ({ ...prev, [key]: value }));
+
+	const filled = Object.values(fields).every((v) => v.trim().length > 0);
+	// Only wait for a token when Turnstile is actually configured — before,
+	// a missing site key left the button enabled but submit() did nothing.
+	const verified = !TURNSTILE_SITE_KEY || token !== null;
+	const canSubmit = filled && verified && status !== "sending";
 
 	const submit = async () => {
-		if (!name.trim() || !email.trim() || !message.trim()) return;
-		if (!turnstileToken) return;
-		if (status === "sending" || status === "sent") return;
-
+		if (!canSubmit) return;
 		setStatus("sending");
-		setErrorMsg(null);
+		setFailure(null);
 
 		try {
 			const res = await fetch("/api/contact", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ name, email, message, turnstileToken }),
+				body: JSON.stringify({
+					...fields,
+					website,
+					turnstileToken: token ?? undefined,
+				}),
 			});
-
-			const data: ApiResponse<{ sent: boolean }> = await res.json();
+			const data = (await res.json()) as ApiResponse<{ sent: boolean }>;
 
 			if (data.success) {
+				setFields({ name: "", email: "", message: "" });
 				setStatus("sent");
-				setName("");
-				setEmail("");
-				setMessage("");
-				setTurnstileToken(null);
-				onSuccess?.();
-				setTimeout(() => setStatus("idle"), 4_000);
 			} else {
+				setFailure((data.code as ContactErrorCode) ?? "send_failed");
 				setStatus("error");
-				setErrorMsg(data.error ?? "Something went wrong");
-				setTimeout(() => setStatus("idle"), 5_000);
 			}
 		} catch {
+			setFailure("network");
 			setStatus("error");
-			setErrorMsg("Network error — please try again");
-			setTimeout(() => setStatus("idle"), 5_000);
+		} finally {
+			// A Turnstile token is single-use: always get a fresh one, otherwise
+			// every retry (and the next message) fails verification.
+			setToken(null);
+			turnstileRef.current?.reset();
 		}
 	};
 
-	const canSubmit =
-		name.trim().length > 0 &&
-		email.trim().length > 0 &&
-		message.trim().length > 0 &&
-		status === "idle" &&
-		(!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || turnstileToken !== null);
-
 	return {
-		name,
-		email,
-		message,
+		fields,
+		setField,
+		website,
+		setWebsite,
 		status,
-		errorMsg,
+		failure,
 		canSubmit,
-		turnstileToken,
-		setName,
-		setEmail,
-		setMessage,
-		setTurnstileToken,
 		submit,
-		reset,
+		turnstile: {
+			siteKey: TURNSTILE_SITE_KEY,
+			ref: turnstileRef,
+			onToken: setToken,
+		},
 	};
 }

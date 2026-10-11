@@ -1,26 +1,26 @@
 import { NextResponse } from "next/server";
 import { getNowPlaying } from "@/lib/spotify";
-import { ApiResponse } from "@/types/api";
+import type { ApiResponse } from "@/types/api";
+import type { SpotifyTrack } from "@/types/spotify";
+
+// Every visitor polls this every 10 s — let the CDN absorb it instead of
+// hitting Spotify (and its rate limit) once per open tab.
+const CACHE_HEADERS = {
+	"Cache-Control": "public, s-maxage=10, stale-while-revalidate=20",
+};
 
 export async function GET() {
 	try {
 		const track = await getNowPlaying();
-
-		const response: ApiResponse<typeof track> = {
-			success: true,
-			data: track,
-		};
-
-		return NextResponse.json(response);
+		return NextResponse.json<ApiResponse<SpotifyTrack | null>>(
+			{ success: true, data: track },
+			{ headers: CACHE_HEADERS },
+		);
 	} catch (error) {
 		console.error("Spotify API error:", error);
-
-		const response: ApiResponse<null> = {
-			success: false,
-			data: null,
-			error: "Failed to fetch Spotify data",
-		};
-
-		return NextResponse.json(response, { status: 500 });
+		return NextResponse.json<ApiResponse<null>>(
+			{ success: false, data: null, error: "Failed to fetch Spotify data" },
+			{ status: 502 },
+		);
 	}
 }

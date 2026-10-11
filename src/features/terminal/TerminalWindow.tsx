@@ -1,111 +1,89 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
-import { useTerminalState } from "./hooks/useTerminalState";
+import { useEffect, useRef } from "react";
+import { prompt } from "./lib/lines";
 import { TerminalHintsBar } from "./TerminalHintsBar";
 import { TerminalInputLine } from "./TerminalInputLine";
 import { TerminalOutput } from "./TerminalOutput";
+import { useTerminalStore } from "./terminal.store";
+import { useTerminalEffects } from "./useTerminalEffects";
 import { VimEditor } from "./VimEditor";
 
 export default function TerminalWindow() {
 	const t = useTranslations("TerminalWindow");
+	const lines = useTerminalStore((s) => s.lines);
+	const cwd = useTerminalStore((s) => s.cwd);
+	const showWelcome = useTerminalStore((s) => s.showWelcome);
+	const vimOpen = useTerminalStore((s) => s.vim !== null);
+	const applyEffect = useTerminalEffects();
 
-	const {
-		lines,
-		input,
-		setInput,
-		cwd,
-		history,
-		fs,
-		vim,
-		setVim,
-		inputRef,
-		bottomRef,
-		addOutputLine,
-		clearTerminal,
-		handleVimClose,
-		handleSubmit,
-		handleHistoryUp,
-		handleHistoryDown,
-	} = useTerminalState({
-		welcomeMsg: t("welcome"),
-		helpHint: t("helpHint"),
-		sessionClosedMsg: t("sessionClosed"),
-	});
+	const scrollRef = useRef<HTMLDivElement>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: ref is mutable and should not trigger scroll
+	// Scroll the log itself — `scrollIntoView` scrolled every ancestor too and
+	// shifted the whole desktop on some browsers.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: re-run when lines change
 	useEffect(() => {
-		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-	}, [lines]);
+		const el = scrollRef.current;
+		if (el) el.scrollTop = el.scrollHeight;
+	}, [lines, vimOpen]);
 
 	useEffect(() => {
-		if (!vim.active) inputRef.current?.focus();
-	}, [vim.active, inputRef]);
+		if (!vimOpen) inputRef.current?.focus({ preventScroll: true });
+	}, [vimOpen]);
 
-	const hints = [
-		{ key: t("hintTab"), desc: t("hintTabDesc") },
-		{ key: t("hintArrows"), desc: t("hintArrowsDesc") },
-		{ key: t("hintClear"), desc: t("hintClearDesc") },
-	];
-
-	const vimHints = [
-		{ key: t("vimInsert"), desc: t("vimInsertDesc") },
-		{ key: t("vimEsc"), desc: t("vimEscDesc") },
-		{ key: t("vimSave"), desc: t("vimSaveDesc") },
-		{ key: t("vimQuit"), desc: t("vimQuitDesc") },
-		{ key: t("vimSaveQuit"), desc: t("vimSaveQuitDesc") },
-	];
-
-	if (vim.active) {
+	if (vimOpen) {
 		return (
 			<VimEditor
-				vim={vim}
-				setVim={setVim}
-				cwd={cwd}
-				setFs={() => {}}
-				onClose={handleVimClose}
-				hints={vimHints}
+				label={t("vimLabel")}
+				hints={[
+					{ key: t("vimInsert"), desc: t("vimInsertDesc") },
+					{ key: t("vimEsc"), desc: t("vimEscDesc") },
+					{ key: t("vimSave"), desc: t("vimSaveDesc") },
+					{ key: t("vimQuit"), desc: t("vimQuitDesc") },
+					{ key: t("vimSaveQuit"), desc: t("vimSaveQuitDesc") },
+				]}
 			/>
 		);
 	}
 
 	return (
+		// biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a click anywhere only focuses the (keyboard-reachable) input
 		<div
-			role="application"
-			aria-label="Terminal"
-			className="h-full flex flex-col font-mono text-sm"
-			// Terminal selalu dark — sama seperti real terminal di semua OS
-			style={{ background: "#0d1117", color: "#e6edf3" }}
-			onClick={() => inputRef.current?.focus()}
+			data-terminal
+			className="h-full flex flex-col font-mono text-xs bg-[#0d1117] text-[#e6edf3]"
+			onClick={() => {
+				// Don't steal a text selection the visitor is making.
+				if (!window.getSelection()?.toString()) inputRef.current?.focus();
+			}}
 		>
-			<div
-				role="log"
-				aria-live="polite"
-				aria-label="Terminal output"
-				className="flex-1 overflow-y-auto p-3 space-y-0.5"
-			>
-				<TerminalOutput lines={lines} />
+			<div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-0.5">
+				<div role="log" aria-live="polite" aria-label={t("outputLabel")}>
+					{showWelcome && (
+						<div className="whitespace-pre-wrap leading-5 text-[#484f58]">
+							{`${t("welcome")}\n${t("helpHint")}\n`}
+						</div>
+					)}
+					<TerminalOutput lines={lines} />
+				</div>
 
 				<TerminalInputLine
-					inputRef={inputRef}
-					input={input}
-					cwd={cwd}
-					history={history}
-					fs={fs}
+					ref={inputRef}
+					prompt={prompt(cwd)}
+					label={t("inputLabel")}
 					placeholder={t("placeholder")}
-					onChange={setInput}
-					onSubmit={handleSubmit}
-					onHistoryUp={handleHistoryUp}
-					onHistoryDown={handleHistoryDown}
-					onClear={clearTerminal}
-					onAddLines={addOutputLine}
+					onEffect={applyEffect}
 				/>
-
-				<div ref={bottomRef} />
 			</div>
 
-			<TerminalHintsBar hints={hints} />
+			<TerminalHintsBar
+				hints={[
+					{ key: t("hintTab"), desc: t("hintTabDesc") },
+					{ key: t("hintArrows"), desc: t("hintArrowsDesc") },
+					{ key: t("hintClear"), desc: t("hintClearDesc") },
+				]}
+			/>
 		</div>
 	);
 }
