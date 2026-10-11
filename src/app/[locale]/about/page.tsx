@@ -2,7 +2,6 @@ import { Download, FolderGit2, Mail } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { PageShell } from "@/components/seo/PageShell";
 import { resumeUrl, SITE } from "@/config/site";
 import { AboutContent } from "@/features/about/AboutContent";
 import { AboutSection } from "@/features/about/AboutSection";
@@ -14,6 +13,8 @@ import {
 } from "@/features/about/about.data";
 import { ExperienceTimeline } from "@/features/experience/ExperienceCard";
 import { EXPERIENCES } from "@/features/experience/experience.data";
+import { Container } from "@/features/site/Container";
+import { SiteShell } from "@/features/site/SiteShell";
 import { Link } from "@/i18n/navigation";
 import { listingPath } from "@/lib/content/paths";
 import { aboutJsonLd, toJsonLdCrumbs } from "@/lib/seo/jsonld";
@@ -57,7 +58,7 @@ export default async function AboutPage({ params }: Props) {
 	const cv = resumeUrl(locale);
 
 	return (
-		<PageShell path={PATH} breadcrumbs={crumbs}>
+		<SiteShell>
 			<JsonLd
 				data={aboutJsonLd({
 					locale,
@@ -78,39 +79,41 @@ export default async function AboutPage({ params }: Props) {
 				})}
 			/>
 
-			<article className="rounded-2xl overflow-hidden border border-(--border) bg-(--surface)">
-				<AboutContent>
-					<AboutSection title={tExp("title")}>
-						<ExperienceTimeline entries={EXPERIENCES} headingLevel={3} />
-					</AboutSection>
-				</AboutContent>
+			<Container className="py-12">
+				<article className="rounded-2xl overflow-hidden border border-(--border) bg-(--surface)">
+					<AboutContent>
+						<AboutSection title={tExp("title")}>
+							<ExperienceTimeline entries={EXPERIENCES} headingLevel={3} />
+						</AboutSection>
+					</AboutContent>
 
-				<footer className="flex flex-wrap gap-2 px-6 py-5">
-					{cv && (
+					<footer className="flex flex-wrap gap-2 px-6 py-5">
+						{cv && (
+							<a
+								href={cv}
+								className="inline-flex items-center gap-1.5 rounded-lg bg-[#e95420] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
+							>
+								<Download size={13} aria-hidden="true" />
+								{t("downloadCv")}
+							</a>
+						)}
 						<a
-							href={cv}
-							className="inline-flex items-center gap-1.5 rounded-lg bg-[#e95420] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
+							href={`mailto:${SITE.email}`}
+							className="inline-flex items-center gap-1.5 rounded-lg border border-(--border) px-3 py-1.5 text-xs font-medium text-(--text-secondary) hover:border-[#e95420] hover:text-[#e95420]"
 						>
-							<Download size={13} aria-hidden="true" />
-							{t("downloadCv")}
+							<Mail size={13} aria-hidden="true" />
+							{t("emailMe")}
 						</a>
-					)}
-					<a
-						href={`mailto:${SITE.email}`}
-						className="inline-flex items-center gap-1.5 rounded-lg border border-(--border) px-3 py-1.5 text-xs font-medium text-(--text-secondary) hover:border-[#e95420] hover:text-[#e95420]"
-					>
-						<Mail size={13} aria-hidden="true" />
-						{t("emailMe")}
-					</a>
-					<Link
-						href={listingPath("project")}
-						className="inline-flex items-center gap-1.5 rounded-lg border border-(--border) px-3 py-1.5 text-xs font-medium text-(--text-secondary) hover:border-[#e95420] hover:text-[#e95420]"
-					>
-						<FolderGit2 size={13} aria-hidden="true" />
-						{t("projectsTitle")}
-					</Link>
-				</footer>
-			</article>
-		</PageShell>
+						<Link
+							href={listingPath("project")}
+							className="inline-flex items-center gap-1.5 rounded-lg border border-(--border) px-3 py-1.5 text-xs font-medium text-(--text-secondary) hover:border-[#e95420] hover:text-[#e95420]"
+						>
+							<FolderGit2 size={13} aria-hidden="true" />
+							{t("projectsTitle")}
+						</Link>
+					</footer>
+				</article>
+			</Container>
+		</SiteShell>
 	);
 }

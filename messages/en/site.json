@@ -1,0 +1,89 @@
+{
+	"Site": {
+		"skipToContent": "Skip to content",
+		"primaryNav": "Main",
+		"breadcrumb": "Breadcrumb",
+		"home": "Home",
+		"nav": {
+			"about": "About",
+			"experience": "Experience",
+			"projects": "Projects",
+			"blog": "Blog",
+			"contact": "Contact"
+		},
+		"menu": "Open menu",
+		"closeMenu": "Close menu",
+		"language": "Language",
+		"theme": {
+			"label": "Theme",
+			"toDark": "Switch to the dark theme",
+			"toLight": "Switch to the light theme",
+			"dark": "Dark",
+			"light": "Light"
+		},
+		"openDesktop": "Open desktop",
+		"openInDesktop": "Open in the desktop",
+		"hero": {
+			"role": "Robotics engineer and full-stack developer",
+			"lede": "I write the software that lets quadruped robots inspect electrical substations, and the web dashboards their operators rely on. Before that, I built autonomous boats that won an international competition.",
+			"now": "Currently {role} at {company}",
+			"seeProjects": "See projects",
+			"getInTouch": "Get in touch",
+			"downloadCv": "Download CV",
+			"previewTitle": "This website is also a desktop",
+			"previewBody": "The same portfolio as an Ubuntu-style desktop, with windows, a terminal and a dock. Best with a mouse and keyboard.",
+			"launch": "Launch the desktop"
+		},
+		"work": {
+			"title": "Selected work",
+			"all": "All {count} projects"
+		},
+		"experience": {
+			"title": "Experience",
+			"all": "Full experience",
+			"summary": "{roles, plural, one {# role} other {# roles}} at {orgs, plural, one {# organization} other {# organizations}} since {year}.",
+			"current": "Current"
+		},
+		"recognition": {
+			"title": "Recognition",
+			"awards": "Awards",
+			"publications": "Publications",
+			"read": "Read the paper"
+		},
+		"writing": {
+			"title": "Writing",
+			"all": "All posts"
+		},
+		"cta": {
+			"title": "Have a robot, a dashboard or an idea that needs building?",
+			"body": "Tell me what you're working on, whether it's robots, web apps or research.",
+			"email": "Email me",
+			"form": "Send a message"
+		},
+		"about": {
+			"seeExperience": "See my experience"
+		},
+		"contact": {
+			"direct": "Reach me directly",
+			"formTitle": "Send a message",
+			"formNote": "Your message goes straight to my inbox."
+		},
+		"projects": {
+			"filter": "Filter projects by category",
+			"empty": "No projects in this category yet.",
+			"featured": "Featured"
+		},
+		"footer": {
+			"tagline": "Robotics engineer and full-stack developer in Denpasar, Bali.",
+			"pages": "Pages",
+			"elsewhere": "Elsewhere",
+			"preferences": "Preferences",
+			"view": "View",
+			"website": "Website",
+			"desktop": "Desktop",
+			"cv": "CV (PDF)",
+			"source": "Source code",
+			"copyright": "© {year} {name}"
+		}
+	}
+}
