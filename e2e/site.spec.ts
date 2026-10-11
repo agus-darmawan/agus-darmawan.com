@@ -76,6 +76,31 @@ test("switching views is remembered on the bare domain", async ({
 	await expect(page).toHaveURL(/\/en\/desktop$/);
 });
 
+test("Back still works after landing on a desktop deep link", async ({
+	page,
+}) => {
+	await page.goto("/en/projects");
+	const href =
+		(await page
+			.getByRole("main")
+			.getByRole("article")
+			.first()
+			.getByRole("link")
+			.getAttribute("href")) ?? "";
+	const slug = href.split("/").at(-1);
+
+	// A full page load straight onto the deep link.
+	await page.goto(`/en/desktop?open=projects&item=${slug}`);
+	await expect(page).toHaveURL(/\/en\/desktop$/);
+	await expect(windowNamed(page, "Projects")).toBeVisible();
+
+	await page.getByRole("link", { name: "Website", exact: true }).click();
+	await expect(page).toHaveURL(new RegExp(`/en/projects/${slug}$`));
+	await page.goBack();
+	await expect(page).toHaveURL(/\/en\/desktop$/);
+	await expect(windowNamed(page, "Projects")).toBeVisible();
+});
+
 test("the terminal can leave for the website", async ({ page }) => {
 	await page.goto("/en/desktop?open=terminal");
 	const input = page.getByRole("textbox", { name: "Command" });

@@ -16,6 +16,13 @@ export function useDeepLink() {
 		if (!link) return;
 		if (link.item) useContentSelection.getState().request(link.app, link.item);
 		useWindowStore.getState().openWindow(link.app);
-		window.history.replaceState(null, "", window.location.pathname);
+
+		// On a full page load this effect runs before the Next router's own,
+		// which is where it hooks into history. Rewriting the URL earlier
+		// would drop its history state and break Back, so wait a tick.
+		const id = window.setTimeout(() => {
+			window.history.replaceState(null, "", window.location.pathname);
+		});
+		return () => window.clearTimeout(id);
 	}, []);
 }
