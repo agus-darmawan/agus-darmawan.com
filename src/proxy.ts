@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
-import { UI_MODE_COOKIE } from "./lib/ui-mode";
+import { UI_MODE_COOKIE, UI_MODE_MAX_AGE } from "./lib/ui-mode";
 
 const intl = createMiddleware(routing);
 
@@ -20,6 +20,14 @@ export default function proxy(request: NextRequest) {
 			const target = new URL(location, request.url);
 			target.pathname = `${target.pathname.replace(/\/$/, "")}/desktop`;
 			response.headers.set("location", target.toString());
+			// Safari expires cookies written by JavaScript after 7 days;
+			// re-issuing it from the server keeps the choice for regulars.
+			response.cookies.set(UI_MODE_COOKIE, "desktop", {
+				path: "/",
+				maxAge: UI_MODE_MAX_AGE,
+				sameSite: "lax",
+				secure: request.nextUrl.protocol === "https:",
+			});
 		}
 	}
 
