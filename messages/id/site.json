@@ -22,7 +22,6 @@
 			"light": "Terang"
 		},
 		"openDesktop": "Buka desktop",
-		"openInDesktop": "Buka di desktop",
 		"hero": {
 			"role": "Robotics engineer dan full-stack developer",
 			"lede": "Saya menulis perangkat lunak yang membuat robot berkaki empat mampu menginspeksi gardu listrik, beserta dashboard web yang diandalkan operatornya. Sebelumnya, saya membangun kapal otonom yang menjuarai kompetisi internasional.",
@@ -41,14 +40,12 @@
 		"experience": {
 			"title": "Pengalaman",
 			"all": "Lihat semua pengalaman",
-			"summary": "{roles} posisi di {orgs} organisasi sejak {year}.",
-			"current": "Saat ini"
+			"summary": "{roles} posisi di {orgs} organisasi sejak {year}."
 		},
 		"recognition": {
 			"title": "Pencapaian",
 			"awards": "Penghargaan",
-			"publications": "Publikasi",
-			"read": "Baca makalah"
+			"publications": "Publikasi"
 		},
 		"writing": {
 			"title": "Tulisan",

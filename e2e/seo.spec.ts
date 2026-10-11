@@ -10,6 +10,13 @@ test("home has the name in the title, canonical and hreflang", async ({
 	expect(html).toContain('"@type":"Person"');
 });
 
+test("the desktop view stays out of the index", async ({ request }) => {
+	const html = await (await request.get("/en/desktop")).text();
+	expect(html).toMatch(/name="robots" content="noindex, follow"/);
+	const sitemap = await (await request.get("/sitemap.xml")).text();
+	expect(sitemap).not.toContain("/desktop");
+});
+
 test("/about is a crawlable profile page", async ({ request }) => {
 	const res = await request.get("/en/about");
 	expect(res.status()).toBe(200);

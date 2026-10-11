@@ -120,6 +120,12 @@ describe("executeCommand", () => {
 			dir: "~",
 			filename: "a.txt",
 		});
+		expect(executeCommand("website", ctx()).effect).toEqual({
+			type: "website",
+		});
+		expect(executeCommand("classic", ctx()).effect).toEqual({
+			type: "website",
+		});
 	});
 });
 

@@ -5,7 +5,7 @@
 		"dockTitle": "Dock",
 		"dockBody": "Click an icon here to open apps like Projects, Terminal, or Resume.",
 		"topbarTitle": "Top Bar",
-		"topbarBody": "Check the time, status, and theme settings here.",
+		"topbarBody": "Check the time, status and theme settings here. Prefer a regular website? The Website button switches views anytime.",
 		"shortcutsTitle": "Tips",
 		"shortcutsBody": "Press Ctrl+K for the command palette. Drag a window to a screen edge to split it, or to the top to go fullscreen.",
 		"skip": "Skip",

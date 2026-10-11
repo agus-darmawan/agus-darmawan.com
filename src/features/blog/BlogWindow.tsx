@@ -29,6 +29,7 @@ export default function BlogWindow() {
 
 	return (
 		<ContentWindow
+			appId="blog"
 			items={posts}
 			filter={filter}
 			hero={{

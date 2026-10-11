@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useCallback } from "react";
+import { useOpenWebsite } from "@/features/desktop/website";
 import { useSwitchLocale } from "@/hooks/useSwitchLocale";
 import { fetchJson } from "@/lib/fetch-json";
 import { useWindowStore } from "@/store/useWindowStore";
@@ -26,6 +27,7 @@ export function useTerminalEffects() {
 	const tApps = useTranslations("Dock");
 	const { setTheme } = useTheme();
 	const { switchLocale } = useSwitchLocale();
+	const openWebsite = useOpenWebsite();
 
 	return useCallback(
 		(effect: Effect | undefined) => {
@@ -61,6 +63,9 @@ export function useTerminalEffects() {
 				case "lang":
 					switchLocale(effect.locale);
 					break;
+				case "website":
+					openWebsite();
+					break;
 				case "vim":
 					terminal.openVim(effect.dir, effect.filename, effect.content);
 					break;
@@ -92,6 +97,6 @@ export function useTerminalEffects() {
 				}
 			}
 		},
-		[setTheme, switchLocale, t, tApps],
+		[openWebsite, setTheme, switchLocale, t, tApps],
 	);
 }

@@ -229,6 +229,17 @@ body {
 	animation: float-particle ease-in-out infinite;
 }
 
+/* Block cursor of the demo terminal on the home page. */
+@keyframes caret-blink {
+	50% {
+		opacity: 0;
+	}
+}
+
+.animate-caret {
+	animation: caret-blink 1.1s steps(1) infinite;
+}
+
 /* Keyboard focus ring. In the base layer so components can override it
    with utilities (the terminal and vim inputs draw their own caret). */
 @layer base {
