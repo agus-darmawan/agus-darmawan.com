@@ -1,6 +1,6 @@
 # 🖥️ agus-darmawan.com
 
-> Portfolio of **I Wayan Agus Darmawan** — an interactive Ubuntu 22.04 GNOME desktop in the browser, plus fast, crawlable pages for every project and post.
+> Portfolio of **I Wayan Agus Darmawan** in two views: a fast, crawlable website, and the same portfolio as an interactive Ubuntu 22.04 GNOME desktop in the browser.
 
 [![CI](https://github.com/agus-darmawan/agus-darmawan.com/actions/workflows/ci.yml/badge.svg)](https://github.com/agus-darmawan/agus-darmawan.com/actions)
 [![Live](https://img.shields.io/badge/live-agus--darmawan.com-e95420)](https://www.agus-darmawan.com)
@@ -11,6 +11,7 @@ Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · Zustand · TanStack Q
 
 ## Features
 
+- 🧭 Two views of the same content: the website (home, about, experience, projects, blog, contact) and the desktop at `/desktop`. Switch from either side; the choice is remembered for the bare domain, and the page you're on opens in the matching window (and back)
 - 🪟 Draggable windows with snap-to-edge, dock, command palette (`Ctrl+K`), screensaver
 - ⌨️ Terminal with `man agus`, easter eggs and UI commands
 - 📂 Projects & blog from MDX **+ live GitHub data** (stars, forks, auto-discovered repos)
@@ -106,11 +107,27 @@ integration simply turns its feature off.
 pnpm dev          # dev server
 pnpm build        # production build
 pnpm test:run     # unit tests (parser, highlighter, content loader)
+pnpm test:e2e     # Playwright, against the standalone build (pnpm build first)
 pnpm type-check   # tsc --noEmit
 pnpm lint         # Biome
 pnpm knip         # unused files / exports / deps
 pnpm analyze      # bundle analyzer
 ```
+
+---
+
+## Dependency updates
+
+Dependabot ([`.github/dependabot.yml`](.github/dependabot.yml)) opens PRs every
+Monday. Patch and minor updates, and GitHub Actions updates, merge themselves
+once CI is green ([`dependabot-auto-merge.yml`](.github/workflows/dependabot-auto-merge.yml));
+major updates wait for a review. One-time repository setup:
+
+1. **Settings → General → Pull Requests:** enable *Allow auto-merge*.
+2. **Settings → Rules → Rulesets:** a ruleset for `main` that requires a pull
+   request and the status checks **Lint, types, unit tests** and
+   **Build + end-to-end**. Add *Repository admin* as a bypass actor to keep
+   pushing to `main` directly.
 
 ---
 
@@ -133,21 +150,24 @@ content/
   blog/{en,id}/*.mdx        posts
   resume/                   PDFs (synced to R2)
 src/
-  app/[locale]/             home (desktop) + SSG pages: projects, blog
+  app/[locale]/             website: home, about, experience, projects, blog, contact (SSG)
+  app/[locale]/desktop/     the interactive desktop (noindex: same content as the website)
   app/api/                  contact, spotify, visitors, content bodies
   components/
     content/                ContentWindow (list + in-window detail), ContentCard, ContentHeader,
                             ContentDetail — one implementation behind both Projects and Blog
     markdown/               Markdown renderer, code highlighting, TOC
-    seo/                    PageShell, JSON-LD, home text profile, route helpers
+    seo/                    JSON-LD, project/blog route helpers
     window/                 WindowHero
   config/site.ts            identity, URLs, socials — single source of truth
   features/                 desktop apps (about, blog, projects, terminal, …)
+  features/site/            the website: shell, header, footer, pages, home preview
   lib/
     content/                loader, GitHub client, Zod schema, types
     markdown/               parser + highlighter (pure, tested)
     seo/                    metadata + structured data builders
-  store/                    Zustand window manager
+  store/                    Zustand window manager, content selection
+  proxy.ts                  locale routing; `/` reopens the view chosen last
 ```
 
 ---

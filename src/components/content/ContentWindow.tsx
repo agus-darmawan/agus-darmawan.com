@@ -13,8 +13,10 @@ import {
 	WindowHero,
 	type WindowHeroProps,
 } from "@/components/window/WindowHero";
+import type { AppId } from "@/config/apps";
 import type { ContentMeta } from "@/lib/content/types";
 import { cn } from "@/lib/utils";
+import { useContentSelection } from "@/store/useContentSelection";
 import { ContentCard } from "./ContentCard";
 import { ContentDetail } from "./ContentDetail";
 
@@ -38,6 +40,8 @@ export interface ContentFilter<T extends ContentMeta> {
 }
 
 interface ContentWindowProps<T extends ContentMeta> {
+	/** The window this list lives in; deep links and the website use it. */
+	appId: AppId;
 	items: T[];
 	hero: Omit<WindowHeroProps, "children">;
 	filter?: ContentFilter<T>;
@@ -54,6 +58,7 @@ interface ContentWindowProps<T extends ContentMeta> {
  * scroll position, search and filters exactly as they were.
  */
 export function ContentWindow<T extends ContentMeta>({
+	appId,
 	items,
 	hero,
 	filter,
@@ -67,6 +72,26 @@ export function ContentWindow<T extends ContentMeta>({
 	const backRef = useRef<HTMLButtonElement>(null);
 
 	const selected = items.find((i) => i.slug === selectedSlug) ?? null;
+
+	// A deep link (/desktop?open=projects&item=…) picks the item to show.
+	const requested = useContentSelection((s) =>
+		s.requested?.app === appId ? s.requested.slug : null,
+	);
+	useEffect(() => {
+		if (!requested) return;
+		setSelectedSlug(requested);
+		useContentSelection.getState().clearRequest();
+	}, [requested]);
+
+	// Publish what's on screen, so "Website" opens the same article.
+	const shownSlug = selected?.slug ?? null;
+	useEffect(() => {
+		useContentSelection.getState().setShown(appId, shownSlug);
+	}, [appId, shownSlug]);
+	useEffect(
+		() => () => useContentSelection.getState().setShown(appId, null),
+		[appId],
+	);
 
 	// Keyboard users land on "back" when a detail opens.
 	useEffect(() => {

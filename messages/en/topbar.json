@@ -10,7 +10,9 @@
 		"charging": "Charging",
 		"offline": "Offline",
 		"settings": "System menu",
-		"albumCover": "{album} album cover"
+		"albumCover": "{album} album cover",
+		"website": "Website",
+		"websiteHint": "Switch to the classic website"
 	},
 	"CommandPalette": {
 		"title": "Command palette",
@@ -24,6 +26,8 @@
 		"navigate": "navigate",
 		"select": "select",
 		"close": "Close",
+		"website": "Website view",
+		"websiteHint": "Switch to the classic website",
 		"keywords": {
 			"about": "me,bio,profile",
 			"terminal": "cli,bash,shell",

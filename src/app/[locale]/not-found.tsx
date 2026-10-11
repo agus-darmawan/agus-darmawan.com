@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
-import { PageShell } from "@/components/seo/PageShell";
-import { SITE } from "@/config/site";
+import { buttonClass } from "@/features/site/button";
+import { Container } from "@/features/site/Container";
+import { SiteShell } from "@/features/site/SiteShell";
 import { Link } from "@/i18n/navigation";
 import { listingPath } from "@/lib/content/paths";
 
@@ -9,36 +10,30 @@ export default function NotFound() {
 	const t = useTranslations("Seo");
 
 	return (
-		<PageShell path="/" breadcrumbs={[{ name: SITE.shortName, href: "/" }]}>
-			<div className="py-16 text-center">
+		<SiteShell>
+			<Container className="py-24 text-center">
 				<p aria-hidden="true" className="text-6xl mb-4">
 					🤖
 				</p>
-				<h1 className="text-2xl font-bold">{t("notFoundTitle")}</h1>
-				<p className="mt-2 text-sm text-(--text-secondary)">
-					{t("notFoundBody")}
-				</p>
-				<div className="mt-6 flex flex-wrap justify-center gap-2 text-sm">
-					<Link
-						href="/"
-						className="rounded-lg bg-[#e95420] px-3 py-1.5 font-medium text-white hover:opacity-90"
-					>
+				<h1 className="text-[clamp(1.75rem,4vw,2.5rem)] font-light text-(--site-ink)">
+					{t("notFoundTitle")}
+				</h1>
+				<p className="mt-3 text-(--site-muted)">{t("notFoundBody")}</p>
+				<div className="mt-8 flex flex-wrap justify-center gap-3">
+					<Link href="/" className={buttonClass("primary")}>
 						{t("backHome")}
 					</Link>
 					<Link
 						href={listingPath("project")}
-						className="rounded-lg border border-(--border) px-3 py-1.5 hover:border-[#e95420]"
+						className={buttonClass("secondary")}
 					>
 						{t("projectsTitle")}
 					</Link>
-					<Link
-						href={listingPath("blog")}
-						className="rounded-lg border border-(--border) px-3 py-1.5 hover:border-[#e95420]"
-					>
+					<Link href={listingPath("blog")} className={buttonClass("secondary")}>
 						{t("blogTitle")}
 					</Link>
 				</div>
-			</div>
-		</PageShell>
+			</Container>
+		</SiteShell>
 	);
 }

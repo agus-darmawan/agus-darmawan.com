@@ -44,6 +44,7 @@ export default function ProjectsWindow() {
 
 	return (
 		<ContentWindow
+			appId="projects"
 			items={projects}
 			filter={filter}
 			emptyIcon="🗂️"

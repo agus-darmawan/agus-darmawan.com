@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
-import { Ubuntu } from "next/font/google";
+import { Ubuntu, Ubuntu_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { hasLocale } from "next-intl";
@@ -19,10 +19,20 @@ type Props = {
 	params: Promise<{ locale: string }>;
 };
 
+// Ubuntu Light (300) is the display voice of the classic site; Ubuntu Mono
+// is what the real terminal uses, so the desktop terminal and code blocks get it.
 const ubuntu = Ubuntu({
+	weight: ["300", "400", "500", "700"],
+	subsets: ["latin"],
+	display: "swap",
+	variable: "--font-ubuntu",
+});
+
+const ubuntuMono = Ubuntu_Mono({
 	weight: ["400", "700"],
 	subsets: ["latin"],
 	display: "swap",
+	variable: "--font-ubuntu-mono",
 });
 
 // Prerender /en and /id at build time instead of rendering per request.
@@ -100,8 +110,12 @@ export default async function LocaleLayout({ children, params }: Props) {
 	const beaconToken = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN;
 
 	return (
-		<html lang={locale} suppressHydrationWarning>
-			<body className={`${ubuntu.className} antialiased`}>
+		<html
+			lang={locale}
+			suppressHydrationWarning
+			className={`${ubuntu.variable} ${ubuntuMono.variable}`}
+		>
+			<body className="antialiased">
 				<Providers locale={locale} messages={messages}>
 					{children}
 				</Providers>

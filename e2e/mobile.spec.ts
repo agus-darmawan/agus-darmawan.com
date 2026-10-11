@@ -19,3 +19,29 @@ test("windows open full screen on phones and stay clear of the dock", async ({
 		viewport.height - 64,
 	);
 });
+
+test("the website fits a phone and its menu navigates", async ({ page }) => {
+	for (const path of ["/en", "/en/experience", "/en/projects", "/en/contact"]) {
+		await page.goto(path);
+		const overflow = await page.evaluate(
+			() =>
+				document.documentElement.scrollWidth -
+				document.documentElement.clientWidth,
+		);
+		expect(overflow, path).toBe(0);
+	}
+
+	await page.goto("/en");
+	const toggle = page.getByRole("button", { name: "Open menu" });
+	await toggle.click();
+	await page.keyboard.press("Escape");
+	await expect(toggle).toBeFocused();
+
+	await toggle.click();
+	await page
+		.getByRole("navigation", { name: "Main" })
+		.getByRole("link", { name: "Experience" })
+		.click();
+	await expect(page).toHaveURL(/\/en\/experience$/);
+	await expect(page.getByRole("button", { name: "Open menu" })).toBeVisible();
+});

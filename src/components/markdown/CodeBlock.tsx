@@ -8,9 +8,15 @@ import { highlight } from "@/lib/markdown/highlight";
 interface CodeBlockProps {
 	lang: string;
 	code: string;
+	/** Font size of the code (compact windows vs reading pages). */
+	className?: string;
 }
 
-export function CodeBlock({ lang, code }: CodeBlockProps) {
+export function CodeBlock({
+	lang,
+	code,
+	className = "text-xs",
+}: CodeBlockProps) {
 	const t = useTranslations("Content");
 	const [copied, setCopied] = useState(false);
 
@@ -51,7 +57,9 @@ export function CodeBlock({ lang, code }: CodeBlockProps) {
 				</button>
 			</div>
 
-			<pre className="overflow-x-auto p-4 text-xs font-mono leading-relaxed m-0 bg-[#1a1a2e] text-[#f8f8f2]">
+			<pre
+				className={`overflow-x-auto p-4 font-mono leading-relaxed m-0 bg-[#1a1a2e] text-[#f8f8f2] ${className}`}
+			>
 				<code
 					// biome-ignore lint/security/noDangerouslySetInnerHtml: highlight() HTML-escapes every slice of the source
 					dangerouslySetInnerHTML={{ __html: highlight(code, lang) }}
