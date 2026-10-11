@@ -1,157 +1,162 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import React, { type ReactNode, useEffect, useState } from "react";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { motion, type Variants } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { type CSSProperties, type MouseEvent, memo, useState } from "react";
+import { FLOATING_SIZE, SNAP_STYLES } from "@/constants/window";
+import { useIsMobile, useReducedMotion } from "@/hooks/useMediaQuery";
+import { cn } from "@/lib/utils";
+import { useWindowStore } from "@/store/useWindowStore";
 import type { WindowState } from "@/types/app";
+import { WindowErrorBoundary } from "./WindowErrorBoundary";
 import { WindowHeader } from "./WindowHeader";
+import { getWindowComponent } from "./window.registry";
 
-interface WindowFrameProps {
-	window: WindowState;
-	isActive: boolean;
-	isDragging: boolean;
-	children: ReactNode;
-	closeLocked?: boolean;
-	onMouseDown: (e: React.MouseEvent) => void;
-	onClick: () => void;
-	onClose: () => void;
-	onMinimize: () => void;
-	onMaximize: () => void;
-}
+const spring = {
+	type: "spring",
+	stiffness: 400,
+	damping: 30,
+	mass: 0.8,
+} as const;
 
-function useIsMobile() {
-	const [isMobile, setIsMobile] = useState(false);
-	useEffect(() => {
-		const check = () => setIsMobile(window.innerWidth < 768);
-		check();
-		window.addEventListener("resize", check);
-		return () => window.removeEventListener("resize", check);
-	}, []);
-	return isMobile;
-}
-
-// ── Animation variants ────────────────────────────────────────────────────────
-
-const windowVariants = {
+// Minimized windows stay mounted (hidden) so a terminal session, a half
+// written contact message or a scrolled PDF survive minimize/restore.
+const VARIANTS: Variants = {
 	initial: { opacity: 0, scale: 0.94, y: 8 },
-	animate: {
+	open: {
 		opacity: 1,
 		scale: 1,
 		y: 0,
-		transition: {
-			type: "spring" as const,
-			stiffness: 400,
-			damping: 30,
-			mass: 0.8,
-		},
+		visibility: "visible",
+		transition: spring,
+	},
+	minimized: {
+		opacity: 0,
+		scale: 0.9,
+		y: 40,
+		transition: { duration: 0.15, ease: "easeIn" },
+		transitionEnd: { visibility: "hidden" },
 	},
 	exit: {
 		opacity: 0,
 		scale: 0.94,
 		y: 8,
-		transition: { duration: 0.15, ease: "easeIn" as const },
+		transition: { duration: 0.15, ease: "easeIn" },
 	},
 };
 
-// Reduced motion — hanya fade, no scale/translate
-const reducedVariants = {
+const REDUCED_VARIANTS: Variants = {
 	initial: { opacity: 0 },
-	animate: { opacity: 1, transition: { duration: 0.1 } },
+	open: { opacity: 1, visibility: "visible", transition: { duration: 0.1 } },
+	minimized: {
+		opacity: 0,
+		transition: { duration: 0.1 },
+		transitionEnd: { visibility: "hidden" },
+	},
 	exit: { opacity: 0, transition: { duration: 0.1 } },
 };
 
-// ── Component ─────────────────────────────────────────────────────────────────
+/** The app inside a window. Memoized: dragging must not re-render content. */
+const WindowContent = memo(function WindowContent({
+	appId,
+}: {
+	appId: string;
+}) {
+	const t = useTranslations("Window");
+	const App = getWindowComponent(appId);
 
-export function WindowFrame({
-	window: win,
-	isActive,
-	isDragging,
-	children,
-	closeLocked = false,
-	onMouseDown,
-	onClick,
-	onClose,
-	onMinimize,
-	onMaximize,
-}: WindowFrameProps) {
-	const isMobile = useIsMobile();
-	const prefersReduced = useReducedMotion();
-
-	if (win.minimized) return null;
-
-	const isFullscreen = win.maximized || win.snapZone === "full" || isMobile;
-
-	const positionStyle: React.CSSProperties = isFullscreen
-		? { top: 0, left: 0, right: 0, bottom: 0, width: "100%", height: "100%" }
-		: win.snapZone === "left"
-			? {
-					top: 32,
-					left: 0,
-					width: "50vw",
-					height: "calc(100vh - 32px)",
-				}
-			: win.snapZone === "right"
-				? {
-						top: 32,
-						left: "50vw",
-						width: "50vw",
-						height: "calc(100vh - 32px)",
-					}
-				: {
-						top: win.position.y,
-						left: win.position.x,
-						width: "clamp(320px, 90vw, 900px)",
-						height: "clamp(400px, 80vh, 650px)",
-					};
-	// Use reducedVariants if user prefers reduced motion
-	const variants = prefersReduced ? reducedVariants : windowVariants;
-
-	return (
-		<motion.div
-			key={win.id}
-			variants={variants} // ← pakai variants variable, bukan hardcode
-			initial="initial"
-			animate="animate"
-			exit="exit"
-			className={[
-				"absolute rounded-lg overflow-hidden flex flex-col",
-				isMobile ? "rounded-none" : "",
-				isDragging && !isMobile ? "cursor-grabbing select-none" : "",
-				isActive ? "shadow-ubuntu-lg" : "shadow-ubuntu",
-			]
-				.filter(Boolean)
-				.join(" ")}
-			style={{
-				...positionStyle,
-				zIndex: win.zIndex,
-			}}
-			onClick={onClick}
-			onMouseDown={onMouseDown}
-			// Disable spring animation during drag — direct positional control
-			transition={isDragging ? { duration: 0 } : undefined}
-		>
-			<WindowHeader
-				title={win.title}
-				isActive={isActive}
-				isMaximized={isFullscreen}
-				closeLocked={closeLocked}
-				onClose={onClose}
-				onMinimize={onMinimize}
-				onMaximize={onMaximize}
-				isMobile={isMobile}
-			/>
-
-			<div
-				className="flex-1 overflow-auto"
-				style={{
-					background: "var(--window-bg)",
-					color: "var(--text-primary)",
-				}}
-			>
-				{children}
+	if (!App) {
+		return (
+			<div className="h-full flex items-center justify-center text-sm text-(--text-muted)">
+				{t("notFound")}
 			</div>
-		</motion.div>
-	);
+		);
+	}
+	return <App />;
+});
+
+function positionOf(win: WindowState, fullscreen: boolean): CSSProperties {
+	if (fullscreen) return SNAP_STYLES.full;
+	if (win.snapZone) return SNAP_STYLES[win.snapZone];
+	return { top: win.position.y, left: win.position.x, ...FLOATING_SIZE };
 }
 
-export { AnimatePresence };
+interface WindowFrameProps {
+	id: string;
+	isDragging: boolean;
+	onTitleBarMouseDown: (e: MouseEvent, id: string) => void;
+}
+
+/**
+ * One window. It subscribes to its own slice of the store, so moving or
+ * focusing a window re-renders that window only — not every open app.
+ */
+export const WindowFrame = memo(function WindowFrame({
+	id,
+	isDragging,
+	onTitleBarMouseDown,
+}: WindowFrameProps) {
+	const live = useWindowStore((s) => s.windows.find((w) => w.id === id));
+	// Once closed, the store no longer has this window, but AnimatePresence
+	// keeps the frame mounted for its exit animation — render the last
+	// known state (derived state, updated during render) until it's gone.
+	const [last, setLast] = useState(live);
+	if (live && live !== last) setLast(live);
+	const win = live ?? last;
+	const isActive = useWindowStore((s) => s.activeWindowId === id);
+	const { focusWindow, closeWindow, minimizeWindow, toggleMaximize } =
+		useWindowStore.getState();
+	const tApps = useTranslations("Dock");
+	const tWindow = useTranslations("Window");
+	const isMobile = useIsMobile();
+	const reduced = useReducedMotion();
+
+	if (!win) return null;
+
+	const fullscreen = win.maximized || win.snapZone === "full" || isMobile;
+	const title = tApps.has(win.appId) ? tApps(win.appId) : win.appId;
+
+	return (
+		<motion.section
+			aria-label={title}
+			aria-hidden={win.minimized || undefined}
+			inert={win.minimized || undefined}
+			variants={reduced ? REDUCED_VARIANTS : VARIANTS}
+			initial="initial"
+			animate={win.minimized ? "minimized" : "open"}
+			exit="exit"
+			// Direct positional control while dragging — no spring lag.
+			transition={isDragging ? { duration: 0 } : undefined}
+			className={cn(
+				"absolute overflow-hidden flex flex-col",
+				isMobile ? "rounded-none" : "rounded-lg",
+				isDragging && "cursor-grabbing select-none",
+				isActive ? "shadow-ubuntu-lg" : "shadow-ubuntu",
+			)}
+			style={{ ...positionOf(win, fullscreen), zIndex: win.zIndex }}
+			onMouseDownCapture={() => focusWindow(id)}
+			onFocusCapture={() => focusWindow(id)}
+			onMouseDown={(e) => onTitleBarMouseDown(e, id)}
+		>
+			<WindowHeader
+				title={title}
+				isActive={isActive}
+				isMaximized={fullscreen}
+				isMobile={isMobile}
+				onClose={() => closeWindow(id)}
+				onMinimize={() => minimizeWindow(id)}
+				onMaximize={() => toggleMaximize(id)}
+			/>
+
+			<div className="flex-1 overflow-auto bg-(--window-bg) text-(--text-primary)">
+				<WindowErrorBoundary
+					appId={win.appId}
+					title={tWindow("crashed")}
+					retryLabel={tWindow("retry")}
+				>
+					<WindowContent appId={win.appId} />
+				</WindowErrorBoundary>
+			</div>
+		</motion.section>
+	);
+});

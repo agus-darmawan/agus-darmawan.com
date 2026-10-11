@@ -2,7 +2,8 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { storage } from "@/lib/storage";
 import { TOUR_STEPS } from "./tourSteps";
 
 const STORAGE_KEY = "onboardingSeen";
@@ -41,28 +42,39 @@ function useTargetRect(selector: string | null): Rect | null {
 	return rect;
 }
 
-interface OnboardingTourProps {
-	onFinish?: () => void;
-}
-
-export function OnboardingTour({ onFinish }: OnboardingTourProps) {
+/** First-visit walkthrough of the dock, top bar and shortcuts. */
+export function OnboardingTour() {
 	const t = useTranslations("Onboarding");
 	const [active, setActive] = useState(false);
 	const [stepIndex, setStepIndex] = useState(0);
+	const nextRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
-		const seen = localStorage.getItem(STORAGE_KEY);
-		if (!seen) setActive(true);
+		if (!storage.get("local", STORAGE_KEY)) setActive(true);
 	}, []);
 
 	const step = TOUR_STEPS[stepIndex];
 	const rect = useTargetRect(step?.target ?? null);
 
 	const finish = () => {
-		localStorage.setItem(STORAGE_KEY, "1");
+		storage.set("local", STORAGE_KEY, "1");
 		setActive(false);
-		onFinish?.();
 	};
+
+	// Keyboard: focus follows the primary button, Escape skips the tour.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: refocus on each step
+	useEffect(() => {
+		if (!active) return;
+		nextRef.current?.focus({ preventScroll: true });
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				storage.set("local", STORAGE_KEY, "1");
+				setActive(false);
+			}
+		};
+		window.addEventListener("keydown", onKey);
+		return () => window.removeEventListener("keydown", onKey);
+	}, [active, stepIndex]);
 
 	const next = () => {
 		if (stepIndex >= TOUR_STEPS.length - 1) {
@@ -130,7 +142,7 @@ export function OnboardingTour({ onFinish }: OnboardingTourProps) {
 	return (
 		<AnimatePresence>
 			<motion.div
-				className="fixed inset-0 z-[9999]"
+				className="fixed inset-0 z-9999"
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}
@@ -146,15 +158,13 @@ export function OnboardingTour({ onFinish }: OnboardingTourProps) {
 					}}
 				/>
 
-				{/* Clicking the dark area does nothing — user drives via the buttons */}
-				<div
-					className="absolute inset-0"
-					onClick={(e) => e.stopPropagation()}
-				/>
-
 				{/* Plain wrapper — owns the anchor transform, untouched by Framer Motion */}
 				<div key={step.id} className="absolute w-72" style={anchorStyle}>
 					<motion.div
+						role="dialog"
+						aria-modal="true"
+						aria-labelledby="onboarding-title"
+						aria-describedby="onboarding-body"
 						className="rounded-lg p-4 shadow-ubuntu-lg"
 						style={{
 							background: "var(--window-bg)",
@@ -165,8 +175,13 @@ export function OnboardingTour({ onFinish }: OnboardingTourProps) {
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0 }}
 					>
-						<h3 className="font-semibold mb-1">{t(step.titleKey)}</h3>
-						<p className="text-sm mb-3" style={{ color: "var(--text-muted)" }}>
+						<h2 id="onboarding-title" className="font-semibold mb-1">
+							{t(step.titleKey)}
+						</h2>
+						<p
+							id="onboarding-body"
+							className="text-sm mb-3 text-(--text-muted)"
+						>
 							{t(step.bodyKey)}
 						</p>
 
@@ -190,6 +205,7 @@ export function OnboardingTour({ onFinish }: OnboardingTourProps) {
 									</button>
 								)}
 								<button
+									ref={nextRef}
 									type="button"
 									onClick={next}
 									className="text-xs px-3 py-1 rounded bg-[#e95420] text-white hover:opacity-90"
@@ -201,15 +217,11 @@ export function OnboardingTour({ onFinish }: OnboardingTourProps) {
 							</div>
 						</div>
 
-						<div className="flex gap-1 mt-3">
+						<div aria-hidden className="flex gap-1 mt-3">
 							{TOUR_STEPS.map((s, i) => (
 								<span
 									key={s.id}
-									className="h-1 flex-1 rounded-full"
-									style={{
-										background:
-											i <= stepIndex ? "#e95420" : "rgba(255,255,255,0.2)",
-									}}
+									className={`h-1 flex-1 rounded-full ${i <= stepIndex ? "bg-ubuntu-orange" : "bg-(--border)"}`}
 								/>
 							))}
 						</div>

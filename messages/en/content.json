@@ -1,0 +1,37 @@
+{
+	"Content": {
+		"copy": "Copy",
+		"copied": "Copied!",
+		"copyCode": "Copy code",
+		"tableOfContents": "Contents",
+		"imageFailed": "Failed to load image: {alt}",
+		"code": "Code",
+		"demo": "Live demo",
+		"viewOnGithub": "View on GitHub",
+		"stars": "{count, plural, one {# star} other {# stars}}",
+		"forks": "{count, plural, one {# fork} other {# forks}}",
+		"readTime": "{min} min read",
+		"featured": "Featured",
+		"loadFailed": "Couldn't load this content. Try again later.",
+		"backToProjects": "All projects",
+		"backToBlog": "All posts",
+		"openDesktop": "Open interactive desktop",
+		"share": "Copy link",
+		"linkCopied": "Link copied",
+		"autoFromGithub": "Synced from GitHub",
+		"category": {
+			"all": "All",
+			"web": "Web",
+			"robotics": "Robotics",
+			"research": "Research"
+		},
+		"categoryLabel": "Category",
+		"projectsSummary": "{count, plural, one {# project} other {# projects}} · {featured} featured",
+		"moreTags": "+{count} more",
+		"morePosts": "More posts",
+		"moreProjects": "More projects",
+		"clearSearch": "Clear search",
+		"video": "YouTube video",
+		"playVideo": "Play video: {title}"
+	}
+}

@@ -1,25 +1,26 @@
-import { RefObject, useEffect } from "react";
+import { type RefObject, useEffect, useRef } from "react";
 
-interface UseClickOutsideOptions<T extends HTMLElement = HTMLElement> {
-	ref: RefObject<T> | null;
-	onOutside: () => void;
-}
-
-export function useClickOutside<T extends HTMLElement = HTMLElement>({
-	ref,
-	onOutside,
-}: UseClickOutsideOptions<T>) {
+/**
+ * Calls `onOutside` on a pointer press outside `ref`. The callback is read
+ * through a ref, so callers don't need to memoize it and the document
+ * listener is bound once instead of on every render.
+ */
+export function useClickOutside(
+	ref: RefObject<HTMLElement | null>,
+	onOutside: () => void,
+) {
+	const callback = useRef(onOutside);
 	useEffect(() => {
-		const handler = (e: MouseEvent) => {
-			if (!ref?.current) return;
-			if (!ref?.current.contains(e.target as Node)) {
-				onOutside();
+		callback.current = onOutside;
+	});
+
+	useEffect(() => {
+		const handler = (e: PointerEvent) => {
+			if (ref.current && !ref.current.contains(e.target as Node)) {
+				callback.current();
 			}
 		};
-
-		document.addEventListener("mousedown", handler);
-		return () => {
-			document.removeEventListener("mousedown", handler);
-		};
-	}, [ref, onOutside]);
+		document.addEventListener("pointerdown", handler);
+		return () => document.removeEventListener("pointerdown", handler);
+	}, [ref]);
 }

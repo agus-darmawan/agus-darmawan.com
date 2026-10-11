@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@import "tw-animate-css";
+
+/* next-themes toggles a `.dark` class; make `dark:` follow it, not the OS. */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
 	--color-ubuntu-orange: #e95420;
@@ -47,11 +49,6 @@
 	--panel-text: rgba(255, 255, 255, 0.9);
 	--panel-text-muted: rgba(255, 255, 255, 0.45);
 
-	/* Dock - light theme */
-	--dock-bg: rgba(240, 240, 240, 0.92);
-	--dock-border: rgba(0, 0, 0, 0.12);
-	--dock-text: rgba(0, 0, 0, 0.75);
-
 	--scrollbar-thumb: rgba(0, 0, 0, 0.2);
 }
 
@@ -71,11 +68,6 @@
 	/* TopBar & Panel — always dark in both modes */
 	--topbar-bg: rgba(18, 12, 16, 0.95);
 	--panel-bg: rgba(22, 16, 20, 0.98);
-
-	/* Dock - dark theme */
-	--dock-bg: rgba(20, 15, 18, 0.95);
-	--dock-border: rgba(255, 255, 255, 0.08);
-	--dock-text: rgba(255, 255, 255, 0.85);
 
 	--scrollbar-thumb: rgba(255, 255, 255, 0.15);
 }
@@ -145,73 +137,55 @@ body {
 	}
 }
 
-@keyframes slide-up {
-	from {
-		opacity: 0;
-		transform: translateY(8px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-
 .animate-fade-in {
 	animation: fade-in 0.15s ease-out forwards;
 }
 
-.animate-slide-up {
-	animation: slide-up 0.2s ease-out forwards;
-}
-
-/* ────────────────────────────────────────────────
-   Dock app grid
-──────────────────────────────────────────────── */
-.dock-grid-item {
-	transition:
-		transform 0.15s ease,
-		box-shadow 0.15s ease;
-}
-.dock-grid-item:hover {
-	transform: scale(1.06);
-}
-
-/* Window title bar shake */
-@keyframes wm-shake {
-	0%,
-	100% {
-		transform: translateX(0);
-	}
-	20% {
-		transform: translateX(-3px);
-	}
-	40% {
-		transform: translateX(3px);
-	}
-	60% {
-		transform: translateX(-2px);
+/* Refetch countdown arc: the circle uses pathLength=1, so the dash offset
+   runs 1 → 0 regardless of size. Duration is set inline per indicator. */
+@keyframes refresh-arc {
+	from {
+		stroke-dashoffset: 1;
+		stroke-opacity: 0.4;
 	}
 	80% {
-		transform: translateX(2px);
+		stroke-opacity: 0.4;
+	}
+	to {
+		stroke-dashoffset: 0;
+		stroke-opacity: 0.9;
 	}
 }
 
-.wm-shake {
-	animation: wm-shake 0.45s ease;
+.animate-refresh-arc {
+	animation: refresh-arc linear forwards;
 }
 
-/* Accessibility — keyboard focus */
-:focus-visible {
-	outline: 2px solid #e95420;
-	outline-offset: 2px;
-	border-radius: 4px;
+/* Screensaver particles; duration and delay are set per particle. */
+@keyframes float-particle {
+	0%,
+	100% {
+		transform: translate(0, 0);
+	}
+	50% {
+		transform: translate(12px, -24px);
+	}
 }
 
-:focus:not(:focus-visible) {
-	outline: none;
+.animate-float-particle {
+	animation: float-particle ease-in-out infinite;
 }
 
-/* prefers-reduced-motion — harus paling bawah */
+/* Keyboard focus ring. In the base layer so components can override it
+   with utilities (the terminal and vim inputs draw their own caret). */
+@layer base {
+	:focus-visible {
+		outline: 2px solid #e95420;
+		outline-offset: 2px;
+	}
+}
+
+/* prefers-reduced-motion — keep last so it wins over everything above. */
 @media (prefers-reduced-motion: reduce) {
 	*,
 	*::before,
@@ -221,30 +195,4 @@ body {
 		transition-duration: 0.01ms !important;
 		scroll-behavior: auto !important;
 	}
-}
-
-/* ────────────────────────────────────────────────
-   Terminal — override global input styles
-   Input di terminal tidak boleh punya border/ring
-──────────────────────────────────────────────── */
-[role="application"][aria-label="Terminal"] input,
-[role="application"][aria-label="Terminal"] input:focus,
-[role="application"][aria-label="Terminal"] input:focus-visible {
-	border: none !important;
-	outline: none !important;
-	box-shadow: none !important;
-	ring: none !important;
-}
-
-/* ────────────────────────────────────────────────
-   Light mode improvements
-   ExperienceCard, ProjectCard, AboutWindow, etc.
-   Sudah pakai CSS variables — tidak perlu override.
-   Yang perlu di-fix adalah komponen yang hardcode.
-──────────────────────────────────────────────── */
-
-/* ResumeViewer — bg abu abu di light mode jadi lebih elegan */
-.light [style*="background-color: rgb(82, 86, 89)"],
-.light [style*="background-color: #525659"] {
-	background-color: #64748b !important;
 }

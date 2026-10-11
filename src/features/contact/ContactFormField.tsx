@@ -1,85 +1,53 @@
-"use client";
+import type { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
-import { type InputHTMLAttributes, type TextareaHTMLAttributes } from "react";
+const FIELD =
+	"w-full px-3 py-2 rounded-xl text-sm outline-none border transition-all duration-150 font-[inherit] bg-(--surface-secondary) border-(--border) text-(--text-primary) focus:border-[#e95420]/40 focus:shadow-[0_0_0_2px_#e9542018] disabled:opacity-60";
 
-const BASE =
-	"w-full px-3 py-2 rounded-xl text-sm outline-none border transition-all duration-150 font-[inherit]";
-
-const STYLE = {
-	background: "var(--surface-secondary)",
-	border: "1px solid var(--border)",
-	color: "var(--text-primary)",
-} as React.CSSProperties;
-
-const FOCUS_STYLE = {
-	borderColor: "#e9542060",
-	boxShadow: "0 0 0 2px #e9542018",
-};
-const BLUR_STYLE = { borderColor: "var(--border)", boxShadow: "none" };
+/** Visually hidden but announced: placeholders alone aren't labels. */
+const LABEL = "sr-only";
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
-	label?: string;
+	id: string;
+	label: string;
 }
 
-export function ContactInputField({ label, id, ...props }: InputFieldProps) {
+export function ContactInputField({
+	id,
+	label,
+	className,
+	...props
+}: InputFieldProps) {
 	return (
 		<div className="flex flex-col gap-1">
-			{label && (
-				<label
-					htmlFor={id}
-					className="text-[10px] font-semibold uppercase tracking-widest"
-					style={{ color: "var(--text-muted)" }}
-				>
-					{label}
-				</label>
-			)}
-			<input
-				id={id}
-				className={BASE}
-				style={STYLE}
-				onFocus={(e) =>
-					Object.assign((e.currentTarget as HTMLElement).style, FOCUS_STYLE)
-				}
-				onBlur={(e) =>
-					Object.assign((e.currentTarget as HTMLElement).style, BLUR_STYLE)
-				}
-				{...props}
-			/>
+			<label htmlFor={id} className={LABEL}>
+				{label}
+			</label>
+			<input id={id} className={cn(FIELD, className)} {...props} />
 		</div>
 	);
 }
 
 interface TextareaFieldProps
 	extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-	label?: string;
+	id: string;
+	label: string;
 }
 
 export function ContactTextareaField({
-	label,
 	id,
+	label,
+	className,
 	...props
 }: TextareaFieldProps) {
 	return (
 		<div className="flex flex-col gap-1">
-			{label && (
-				<label
-					htmlFor={id}
-					className="text-[10px] font-semibold uppercase tracking-widest"
-					style={{ color: "var(--text-muted)" }}
-				>
-					{label}
-				</label>
-			)}
+			<label htmlFor={id} className={LABEL}>
+				{label}
+			</label>
 			<textarea
 				id={id}
-				className={`${BASE} resize-none`}
-				style={STYLE}
-				onFocus={(e) =>
-					Object.assign((e.currentTarget as HTMLElement).style, FOCUS_STYLE)
-				}
-				onBlur={(e) =>
-					Object.assign((e.currentTarget as HTMLElement).style, BLUR_STYLE)
-				}
+				className={cn(FIELD, "resize-none", className)}
 				{...props}
 			/>
 		</div>

@@ -1,12 +1,4 @@
-/**
- * Divider — thin separator line for settings panel sections.
- */
+/** Thin separator between system menu sections. */
 export function Divider() {
-	return (
-		<div
-			className="h-px my-1"
-			style={{ background: "var(--panel-border)" }}
-			aria-hidden
-		/>
-	);
+	return <hr className="h-px my-1 border-0 bg-(--panel-border)" />;
 }

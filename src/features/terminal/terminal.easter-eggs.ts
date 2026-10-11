@@ -76,16 +76,6 @@ rm: it looks like you're trying to delete the portfolio
 rm: that would be bad. aborting.
 rm: also, who hurt you?`;
 
-export const COWSAY_DEFAULT = `
- ______
-< Moo! >
- ------
-        \\   ^__^
-         \\  (oo)\\_______
-            (__)\\       )\\/\\
-                ||----w |
-                ||     ||`.trim();
-
 export const NEOFETCH_OUTPUT = `
             .-/+oossssoo+/-.               agus@ubuntu
         \`:+ssssssssssssssssss+:\`           ─────────────────────────

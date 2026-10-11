@@ -1,79 +1,32 @@
-"use client";
+import { useTranslations } from "next-intl";
+import { accentStyle } from "@/components/content/primitives";
+import { AboutSection } from "./AboutSection";
+import { SKILL_GROUPS } from "./about.data";
 
-const SKILL_GROUPS = [
-	{
-		label: "Frontend & Mobile",
-		color: "#e95420",
-		skills: [
-			"Swift",
-			"SwiftUI",
-			"React",
-			"Next.js",
-			"TypeScript",
-			"Tailwind CSS",
-		],
-	},
-	{
-		label: "Backend",
-		color: "#3b82f6",
-		skills: [
-			"Node.js",
-			"Express",
-			"AdonisJS",
-			"PostgreSQL",
-			"Prisma",
-			"Docker",
-		],
-	},
-	{
-		label: "Robotics & AI",
-		color: "#10b981",
-		skills: [
-			"ROS / ROS2",
-			"Python",
-			"C++",
-			"OpenCV",
-			"YOLO",
-			"TensorFlow",
-			"Gazebo",
-			"ESP-IDF",
-		],
-	},
-] as const;
+export function AboutSkills() {
+	const t = useTranslations("AboutWindow");
 
-interface AboutSkillsProps {
-	t: (key: string) => string;
-}
-
-export function AboutSkills({ t }: AboutSkillsProps) {
 	return (
-		<div className="px-6 py-5 border-b border-(--border)">
-			<h2 className="text-xs font-semibold uppercase tracking-wider mb-4 text-(--text-muted)">
-				{t("skills")}
-			</h2>
-
+		<AboutSection title={t("skills")}>
 			<div className="space-y-3">
 				{SKILL_GROUPS.map((group) => (
-					<div
-						key={group.label}
-						style={{ "--skill": group.color } as React.CSSProperties}
-					>
-						<p className="text-xs font-medium mb-1.5 text-(--skill)">
-							{group.label}
-						</p>
-						<div className="flex flex-wrap gap-1.5">
+					<div key={group.labelKey} style={accentStyle(group.color)}>
+						<h3 className="text-xs font-medium mb-1.5 text-(--accent)">
+							{t(group.labelKey)}
+						</h3>
+						<ul className="flex flex-wrap gap-1.5">
 							{group.skills.map((skill) => (
-								<span
+								<li
 									key={skill}
-									className="text-xs px-2 py-0.5 rounded-full font-medium border text-(--skill) bg-[color-mix(in_srgb,var(--skill)_10%,transparent)] border-[color-mix(in_srgb,var(--skill)_20%,transparent)]"
+									className="text-xs px-2 py-0.5 rounded-full font-medium border text-(--accent) bg-(--accent)/10 border-(--accent)/20"
 								>
 									{skill}
-								</span>
+								</li>
 							))}
-						</div>
+						</ul>
 					</div>
 				))}
 			</div>
-		</div>
+		</AboutSection>
 	);
 }

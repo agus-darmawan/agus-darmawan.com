@@ -1,0 +1,25 @@
+{
+	"Seo": {
+		"homeTitle": "Agus Darmawan — Robotics & Full-Stack Developer",
+		"homeDescription": "I Wayan Agus Darmawan (Agus Darmawan) — robotics engineer & full-stack developer dari Bali. Robot otonom ROS2, robot inspeksi quadruped, Next.js.",
+		"skipToProfile": "Lompat ke versi teks portofolio ini",
+		"profileHeading": "Tentang {name}",
+		"projectsTitle": "Proyek",
+		"projectsDescription": "Proyek robotika, sistem otonom, dan web oleh Agus Darmawan — navigasi ROS2, robot inspeksi quadruped, dashboard, dan riset.",
+		"blogTitle": "Blog",
+		"blogDescription": "Tulisan Agus Darmawan tentang robotika, ROS2, full-stack web development, dan membangun sistem yang benar-benar bekerja.",
+		"home": "Beranda",
+		"elsewhere": "Temukan saya di",
+		"language": "Bahasa",
+		"projectBy": "Proyek oleh {name}",
+		"postBy": "Tulisan oleh {name}",
+		"aboutTitle": "Tentang",
+		"aboutPageTitle": "Tentang Agus Darmawan — Robotics & Full-Stack Developer",
+		"aboutDescription": "Tentang I Wayan Agus Darmawan (Agus Darmawan): robotics engineer dan full-stack developer dari Bali — pengalaman kerja, pendidikan, penghargaan, dan publikasi.",
+		"downloadCv": "Unduh CV",
+		"emailMe": "Kirim email",
+		"notFoundTitle": "Halaman tidak ditemukan",
+		"notFoundBody": "Halaman yang kamu cari tidak ada atau sudah dipindahkan.",
+		"backHome": "Kembali ke beranda"
+	}
+}

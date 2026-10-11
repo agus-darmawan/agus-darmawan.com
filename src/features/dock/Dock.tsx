@@ -1,100 +1,85 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { APPS, DOCK_MOBILE_LIMIT } from "@/config/apps";
 import { useClickOutside } from "@/hooks/useClickOutside";
-import type { WindowState } from "@/types/app";
+import { useWindowStore } from "@/store/useWindowStore";
 import { AppGrid } from "./AppGrid";
 import { DockIcon } from "./DockIcon";
 import { DockLauncher } from "./DockLauncher";
 
-interface DockProps {
-	windows: WindowState[];
-	activeWindow: string | null;
-	onIconClick: (appId: string) => void;
-}
-
-export function Dock({ windows, activeWindow, onIconClick }: DockProps) {
+export function Dock() {
 	const [gridOpen, setGridOpen] = useState(false);
-	const dockRef = useRef<HTMLDivElement>(null!);
+	const dockRef = useRef<HTMLDivElement>(null);
 	const t = useTranslations("Dock");
+	const runningApps = useWindowStore(
+		useShallow((s) => s.windows.map((w) => w.appId)),
+	);
+	const handleDockClick = useWindowStore((s) => s.handleDockClick);
+	const openWindow = useWindowStore((s) => s.openWindow);
 
-	useClickOutside({ ref: dockRef, onOutside: () => setGridOpen(false) });
+	const closeGrid = useCallback(() => setGridOpen(false), []);
+	useClickOutside(dockRef, closeGrid);
 
-	const handleAppClick = (appId: string) => {
+	// Dock icons toggle (open → minimize → restore); the app grid always
+	// brings the app forward, like GNOME's overview.
+	const launch = (appId: string) => {
 		setGridOpen(false);
-		onIconClick(appId);
+		handleDockClick(appId);
 	};
-
-	const toggleGrid = () => {
-		if (!gridOpen) {
-			window.dispatchEvent(new CustomEvent("minimizeAllWindows"));
-		}
-		setGridOpen((v) => !v);
+	const launchFromGrid = (appId: string) => {
+		setGridOpen(false);
+		openWindow(appId);
 	};
 
 	return (
 		<div ref={dockRef}>
+			{/* The grid overlays the windows (they sit in a lower stacking
+			    context), so opening it no longer minimizes everything. */}
 			{gridOpen && (
 				<AppGrid
-					apps={APPS}
-					windows={windows}
-					onAppClick={handleAppClick}
-					onClose={() => setGridOpen(false)}
-					t={t}
+					runningApps={runningApps}
+					onAppClick={launchFromGrid}
+					onClose={closeGrid}
 				/>
 			)}
 
-			<div className="fixed bottom-0 left-0 right-0 h-16 flex items-end justify-center pointer-events-none z-40">
+			<nav
+				aria-label={t("label")}
+				className="fixed bottom-0 inset-x-0 h-16 flex items-end justify-center pointer-events-none z-40"
+			>
 				<div
 					data-tour="dock"
-					className="flex items-center gap-1 px-3 py-2 rounded-t-xl pointer-events-auto"
-					style={{
-						background: "#111111",
-						borderTop: "1px solid rgba(255,255,255,0.1)",
-						borderLeft: "1px solid rgba(255,255,255,0.1)",
-						borderRight: "1px solid rgba(255,255,255,0.1)",
-						boxShadow: "0 -4px 24px rgba(0,0,0,0.6)",
-					}}
+					className="flex items-center gap-1 px-3 py-2 rounded-t-xl pointer-events-auto bg-[#111] border border-b-0 border-white/10 shadow-[0_-4px_24px_rgba(0,0,0,0.6)]"
 				>
-					<DockLauncher isOpen={gridOpen} onClick={toggleGrid} />
+					<DockLauncher
+						isOpen={gridOpen}
+						onClick={() => setGridOpen((v) => !v)}
+					/>
 
-					<div
-						className="w-px h-8 mx-1 rounded-full"
-						style={{ background: "rgba(255,255,255,0.1)" }}
+					<span
 						aria-hidden
+						className="w-px h-8 mx-1 rounded-full bg-white/10"
 					/>
 
 					<div className="flex items-center gap-1">
-						{APPS.slice(0, DOCK_MOBILE_LIMIT).map((app) => {
-							const win = windows.find((w) => w.appId === app.id);
-							return (
-								<DockIcon
-									key={app.id}
-									app={app}
-									label={t(app.name)}
-									isRunning={!!win}
-									onClick={() => handleAppClick(app.id)}
-								/>
-							);
-						})}
-						{APPS.slice(DOCK_MOBILE_LIMIT).map((app) => {
-							const win = windows.find((w) => w.appId === app.id);
-							return (
-								<DockIcon
-									key={app.id}
-									app={app}
-									label={t(app.name)}
-									isRunning={!!win}
-									onClick={() => handleAppClick(app.id)}
-									className="hidden sm:flex"
-								/>
-							);
-						})}
+						{APPS.map((app, index) => (
+							<DockIcon
+								key={app.id}
+								app={app}
+								label={t(app.id)}
+								isRunning={runningApps.includes(app.id)}
+								onClick={() => launch(app.id)}
+								className={
+									index >= DOCK_MOBILE_LIMIT ? "hidden sm:flex" : undefined
+								}
+							/>
+						))}
 					</div>
 				</div>
-			</div>
+			</nav>
 		</div>
 	);
 }

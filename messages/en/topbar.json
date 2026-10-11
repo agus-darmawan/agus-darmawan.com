@@ -9,7 +9,32 @@
 		"battery": "Battery",
 		"charging": "Charging",
 		"offline": "Offline",
-		"openApps": "Open Apps",
-		"noOpenApps": "No open apps"
+		"settings": "System menu",
+		"albumCover": "{album} album cover"
+	},
+	"CommandPalette": {
+		"title": "Command palette",
+		"placeholder": "Search commands…",
+		"empty": "No commands found",
+		"openWindow": "Open window",
+		"toggleTheme": "Toggle theme",
+		"lightMode": "Switch to light mode",
+		"darkMode": "Switch to dark mode",
+		"changeLanguage": "Change language",
+		"navigate": "navigate",
+		"select": "select",
+		"close": "Close",
+		"keywords": {
+			"about": "me,bio,profile",
+			"terminal": "cli,bash,shell",
+			"resume": "cv,pdf",
+			"experience": "work,job,career",
+			"projects": "portfolio,code,github",
+			"blog": "writing,posts,articles",
+			"contact": "email,message,hire"
+		}
+	},
+	"Screensaver": {
+		"wake": "Move the mouse or press a key to wake"
 	}
 }

@@ -1,18 +1,63 @@
 import type { MetadataRoute } from "next";
+import { absoluteUrl } from "@/config/site";
+import { localizedPath } from "@/i18n/paths";
 import { routing } from "@/i18n/routing";
+import { getPosts, getProjects } from "@/lib/content";
+import { contentPath, listingPath } from "@/lib/content/paths";
 
-const BASE_URL = "https://agus-darmawan.com";
+export const revalidate = 3600;
 
-export default function sitemap(): MetadataRoute.Sitemap {
-	// Currently there's only one route per locale (the main desktop shell).
-	// Once /blog/[slug] or /projects/[slug] become real routes (not just
-	// windows inside the desktop), add them here — don't list URLs that
-	// don't have a matching route yet, or Search Console will flag them
-	// as errors.
+type Entry = MetadataRoute.Sitemap[number];
+
+/** One entry per locale, each listing its translations (hreflang in sitemap). */
+function localized(
+	path: string,
+	extra: Omit<Entry, "url" | "alternates">,
+): Entry[] {
+	const languages = Object.fromEntries(
+		routing.locales.map((l) => [l, absoluteUrl(localizedPath(l, path))]),
+	);
 	return routing.locales.map((locale) => ({
-		url: `${BASE_URL}/${locale}`,
-		lastModified: new Date(),
-		changeFrequency: "monthly",
-		priority: locale === routing.defaultLocale ? 1 : 0.9,
+		url: absoluteUrl(localizedPath(locale, path)),
+		alternates: { languages },
+		...extra,
 	}));
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+	const locale = routing.defaultLocale;
+	const [projects, posts] = await Promise.all([
+		getProjects(locale),
+		getPosts(locale),
+	]);
+
+	const lastModified = (date: string | null) =>
+		date ? new Date(date) : undefined;
+
+	return [
+		...localized("", { changeFrequency: "monthly", priority: 1 }),
+		...localized("/about", { changeFrequency: "monthly", priority: 0.9 }),
+		...localized(listingPath("project"), {
+			changeFrequency: "weekly",
+			priority: 0.8,
+		}),
+		...localized(listingPath("blog"), {
+			changeFrequency: "weekly",
+			priority: 0.8,
+		}),
+		...projects.flatMap((p) =>
+			localized(contentPath(p), {
+				lastModified: lastModified(p.date),
+				changeFrequency: "monthly",
+				priority: p.featured ? 0.7 : 0.6,
+			}),
+		),
+		...posts.flatMap((p) =>
+			localized(contentPath(p), {
+				lastModified: lastModified(p.date),
+				changeFrequency: "yearly",
+				priority: 0.6,
+			}),
+		),
+	];
 }

@@ -1,7 +1,4 @@
 {
-	"HomePage": {
-		"title": "Hello world!"
-	},
 	"Dock": {
 		"about": "About Me",
 		"terminal": "Terminal",
@@ -13,15 +10,17 @@
 		"search": "Search applications…",
 		"noResults": "No applications found",
 		"launcherOpen": "Show Apps",
-		"launcherClose": "Close"
+		"launcherClose": "Close",
+		"label": "Dock",
+		"clearSearch": "Clear search"
 	},
-	"Windows": {
-		"about": "About Me",
-		"terminal": "Terminal",
-		"resume": "Resume",
-		"experience": "Experience",
-		"projects": "Projects",
-		"blog": "Blog",
-		"contact": "Contact"
+	"Window": {
+		"close": "Close",
+		"minimize": "Minimize",
+		"maximize": "Maximize",
+		"restore": "Restore",
+		"crashed": "This app ran into a problem.",
+		"retry": "Try again",
+		"notFound": "App not found"
 	}
 }
