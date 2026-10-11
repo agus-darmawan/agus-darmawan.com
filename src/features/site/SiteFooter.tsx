@@ -118,7 +118,7 @@ export function SiteFooter() {
 					<p>
 						{t("footer.copyright", {
 							year: new Date().getFullYear(),
-							name: SITE.name,
+							name: SITE.shortName,
 						})}
 					</p>
 					<a

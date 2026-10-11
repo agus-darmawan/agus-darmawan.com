@@ -171,7 +171,7 @@ export function renderOgCard({
 					fontSize: 18,
 				}}
 			>
-				<span style={{ display: "flex" }}>{SITE.name}</span>
+				<span style={{ display: "flex" }}>{SITE.shortName}</span>
 				<span style={{ display: "flex" }}>{host}</span>
 			</div>
 		</div>,
