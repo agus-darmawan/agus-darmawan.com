@@ -1,18 +1,26 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ContentCard } from "@/components/content/ContentCard";
-import { ContentHeader } from "@/components/content/ContentHeader";
-import { accentStyle } from "@/components/content/primitives";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { SITE } from "@/config/site";
 import { Breadcrumbs } from "@/features/site/Breadcrumbs";
 import { Container } from "@/features/site/Container";
+import { DetailHeader } from "@/features/site/content/DetailHeader";
+import { PostRow } from "@/features/site/content/PostRow";
+import { ProjectIndex } from "@/features/site/content/ProjectIndex";
+import { ProjectRow } from "@/features/site/content/ProjectRow";
 import { PageHeader } from "@/features/site/PageHeader";
+import { Section } from "@/features/site/Section";
 import { SiteShell } from "@/features/site/SiteShell";
 import { getPostsWithBody, getProjectsWithBody } from "@/lib/content";
 import { contentPath, listingPath } from "@/lib/content/paths";
-import type { ContentKind, ContentMeta, WithBody } from "@/lib/content/types";
+import type {
+	BlogMeta,
+	ContentKind,
+	ContentMeta,
+	ProjectMeta,
+	WithBody,
+} from "@/lib/content/types";
 import {
 	collectionJsonLd,
 	postJsonLd,
@@ -45,6 +53,29 @@ const listingKeys = {
 
 const stripBody = ({ body: _, ...meta }: WithBody<ContentMeta>) =>
 	meta as ContentMeta;
+
+/** Rows for a list of mixed items; one component per kind. */
+function ContentRows({
+	items,
+	headingLevel = 2,
+}: {
+	items: ContentMeta[];
+	headingLevel?: 2 | 3;
+}) {
+	return (
+		<ul className="border-t border-(--site-line)">
+			{items.map((item) => (
+				<li key={item.slug} className="border-b border-(--site-line)">
+					{item.kind === "project" ? (
+						<ProjectRow project={item} headingLevel={headingLevel} />
+					) : (
+						<PostRow post={item} headingLevel={headingLevel} />
+					)}
+				</li>
+			))}
+		</ul>
+	);
+}
 
 // ── Listing (/projects, /blog) ───────────────────────────────────────────────
 
@@ -87,15 +118,13 @@ export async function ListingPage({
 					toJsonLdCrumbs(locale, crumbs),
 				)}
 			/>
-			<Container className="pb-20">
+			<Container className="pb-24">
 				<PageHeader title={title} lede={t(listingKeys[kind].description)} />
-				<ul className="grid gap-4 sm:grid-cols-2">
-					{items.map((item) => (
-						<li key={item.slug}>
-							<ContentCard item={item} />
-						</li>
-					))}
-				</ul>
+				{kind === "project" ? (
+					<ProjectIndex projects={items as ProjectMeta[]} />
+				) : (
+					<ContentRows items={items as BlogMeta[]} />
+				)}
 			</Container>
 		</SiteShell>
 	);
@@ -155,7 +184,7 @@ export async function DetailPage({
 	const ldCrumbs = toJsonLdCrumbs(locale, crumbs);
 	const more = all
 		.filter((i) => i.slug !== item.slug)
-		.slice(0, 2)
+		.slice(0, 3)
 		.map(stripBody);
 
 	return (
@@ -168,31 +197,26 @@ export async function DetailPage({
 				}
 			/>
 
-			<Container className="pb-20">
+			<Container className="pb-8">
 				<Breadcrumbs items={crumbs} />
-				<article className="mt-6 rounded-2xl overflow-hidden border border-(--border) bg-(--surface)">
-					<ContentHeader item={stripBody(item)} as="h1" />
-					<div
-						style={accentStyle(item.color)}
-						className="px-5 sm:px-8 py-6 [&_p]:text-sm [&_li]:text-sm [&_h1]:text-xl [&_h2]:text-lg [&_h3]:text-base"
-					>
-						<MarkdownRenderer content={item.body} accentColor={item.color} />
+				<article>
+					<DetailHeader item={stripBody(item)} />
+					<div className="border-t border-(--site-line) pt-12 pb-16">
+						<MarkdownRenderer
+							content={item.body}
+							accentColor={item.color}
+							size="comfortable"
+						/>
 					</div>
 				</article>
 
 				{more.length > 0 && (
-					<section className="mt-10" aria-labelledby="more-heading">
-						<h2 id="more-heading" className="text-lg font-semibold mb-4">
-							{kind === "project" ? tc("moreProjects") : tc("morePosts")}
-						</h2>
-						<ul className="grid gap-4 sm:grid-cols-2">
-							{more.map((m) => (
-								<li key={m.slug}>
-									<ContentCard item={m} />
-								</li>
-							))}
-						</ul>
-					</section>
+					<Section
+						id="more-heading"
+						title={kind === "project" ? tc("moreProjects") : tc("morePosts")}
+					>
+						<ContentRows items={more} headingLevel={3} />
+					</Section>
 				)}
 			</Container>
 		</SiteShell>

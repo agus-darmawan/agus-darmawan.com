@@ -26,7 +26,7 @@ export function Inline({ nodes }: { nodes: InlineNode[] }) {
 				return (
 					<code
 						key={i}
-						className="px-1 py-0.5 rounded text-[11px] font-mono bg-(--surface-secondary) border border-(--border) text-(--accent)"
+						className="px-1 py-0.5 rounded text-[0.88em] font-mono bg-(--surface-secondary) border border-(--border) text-(--accent)"
 					>
 						{node.value}
 					</code>
