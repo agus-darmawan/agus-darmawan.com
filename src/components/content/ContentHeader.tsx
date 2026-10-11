@@ -35,21 +35,27 @@ export function useMetaLabels(
 }
 
 /** "Code" / "Live demo" buttons — only rendered when the target exists. */
+const LINK_SIZES = {
+	sm: { box: "text-[10px] px-2 py-1", icon: 10 },
+	md: { box: "text-xs px-3 py-1.5", icon: 13 },
+	lg: { box: "text-sm h-10 px-4", icon: 15 },
+} as const;
+
 export function ContentLinks({
 	item,
 	size = "md",
 }: {
 	item: ContentMeta;
-	size?: "sm" | "md";
+	size?: keyof typeof LINK_SIZES;
 }) {
 	const t = useTranslations("Content");
 	if (item.kind !== "project" || (!item.repoUrl && !item.demo)) return null;
 
 	const base = cn(
 		"relative z-10 inline-flex items-center gap-1.5 rounded-lg font-medium transition-colors",
-		size === "sm" ? "text-[10px] px-2 py-1" : "text-xs px-3 py-1.5",
+		LINK_SIZES[size].box,
 	);
-	const icon = size === "sm" ? 10 : 13;
+	const icon = LINK_SIZES[size].icon;
 
 	return (
 		<div className="flex items-center gap-1.5 shrink-0">
