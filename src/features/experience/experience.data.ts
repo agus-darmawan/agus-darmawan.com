@@ -1,7 +1,7 @@
 /** `YYYY-MM`; formatted per locale at render time. */
 type YearMonth = `${number}-${number}`;
 
-interface ExperienceRole {
+export interface ExperienceRole {
 	/** Key under `Experience.{company}.roles.{role}` in messages/{locale}/experience.json */
 	i18nKey: string;
 	period: { start: YearMonth; end: YearMonth | null };

@@ -20,6 +20,10 @@
 		"emailMe": "Kirim email",
 		"notFoundTitle": "Halaman tidak ditemukan",
 		"notFoundBody": "Halaman yang kamu cari tidak ada atau sudah dipindahkan.",
-		"backHome": "Kembali ke beranda"
+		"backHome": "Kembali ke beranda",
+		"experienceTitle": "Pengalaman",
+		"experienceDescription": "Pengalaman kerja Agus Darmawan: robotics engineer di PT Ezra Robotics Teknologi, kendaraan otonom di ITS, tim roboboat Barunastra, dan peran full-stack web.",
+		"contactTitle": "Kontak",
+		"contactDescription": "Hubungi Agus Darmawan untuk pekerjaan robotika atau full-stack, kolaborasi, dan riset, lewat email, LinkedIn, GitHub, atau formulir kontak."
 	}
 }
