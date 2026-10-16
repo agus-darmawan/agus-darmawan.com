@@ -50,15 +50,17 @@ window.addEventListener("openApp", (e) => openWindow(e.detail.appId));
 
 This keeps the terminal completely decoupled from the window manager. The terminal doesn't import anything from the window system — it just dispatches events and forgets.
 
-### Custom MDX Parser
+### Markdown, Rendered Once on the Server
 
-Rather than adding a heavy markdown library, I wrote a custom MDX parser from scratch. It handles headings, code blocks, tables, blockquotes, inline formatting, YouTube embeds, and generates a table of contents automatically.
+The first version used a parser I wrote from scratch: about 250 lines, zero dependencies. It held up until the write-ups grew. Every line became its own paragraph, lists couldn't nest, and the regex highlighter knew a handful of languages.
+
+Now every body goes through remark and rehype (GitHub-flavoured Markdown, sanitized raw HTML) with Shiki for highlighting, once, when the page is built:
 
 ```ts
-export function parseMdx(raw: string): { tokens: Token[]; toc: TocEntry[] }
+const { tree, toc } = await renderMarkdown(body);
 ```
 
-The parser is ~250 lines, zero dependencies, and tested with 35 Vitest cases.
+The result is a plain tree that the website renders on the server and the desktop windows render in the browser, so code gets VS Code's grammars without a single grammar shipped to the client.
 
 ## Infrastructure
 
