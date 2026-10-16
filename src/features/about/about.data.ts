@@ -147,8 +147,8 @@ export const PUBLICATIONS = [
 		titleKey: "publicationGesture",
 		authorsKey: "publicationGestureAuthors",
 		venueKey: "publicationGestureVenue",
-		year: "2024",
+		year: "2025",
 		color: "#8b5cf6",
-		url: "https://repository.its.ac.id/123032/",
+		url: "https://arxiv.org/abs/2507.10055",
 	},
 ] as const;
