@@ -2,22 +2,21 @@
 
 import { Check, Copy } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
-import { highlight } from "@/lib/markdown/highlight";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 
 interface CodeBlockProps {
-	lang: string;
-	code: string;
-	/** Font size of the code (compact windows vs reading pages). */
-	className?: string;
+	/** Display name of the language; none for plain text. */
+	lang?: string;
+	/** File name from the fence (`title="store.ts"`), shown instead. */
+	title?: string;
+	/** The highlighted `<pre>`, rendered on the server. */
+	children: ReactNode;
 }
 
-export function CodeBlock({
-	lang,
-	code,
-	className = "text-xs",
-}: CodeBlockProps) {
+/** A highlighted code block with its file name or language and a copy button. */
+export function CodeBlock({ lang, title, children }: CodeBlockProps) {
 	const t = useTranslations("Content");
+	const body = useRef<HTMLDivElement>(null);
 	const [copied, setCopied] = useState(false);
 
 	useEffect(() => {
@@ -26,45 +25,37 @@ export function CodeBlock({
 		return () => clearTimeout(id);
 	}, [copied]);
 
-	const handleCopy = async () => {
+	const copy = async () => {
+		// Lines are block elements without newlines between them.
+		const lines = body.current?.querySelectorAll(".line") ?? [];
+		const text = Array.from(lines, (line) => line.textContent ?? "").join("\n");
 		try {
-			await navigator.clipboard.writeText(code);
+			await navigator.clipboard.writeText(text);
 			setCopied(true);
 		} catch {
-			// Clipboard blocked (insecure context / permissions) — fail silently.
+			// Clipboard blocked (insecure context, permissions): nothing to undo.
 		}
 	};
 
 	return (
-		<div className="rounded-xl overflow-hidden my-3 border border-(--border)">
-			<div className="flex items-center justify-between px-3 py-1.5 bg-(--surface-secondary) border-b border-(--border)">
-				<span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-(--accent)/10 text-(--accent) border border-(--accent)/20">
-					{lang || "text"}
-				</span>
-
+		<div className="md-code">
+			<div className="md-code-bar">
+				{title ? (
+					<span className="md-code-title">{title}</span>
+				) : (
+					<span>{lang}</span>
+				)}
 				<button
 					type="button"
-					onClick={handleCopy}
-					aria-label={t("copyCode")}
-					className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded transition-colors hover:bg-(--border) ${copied ? "text-[#50fa7b]" : "text-(--text-muted)"}`}
+					onClick={copy}
+					aria-label={copied ? t("copied") : t("copyCode")}
+					className="md-code-copy"
 				>
-					{copied ? (
-						<Check size={11} aria-hidden />
-					) : (
-						<Copy size={11} aria-hidden />
-					)}
-					{copied ? t("copied") : t("copy")}
+					{copied ? <Check aria-hidden /> : <Copy aria-hidden />}
+					<span aria-hidden>{copied ? t("copied") : t("copy")}</span>
 				</button>
 			</div>
-
-			<pre
-				className={`overflow-x-auto p-4 font-mono leading-relaxed m-0 bg-[#1a1a2e] text-[#f8f8f2] ${className}`}
-			>
-				<code
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: highlight() HTML-escapes every slice of the source
-					dangerouslySetInnerHTML={{ __html: highlight(code, lang) }}
-				/>
-			</pre>
+			<div ref={body}>{children}</div>
 		</div>
 	);
 }

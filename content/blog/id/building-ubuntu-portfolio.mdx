@@ -46,15 +46,17 @@ window.addEventListener("openApp", (e) => openWindow(e.detail.appId));
 
 Ini membuat terminal sepenuhnya terpisah dari window manager. Terminal tidak mengimpor apapun dari sistem window — hanya dispatch event dan selesai.
 
-### Custom MDX Parser
+### Markdown, Dirender Sekali di Server
 
-Daripada menambahkan library markdown yang berat, saya menulis custom MDX parser dari scratch. Parser ini menangani heading, code block, tabel, blockquote, format inline, embed YouTube, dan menghasilkan daftar isi secara otomatis.
+Versi pertama memakai parser yang saya tulis dari nol: sekitar 250 baris, tanpa dependensi. Parser itu bertahan sampai tulisannya makin panjang. Setiap baris jadi paragraf sendiri, list tidak bisa bersarang, dan highlighter berbasis regex cuma kenal beberapa bahasa.
+
+Sekarang setiap body diproses remark dan rehype (Markdown ala GitHub, HTML mentah yang disanitasi) dengan Shiki untuk highlighting, sekali, saat halaman di-build:
 
 ```ts
-export function parseMdx(raw: string): { tokens: Token[]; toc: TocEntry[] }
+const { tree, toc } = await renderMarkdown(body);
 ```
 
-Parser ini ~250 baris, tanpa dependensi, dan diuji dengan 35 test case Vitest.
+Hasilnya tree biasa yang dirender website di server dan dirender jendela desktop di browser, jadi kode dapat grammar VS Code tanpa satu grammar pun dikirim ke client.
 
 ## Infrastruktur
 

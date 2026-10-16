@@ -49,7 +49,10 @@
 		},
 		"writing": {
 			"title": "Tulisan",
-			"all": "Semua tulisan"
+			"all": "Semua tulisan",
+			"search": "Cari tulisan",
+			"noMatch": "Tidak ada tulisan yang cocok dengan “{query}”.",
+			"filter": "Saring tulisan berdasarkan tag"
 		},
 		"cta": {
 			"title": "Punya robot, dashboard, atau ide yang perlu dibangun?",
@@ -68,7 +71,9 @@
 		"projects": {
 			"filter": "Saring proyek berdasarkan kategori",
 			"empty": "Belum ada proyek di kategori ini.",
-			"featured": "Unggulan"
+			"featured": "Unggulan",
+			"search": "Cari proyek",
+			"noMatch": "Tidak ada proyek yang cocok dengan “{query}”."
 		},
 		"footer": {
 			"tagline": "Robotics engineer dan full-stack developer di Denpasar, Bali.",

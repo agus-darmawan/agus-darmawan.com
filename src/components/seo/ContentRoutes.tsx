@@ -1,17 +1,25 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
+import { StatsScope } from "@/components/content/stats/ItemStats";
 import { SITE } from "@/config/site";
 import { Breadcrumbs } from "@/features/site/Breadcrumbs";
 import { Container } from "@/features/site/Container";
+import { ArticleBody } from "@/features/site/content/ArticleBody";
+import { ArticleEnd } from "@/features/site/content/ArticleEnd";
 import { ContentRows } from "@/features/site/content/ContentRows";
 import { DetailHeader } from "@/features/site/content/DetailHeader";
+import { PostIndex } from "@/features/site/content/PostIndex";
+import { ProjectCard } from "@/features/site/content/ProjectCard";
 import { ProjectIndex } from "@/features/site/content/ProjectIndex";
 import { PageHeader } from "@/features/site/PageHeader";
 import { Section } from "@/features/site/Section";
 import { SiteShell } from "@/features/site/SiteShell";
-import { getPostsWithBody, getProjectsWithBody } from "@/lib/content";
+import {
+	getPostsWithBody,
+	getProjectsWithBody,
+	renderBody,
+} from "@/lib/content";
 import { contentPath, listingPath } from "@/lib/content/paths";
 import type {
 	BlogMeta,
@@ -20,6 +28,7 @@ import type {
 	ProjectMeta,
 	WithBody,
 } from "@/lib/content/types";
+import { itemKey } from "@/lib/meta/keys";
 import {
 	collectionJsonLd,
 	postJsonLd,
@@ -52,6 +61,26 @@ const listingKeys = {
 
 const stripBody = ({ body: _, ...meta }: WithBody<ContentMeta>) =>
 	meta as ContentMeta;
+
+/**
+ * Up to `count` items to read next: shared tags count most, then the same
+ * category; ties keep the list's own order (featured and newest first).
+ */
+function related(item: ContentMeta, all: ContentMeta[], count = 3) {
+	const score = (other: ContentMeta) =>
+		other.tags.filter((tag) => item.tags.includes(tag)).length * 2 +
+		(item.kind === "project" &&
+		other.kind === "project" &&
+		other.category === item.category
+			? 1
+			: 0);
+	return all
+		.filter((other) => other.slug !== item.slug)
+		.map((other, index) => ({ other, index, score: score(other) }))
+		.sort((a, b) => b.score - a.score || a.index - b.index)
+		.slice(0, count)
+		.map(({ other }) => other);
+}
 
 // ── Listing (/projects, /blog) ───────────────────────────────────────────────
 
@@ -99,7 +128,7 @@ export async function ListingPage({
 				{kind === "project" ? (
 					<ProjectIndex projects={items as ProjectMeta[]} />
 				) : (
-					<ContentRows items={items as BlogMeta[]} />
+					<PostIndex posts={items as BlogMeta[]} />
 				)}
 			</Container>
 		</SiteShell>
@@ -158,10 +187,9 @@ export async function DetailPage({
 		{ name: item.title, href: contentPath(item) },
 	];
 	const ldCrumbs = toJsonLdCrumbs(locale, crumbs);
-	const more = all
-		.filter((i) => i.slug !== item.slug)
-		.slice(0, 3)
-		.map(stripBody);
+	const meta = stripBody(item);
+	const more = related(meta, all.map(stripBody));
+	const doc = await renderBody(locale, item.body);
 
 	return (
 		<SiteShell>
@@ -175,15 +203,10 @@ export async function DetailPage({
 
 			<Container className="pb-8">
 				<Breadcrumbs items={crumbs} />
-				<article>
-					<DetailHeader item={stripBody(item)} />
-					<div className="border-t border-(--site-line) pt-10 pb-14">
-						<MarkdownRenderer
-							content={item.body}
-							accentColor={item.color}
-							size="comfortable"
-						/>
-					</div>
+				<article className="pb-16">
+					<DetailHeader item={meta} />
+					<ArticleBody doc={doc} accent={item.color} />
+					<ArticleEnd item={meta} />
 				</article>
 
 				{more.length > 0 && (
@@ -191,7 +214,25 @@ export async function DetailPage({
 						id="more-heading"
 						title={kind === "project" ? tc("moreProjects") : tc("morePosts")}
 					>
-						<ContentRows items={more} headingLevel={3} />
+						{kind === "project" ? (
+							<StatsScope items={more.map(itemKey)}>
+								<ul className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+									{(more as ProjectMeta[]).map((project) => (
+										<li key={project.slug}>
+											<ProjectCard
+												project={project}
+												headingLevel={3}
+												sizes="(min-width: 1024px) 22rem, (min-width: 640px) 50vw, 100vw"
+											/>
+										</li>
+									))}
+								</ul>
+							</StatsScope>
+						) : (
+							<StatsScope items={more.map(itemKey)}>
+								<ContentRows items={more} headingLevel={3} />
+							</StatsScope>
+						)}
 					</Section>
 				)}
 			</Container>

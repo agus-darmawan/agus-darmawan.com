@@ -1,3 +1,4 @@
+export { renderBody } from "./doc";
 export {
 	getPosts,
 	getPostsWithBody,

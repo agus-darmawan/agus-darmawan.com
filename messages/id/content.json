@@ -4,7 +4,6 @@
 		"copied": "Tersalin!",
 		"copyCode": "Salin kode",
 		"tableOfContents": "Daftar isi",
-		"imageFailed": "Gagal memuat gambar: {alt}",
 		"code": "Kode",
 		"demo": "Demo langsung",
 		"viewOnGithub": "Lihat di GitHub",
@@ -32,6 +31,19 @@
 		"moreProjects": "Proyek lainnya",
 		"clearSearch": "Hapus pencarian",
 		"video": "Video YouTube",
-		"playVideo": "Putar video: {title}"
+		"playVideo": "Putar video: {title}",
+		"footnotes": "Catatan kaki",
+		"backToReference": "Kembali ke rujukan {n}",
+		"callout": {
+			"note": "Catatan",
+			"tip": "Tips",
+			"important": "Penting",
+			"warning": "Peringatan",
+			"caution": "Hati-hati"
+		},
+		"views": "{count, plural, other {# kali dilihat}}",
+		"likes": "{count, plural, other {# suka}}",
+		"like": "Suka",
+		"loading": "Memuat"
 	}
 }

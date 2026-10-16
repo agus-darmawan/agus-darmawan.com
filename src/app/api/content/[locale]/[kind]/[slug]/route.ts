@@ -5,13 +5,16 @@ import {
 	type ContentKind,
 	getPostsWithBody,
 	getProjectsWithBody,
+	renderBody,
 } from "@/lib/content";
+import type { MarkdownDoc } from "@/lib/markdown/types";
 import type { ApiResponse } from "@/types/api";
 
 /**
- * Body of a single project/post for the desktop windows. Metadata is already
- * server-rendered into the page; bodies are fetched lazily so the initial HTML
- * stays small. Statically generated + revalidated hourly (GitHub stats).
+ * Body of a single project/post for the desktop windows, already parsed,
+ * sanitized and highlighted (the same tree the website renders). Metadata
+ * is server-rendered into the page; bodies are fetched lazily so the initial
+ * HTML stays small. Statically generated + revalidated hourly (GitHub stats).
  */
 export const revalidate = 3600;
 
@@ -60,8 +63,8 @@ export async function GET(
 		);
 	}
 
-	return NextResponse.json<ApiResponse<{ body: string }>>({
+	return NextResponse.json<ApiResponse<MarkdownDoc>>({
 		success: true,
-		data: { body: entry.body },
+		data: await renderBody(locale, entry.body),
 	});
 }

@@ -39,6 +39,16 @@ const envSchema = z.object({
 
 	// ── GitHub (project enrichment — 60 → 5000 req/h when set) ───────────────
 	GITHUB_TOKEN: optional,
+
+	// ── Views & likes (Upstash Redis — hidden when not set) ──────────────────
+	UPSTASH_REDIS_REST_URL: optional.pipe(z.url().optional()),
+	UPSTASH_REDIS_REST_TOKEN: optional,
+	// The names Vercel's Upstash integration uses.
+	KV_REST_API_URL: optional.pipe(z.url().optional()),
+	KV_REST_API_TOKEN: optional,
+	META_SALT: optional,
+	// "memory": keep counts in the server process (development, e2e tests).
+	META_STORE: optional.pipe(z.enum(["memory"]).optional()),
 });
 
 const parsed = envSchema.safeParse(process.env);

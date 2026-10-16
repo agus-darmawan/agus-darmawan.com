@@ -22,27 +22,51 @@ const shared = {
 	tags: z.array(z.string()).default([]),
 	emoji: z.string().default("📄"),
 	color: hexColor.default("#e95420"),
+	/**
+	 * A photo for the banner, from /public (e.g. "/images/projects/x.jpg").
+	 * Without one, the page draws a banner from the slug.
+	 */
+	banner: z
+		.string()
+		.regex(
+			/^\/[\w./-]+\.(?:avif|webp|png|jpe?g)$/i,
+			"Expected /path/in/public.jpg",
+		)
+		.optional(),
+	/** What the photo shows, for screen readers. Required with `banner`. */
+	bannerAlt: z.string().min(1).optional(),
 };
 
-export const projectFrontmatter = z.object({
-	...shared,
-	date: isoDate.optional(),
-	category: z.enum(["web", "robotics", "research"]).default("web"),
-	featured: z.boolean().default(false),
-	order: z.number().int().default(100),
-	repo: z
-		.string()
-		.regex(/^[\w.-]+\/[\w.-]+$/, "Expected owner/name")
-		.optional(),
-	demo: z.url().optional(),
-	draft: z.boolean().default(false),
-});
+const withBannerAlt = (data: { banner?: string; bannerAlt?: string }) =>
+	!data.banner || Boolean(data.bannerAlt);
+const bannerAltIssue = {
+	message: "`banner` needs a `bannerAlt` describing the photo",
+	path: ["bannerAlt"],
+};
 
-export const blogFrontmatter = z.object({
-	...shared,
-	date: isoDate,
-	draft: z.boolean().default(false),
-});
+export const projectFrontmatter = z
+	.object({
+		...shared,
+		date: isoDate.optional(),
+		category: z.enum(["web", "robotics", "research"]).default("web"),
+		featured: z.boolean().default(false),
+		order: z.number().int().default(100),
+		repo: z
+			.string()
+			.regex(/^[\w.-]+\/[\w.-]+$/, "Expected owner/name")
+			.optional(),
+		demo: z.url().optional(),
+		draft: z.boolean().default(false),
+	})
+	.refine(withBannerAlt, bannerAltIssue);
+
+export const blogFrontmatter = z
+	.object({
+		...shared,
+		date: isoDate,
+		draft: z.boolean().default(false),
+	})
+	.refine(withBannerAlt, bannerAltIssue);
 
 /**
  * Locale override file — only translatable fields. Unknown keys are stripped
@@ -52,6 +76,7 @@ export const localeOverride = z.object({
 	title: z.string().min(1).optional(),
 	description: z.string().min(1).max(300).optional(),
 	tags: z.array(z.string()).optional(),
+	bannerAlt: z.string().min(1).optional(),
 });
 
 export type ProjectFrontmatter = z.infer<typeof projectFrontmatter>;

@@ -1,32 +1,21 @@
+import type { Root } from "hast";
+
+/** A section of the article in the table of contents. */
 export interface TocEntry {
 	id: string;
 	text: string;
-	level: 1 | 2 | 3;
+	level: 2 | 3;
 }
 
-// ── Inline nodes ─────────────────────────────────────────────────────────────
+/**
+ * A Markdown body prepared on the server: parsed, sanitized and highlighted
+ * once, then rendered as-is by the website pages and the desktop windows.
+ * Plain JSON, so it can travel through the content API.
+ */
+export interface MarkdownDoc {
+	tree: Root;
+	toc: TocEntry[];
+}
 
-export type InlineNode =
-	| { type: "text"; value: string }
-	| { type: "bold"; children: InlineNode[] }
-	| { type: "italic"; children: InlineNode[] }
-	| { type: "code"; value: string }
-	| { type: "link"; href: string; children: InlineNode[] }
-	| { type: "image"; src: string; alt: string };
-
-// ── Block tokens ─────────────────────────────────────────────────────────────
-
-export type Token =
-	| { type: "h1"; id: string; children: InlineNode[] }
-	| { type: "h2"; id: string; children: InlineNode[] }
-	| { type: "h3"; id: string; children: InlineNode[] }
-	| { type: "p"; children: InlineNode[] }
-	| { type: "blockquote"; children: Token[] }
-	| { type: "code_block"; lang: string; code: string }
-	| { type: "table"; headers: InlineNode[][]; rows: InlineNode[][][] }
-	| { type: "ul"; items: InlineNode[][] }
-	| { type: "ol"; items: InlineNode[][] }
-	| { type: "hr" }
-	| { type: "image"; src: string; alt: string; title?: string }
-	| { type: "youtube"; videoId: string; title?: string }
-	| { type: "blank" };
+/** Elements the renderer swaps for components (`<div data-component>`). */
+export type CalloutKind = "note" | "tip" | "important" | "warning" | "caution";

@@ -17,6 +17,9 @@ interface BaseMeta {
 	/** ISO date (YYYY-MM-DD) — required for posts, optional for projects. */
 	date: string | null;
 	readingTime: number;
+	/** Photo for the banner (a path in /public); null draws one instead. */
+	banner: string | null;
+	bannerAlt: string | null;
 }
 
 export interface ProjectMeta extends BaseMeta {
