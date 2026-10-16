@@ -1,0 +1,89 @@
+---
+title: "iCar 4: Porting the Self-Driving Stack"
+description: "Brought the iCar ITS self-driving workspace up on the new iCar 4: one wire format for its new STM32 board, two Velodyne LiDARs and a cleaner workspace, refactored from Pandu Surya Tantra's base program."
+category: robotics
+featured: false
+order: 6
+emoji: "🚙"
+color: "#6366f1"
+tags: ["ROS Noetic", "C++", "Velodyne VLP-16", "STM32", "UDP", "LVGL", "GPS"]
+repo: "iCar-ITS/ICar4-ITS"
+---
+
+iCar is the autonomous electric car developed at ITS. iCar 4 is a new vehicle with a new low-level controller board and new LiDARs, and the existing self-driving software had to run on it. The base program and its architecture are by Pandu Surya Tantra; my part was porting and refactoring it for the new car.
+
+## The problem
+
+The software worked on the previous car, but iCar 4 changed the two things it talks to most: the STM32 board that drives the throttle, steering and brake, and the LiDARs. The old code packed its UDP packets by hand at byte offsets that matched the old firmware, and the workspace carried a vendored driver for LiDARs the new car no longer has.
+
+## How the stack works
+
+The workspace is ROS Noetic in C++, split by responsibility:
+
+- `icar_interface` talks to the hardware: the STM32 over UDP, the GPS (ready for NTRIP corrections), the LiDARs, and a web interface through rosbridge.
+- `icar_middleware` turns raw data into state: wheel odometry, a complementary-filter pose estimator, LiDAR segmentation and obstacles, a minimap and the TF tree.
+- `icar_routine` drives: record a route, load it, and follow it with pure pursuit and a speed PID, with obstacle zones from the LiDAR.
+- `icar_ui` is the touchscreen in the car, built with LVGL.
+
+## What I changed
+
+### One wire format, defined once
+
+**Problem.** The PC and the new STM32 firmware disagreed on the packet layout. The old code copied each field into a buffer at a hand-counted offset, so every firmware change meant recounting bytes on both sides, and a mismatch failed silently.
+
+**Solution.** Both directions are now plain structs with fixed-width fields. From the car: timestamp, status, 16 remote-control channels, steering position, two encoder counts and gyro yaw. To the car: timestamp, transmission, throttle, steering setpoint, brake and I/O state. The whole struct goes out and comes back with non-blocking `sendto` and `recvfrom`, so the 50 Hz loop never stalls on a missing packet, and a negative throttle now drives the brake.
+
+```cpp
+struct {
+  uint32_t timestamp;
+  uint32_t status;
+  uint16_t remote_data[16];
+  uint32_t steer_pos;
+  uint16_t odom_enc_val[2];
+  float gyro_yaw_data;
+} data_to_pc;
+```
+
+### New LiDARs without new driver code
+
+**Problem.** iCar 4 replaced the two Leishen LiDARs with two Velodyne VLP-16s, one at the front and one at the rear right.
+
+**Solution.** The official ROS Velodyne driver comes in as a git submodule, and each sensor runs in its own namespace with its own nodelet manager, IP address, port and frame. The existing LiDAR interface, which merges both clouds into the car's base frame and separates the floor, only needed its inputs remapped, so segmentation and obstacle detection downstream did not change.
+
+### A workspace you can diff against
+
+**Problem.** The team's code was mixed with copies of third-party libraries, which made it hard to see what the iCar code was and what I had changed.
+
+**Solution.** The first commit is the base program as I received it, minus the vendored LiDAR driver, helper library and NTRIP client. Pandu's helper library `ps_ros_lib` and the Velodyne driver are submodules, and the remaining third-party code (LVGL, lwgps, lwpkt, lwrb) lives under `xtras/`. Every later change is a readable diff against the original.
+
+### Bring-up before strictness
+
+**Problem.** The link check expects the car's packet counter to advance by exactly one every cycle. The new firmware's counter did not, so every packet was rejected and the car never moved.
+
+**Solution.** For bring-up I disabled the check and logged packet sizes on both sides to confirm the layout, which got the car driving on the new board. The check goes back once the counter's behavior is agreed with the firmware side: it is the only thing that tells the car its controller has stopped listening.
+
+## Results
+
+- The iCar base program runs on iCar 4's new board and LiDARs, with its routines and middleware unchanged.
+- The workspace became the base for the work that followed in the same role: LiDAR-inertial odometry fused with GPS, tuned obstacle avoidance and a web dashboard for monitoring the car.
+
+## Lessons learned
+
+- Define a wire format once, as a type both sides share. Byte offsets kept in two codebases drift apart.
+- When you refactor someone else's code, make the original your first commit. Credit and review both get easy.
+- Disabling a safety check is sometimes the fastest way through bring-up, but only with the reason written down and a plan to restore it.
+- Use upstream drivers as submodules instead of vendored copies.
+
+## Stack
+
+| Part | Technology |
+|------|-----------|
+| Middleware | ROS Noetic, C++, catkin |
+| Sensors | Two Velodyne VLP-16, GPS, wheel encoders, gyro |
+| Low level | STM32 board over UDP |
+| In-car UI | LVGL touchscreen |
+| Libraries | rosbridge, GeographicLib, libserialport |
+
+## Credits
+
+The iCar base program, its architecture and the `ps_ros_lib` helper library are by Pandu Surya Tantra. My part was the iCar 4 port: the new protocol, the Velodyne integration, brake support, the launch files and the workspace cleanup.

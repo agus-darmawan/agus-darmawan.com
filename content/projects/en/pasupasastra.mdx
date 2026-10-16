@@ -1,0 +1,106 @@
+---
+title: "PASUPASASTRA: Multi-Drone Command Center"
+description: "One console for a mixed drone fleet: live telemetry and video from DJI, Autel and MAVLink drones, AI detection on every feed, and a 3D map that keeps working without internet."
+category: robotics
+featured: true
+order: 2
+emoji: "🚁"
+color: "#5a8a12"
+tags: ["Next.js", "Tauri", "CesiumJS", "FastAPI", "MediaMTX", "YOLO", "Ollama", "Flutter"]
+---
+
+PASUPASASTRA is a command center for teams that fly several drone brands at once. It puts every drone, its video and what the AI sees in that video on one 3D map, and it runs entirely on the operator's own hardware, with or without internet. The name plays on Pasupatastra, Arjuna's arrow in the Kakawin Arjunawiwaha.
+
+## The problem
+
+Mixed fleets are the norm: one operation can fly a DJI enterprise drone, an Autel and a MAVLink autopilot side by side. Each arrives with its own ground station, so operators juggle screens and nobody holds one picture of where everything is. The integrated systems that solve this are closed foreign products, which leaves the operator's data and roadmap in someone else's hands, and most of them assume a cloud connection that field teams do not have.
+
+## What I built
+
+- **Bridges**: Android apps on the drones' remote controllers use the vendor SDKs (DJI MSDK v5, Autel SDK) and speak one WebSocket protocol to the server. MAVLink autopilots connect directly.
+- **API**: a FastAPI service holds the fleet state, stores telemetry in TimescaleDB and streams live state to every open console.
+- **Video**: MediaMTX takes RTMP and RTSP from drones and CCTV cameras and serves WebRTC for low latency, with HLS as a fallback.
+- **AI worker**: a GPU worker reads the streams and runs several YOLO models at once, plus a vision-language model through Ollama: a larger one answers an operator's questions about the stream in focus, a small one captions feeds automatically.
+- **Console**: Next.js with CesiumJS for the 3D map, in Bahasa Indonesia, as a web app or a Tauri desktop app. A demo mode simulates the whole backend in the browser for presentations.
+
+```text
+Telemetry and commands
+
+  DJI / Autel bridge apps --+
+  MAVLink autopilots -------+--> gcs-api (FastAPI) --> console (Next.js, Cesium)
+                                     |
+                                     +--> PostgreSQL + TimescaleDB
+
+Video and AI
+
+  drone and CCTV video --> MediaMTX --> WebRTC / HLS --> console
+                              |
+                              +--> gcs-worker (GPU): YOLO, VLM via Ollama
+                                       |
+                                       +--> detections, captions --> gcs-api
+```
+
+## Challenges and how I solved them
+
+### The map that vanished in production
+
+**Problem.** The 3D map worked in development and was blank in every production build, web and desktop alike. Turbopack's minifier rewrote parts of Cesium into template strings with octal escapes, which browsers refuse to parse, so the dynamic import failed without a word.
+
+**Solution.** Cesium is no longer bundled. The app loads Cesium's own prebuilt UMD build with a script tag from the folder that already serves its workers and assets, and shows an error instead of an empty canvas if that fails. As a bonus, the app's JavaScript dropped from about 7 MB to 1.2 MB.
+
+### No internet in the field
+
+**Problem.** Field teams often have no connection, and a map that needs online tiles goes blank exactly when it matters.
+
+**Solution.** The Natural Earth imagery that ships with Cesium always renders as the base layer, and an offline layer serves XYZ tiles from local disk through Caddy. The vision-language model runs locally through Ollama, and the whole stack runs on one laptop.
+
+### "Link lost" while the drone flew fine
+
+**Problem.** The console marked DJI drones as disconnected while their telemetry kept arriving. The remote controller's clock was minutes behind the server, so every message looked stale on arrival.
+
+**Solution.** The server stamps telemetry with its own receive time and judges link health against that, never against a device clock.
+
+### A crash when two models loaded at once
+
+**Problem.** Starting several detectors together crashed the Python worker outright: two threads loaded YOLO models while the GPU backend was still initializing.
+
+**Solution.** Model loading goes through a lock in the model registry, so models load one at a time.
+
+### Phones as routers
+
+**Problem.** In tests the server laptop sat on a phone hotspot. Its address changed between sessions, and some hotspots isolate their clients, so bridges and other laptops could not reach the server or its video.
+
+**Solution.** A script rewrites the server address in the environment file whenever it changes, and WebRTC gained a TCP fallback for networks that block UDP. For field use, a dedicated travel router with fixed DHCP reservations, or the laptop itself as the hotspot, avoids both problems.
+
+### Configuration traps
+
+**Problem.** Several startup crashes came from configuration, not code: CORS origins written as a comma-separated list where the settings library expected JSON, a demo drone seeded a second time after an operator edited it, and a Next.js 16 static export on Windows that wrote route segment files as nested folders instead of dotted names.
+
+**Solution.** The settings parser accepts both list formats, the seed checks whether the drone ID already exists instead of trusting a flag, and a post-build script renames the segment files on Windows.
+
+## Status
+
+Live telemetry from a DJI enterprise drone runs end to end in the console, next to video streamed through MediaMTX. Flight commands and waypoint missions are implemented in the bridges; full flight tests are next. The stack runs on macOS and Windows laptops, with the GPU worker native on Apple silicon and in Docker on NVIDIA machines.
+
+## Lessons learned
+
+- A production build is a different program. Test the built artifact, not the dev server, especially with a library as large as Cesium.
+- Never trust a device clock for liveness. Stamp messages when they arrive.
+- Offline is a feature you design from the start: base imagery, local tiles and local models.
+- The field network is part of the system. Plan the router like you plan the server.
+- Keep vendor SDKs at the edge. Each bridge translates its SDK into one protocol, so the server and the console never need to know a drone's brand.
+
+## Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Console | Next.js 16 (static export), TypeScript, Zustand, CesiumJS, Tauri 2 |
+| API | Python, FastAPI, PostgreSQL with TimescaleDB, NATS |
+| AI | Several YOLO models at once, a vision-language model through Ollama |
+| Video | MediaMTX: RTMP and RTSP in, WebRTC and HLS out |
+| Bridges | Flutter apps with native code for DJI MSDK v5 and the Autel SDK |
+| Deployment | Docker Compose, Caddy, PM2 for native services |
+
+## My role
+
+I designed the system and built it end to end: the console, the API, the AI worker, the drone bridges, the infrastructure and the user manual.

@@ -1,0 +1,116 @@
+---
+title: "Pashupati & NETRA: Patroli Mal Otonom"
+description: "Stack patroli dan inspeksi ROS 2 yang tidak terikat merek robot untuk quadruped beroda, plus NETRA, command center yang menjadwalkan patroli, memvalidasi temuan robot, dan mengirim alert."
+---
+
+Pashupati menjalankan quadruped beroda keliling mal di rute tetap, berhenti di titik cek, dan mencari sampah, tumpahan, lantai rusak, atau orang yang terjatuh. NETRA adalah command center di belakangnya: operator menjadwalkan patroli, memantau robot di denah mal, mengonfirmasi temuannya, dan menerima alert di Telegram.
+
+## Masalahnya
+
+Petugas keamanan dan kebersihan menyusuri koridor yang sama setiap shift. Robot ini harus mengambil alih ronda itu: melaporkan masalah lengkap dengan foto dan posisinya di peta, menghitung keramaian, dan tidak pernah jadi bahaya sendiri di koridor yang penuh pengunjung. Robot juga harus tetap patroli saat Wi-Fi putus, dan bisa dioperasikan oleh operator mal, bukan oleh roboticist.
+
+## Yang saya bangun
+
+Koridor dipatroli lewat rute yang sama setiap shift, jadi Pashupati memakai teach and repeat, bukan global planner:
+
+- **Teach**: jalankan rute sekali dengan handheld sementara FAST-LIO2 melacak robot, tandai titik inspeksi, dan rekam AprilTag yang menjadi jangkar peta.
+- **Repeat**: rute di-resample dan dihaluskan, lalu diikuti dengan profil kecepatan yang memperhitungkan kelengkungan; di setiap titik henti robot mengunci posisi sampai 5 cm dan 3° lalu melakukan inspeksi.
+- **Inspeksi**: vision-language model lokal (Moondream lewat Ollama) memeriksa setiap titik, lalu NETRA melakukan pengecekan kedua sebelum dikonfirmasi oleh manusia.
+- **Hitung orang**: orang yang terlihat kamera dipetakan ke denah dan dirangkum menjadi heatmap keramaian per menit.
+- **Operasional**: jadwal dan kendali langsung dari NETRA, kendali manual dari handheld Retroid lewat UDP, dan seluruh stack robot berjalan sebagai satu systemd service yang diawasi.
+
+```text
+Livox Mid-360 ---> FAST-LIO2 ---> localization <--- AprilTag
+      |                                |
+      +---> scan sektor 360°           |
+                   |                   v
+                   +---------> path follower + avoidance
+                                       |
+          handheld (UDP) ---> control mux ---> driver robot
+                              e-stop, protective field
+
+RealSense ---> AprilTag, inspeksi (VLM), deteksi orang
+status, temuan, keramaian ---> fleet uplink ---> NETRA
+                               (WebSocket)       API Go, PostgreSQL,
+                                                 Next.js, Telegram
+```
+
+## Tantangan dan solusinya
+
+### Satu koneksi ke robot, atau robotnya jatuh
+
+**Masalah.** SDK robot hanya menerima satu koneksi kontrol. Driver pertama memakai node terpisah untuk mengirim perintah dan membaca status, masing-masing dengan koneksinya sendiri, dan robot kehilangan kendali di tengah gerakan lalu jatuh. Belakangan robot tetap mengirim telemetri tetapi mengabaikan semua perintah gerak.
+
+**Solusi.** Satu node driver memegang satu-satunya koneksi SDK, dan semua node lain bicara dengannya lewat ROS. Saat terhubung, driver meminta hak kontrol SDK ke robot dan mengulang sampai diberikan; semua perintah menunggu mode itu, kecuali emergency stop. Driver lama yang masih memegang port UDP sempat membuat telemetri lama terlihat hidup, jadi sekarang seluruh stack berjalan sebagai satu service yang diawasi dan juga mematikan autostart bawaan vendor.
+
+### Jetson yang sibuk mengerjakan hal yang sia-sia
+
+**Masalah.** Di Jetson Orin NX, node sektor LiDAR hanya jalan sekitar 6 Hz sambil menghabiskan satu core penuh, dan node localization memakai CPU 200 %. rclpy mengubah setiap titik dari sekitar 20.000 titik di satu scan Livox menjadi objek Python, dan NumPy dari pip membawa thread OpenBLAS yang busy-wait.
+
+**Solusi.** Node sekarang membaca pesan Livox yang masih serialized langsung ke NumPy sebagai strided view dari buffer-nya, sekitar 1 ms per scan, dengan parser yang punya unit test. Setiap node Python berjalan dengan satu thread BLAS, TF listener memakai executor milik node itu sendiri, dan topic berat seperti kamera teleop hanya di-subscribe selama ada yang menonton.
+
+### Model yang menghabiskan RAM
+
+**Masalah.** Saat inspeksi menyala, robot memakai 15,1 dari 15,3 GB RAM dan mulai swap. Runner Ollama menyimpan prompt sebelumnya di RAM, sampai 8 GiB per model, padahal inspeksi tidak pernah memakainya ulang karena setiap prompt membawa gambar baru.
+
+**Solusi.** Script setup mematikan cache itu untuk service Ollama dan mengeceknya di setiap instalasi, dan detector mengeluarkan modelnya dari memori setiap kali inspeksi dimatikan.
+
+### Aman di sekitar orang
+
+**Masalah.** Avoidance yang reaktif bukan fungsi keselamatan, dan di mal robot berbagi koridor dengan anak-anak, troli, dan orang yang sibuk dengan ponselnya.
+
+**Solusi.** Setiap perintah kecepatan, baik dari mode otonom maupun dari handheld, melewati control mux dengan dua penjaga. Software e-stop yang terkunci hanya meloloskan nol sampai ada yang melepasnya. Protective field 360° hanya mengizinkan kecepatan yang masih memungkinkan robot berhenti tepat waktu ke arah geraknya, v·t + v²/2a ≤ clearance − margin, dan tanpa scan 360° yang segar tidak ada gerakan otonom sama sekali. Saat sumber perintah yang aktif diam, keluarannya turun ke nol.
+
+### Mengikuti jalur tanpa bergoyang
+
+**Masalah.** Path follower pertama menyetir seperti mobil, maju plus yaw. Robot berosilasi di sekitar jalur dan berbelok terlalu lebar saat menghindari rintangan, padahal quadruped beroda bisa bergerak menyamping.
+
+**Solusi.** Kontroler holonomic memberi perintah x, y, dan yaw sekaligus, jadi robot bergeser kembali ke jalur alih-alih berbelok ke arahnya. Avoidance menjadi path shift: robot melangkah menyamping melewati rintangan dalam offset yang dibatasi sambil mempertahankan heading. Di simulator, rata-rata cross-track error turun dari 0,070 m ke 0,046 m.
+
+### Testing tanpa robot
+
+**Masalah.** Waktu dengan robot terbatas, dan regresi yang baru ketahuan di lapangan menghabiskan satu hari.
+
+**Solusi.** Simulator software-in-the-loop menggantikan robot, sensornya, dan koridornya, dan CI di ROS 2 Humble menjalankan skenario end-to-end di setiap perubahan: bergeser melewati orang, berhenti karena kerumunan, dan menolak handheld yang mau menabrakkan robot ke orang. Batas yang sama membuat stack ini tidak terikat merek robot. Package robot cukup menyediakan perintah kecepatan, status baterai, dan URDF dengan frame LiDAR dan kamera, dan simulatornya menjadi implementasi referensi.
+
+### Command center yang tidak menjadi ketergantungan robot
+
+**Masalah.** Wi-Fi mal bisa putus, dan robot yang ikut berhenti saat koneksi hilang tidak ada gunanya. Operator juga tidak mau menerima pesan Telegram untuk setiap tisu yang tercecer.
+
+**Solusi.** Selama patroli robot berjalan otonom; NETRA adalah tempat orang merencanakan, memantau, dan memutuskan. Uplink menampung upload selama offline, dan upload-nya idempoten, jadi pengiriman ulang tidak pernah membuat data ganda. Temuan melewati dua tahap, deteksi awal di robot lalu pengecekan akhir dan validasi manusia di NETRA, dan aturan per kategori menentukan apakah grup Telegram langsung diberi alert atau operator mengonfirmasi dulu.
+
+### Menaruh robot di denah mal
+
+**Masalah.** Operator berpikir dalam toko dan koridor, sedangkan robot dalam meter di map frame-nya sendiri.
+
+**Solusi.** NETRA menerima denah mal dalam format SVG atau PDF, lalu operator mengkalibrasi titik dasar, skala, dan rotasinya terhadap rute pertama yang di-upload dengan pratinjau langsung. Sejak itu pose robot, rute, temuan, dan heatmap keramaian digambar di atas denah. Selama denah belum ada, peta memakai grid di frame robot.
+
+## Hasil
+
+- Navigasi teach-and-repeat, teleop handheld, dan localization AprilTag berjalan di robot sebagai satu service yang diawasi; inspeksi dan penghitungan orang dinyalakan sesuai kebutuhan lokasi.
+- Kontroler holonomic menurunkan rata-rata cross-track error di simulasi dari 0,070 m ke 0,046 m, dan skenario end-to-end berjalan di CI pada setiap perubahan.
+- Membaca satu scan LiDAR yang tadinya menghabiskan satu core Jetson di 6 Hz sekarang butuh sekitar 1 ms, dan prompt cache yang membuat robot swap sudah dimatikan.
+- Operator punya user manual, panduan tuning, dan rencana uji lapangan, dan tim punya technical reference berisi matematika kontroler dan daftar isu yang diberi tingkat keparahan.
+
+## Pelajaran
+
+- Ukur di perangkat target. Bottleneck LiDAR 6 Hz dan thread BLAS yang busy-wait tidak pernah muncul di laptop.
+- SDK vendor punya aturan yang baru terlihat saat gagal. Sekarang saya membaca dokumen protokolnya dulu dan menguji driver sendirian sebelum ada yang bergantung padanya.
+- Taruh keselamatan di tempat yang dilewati semua perintah. Penjaga di dalam path follower tidak akan menghentikan handheld; mux bisa.
+- Robot harus otonom, command center hanya pelengkap. Mendesain untuk koneksi putus sejak awal membuat uplink tetap sederhana: tampung, kirim ulang, upload idempoten.
+- Simulator di CI mengubah hari di lapangan menjadi konfirmasi, bukan sesi debugging.
+
+## Stack
+
+| Layer | Teknologi |
+|-------|-----------|
+| Robot | Quadruped beroda ZSBot Genisom L1W, Livox Mid-360, Intel RealSense D435i, Jetson Orin NX |
+| Software robot | ROS 2 Humble, Python, driver C++, FAST-LIO2, AprilTag |
+| Persepsi | Moondream lewat Ollama, YOLO11n (ONNX) untuk orang |
+| Handheld | Aplikasi Flutter di Retroid Pocket 4, UDP |
+| NETRA | API Go, PostgreSQL, dashboard Next.js, Docker Compose, Caddy, Grafana, bot Telegram |
+| Kualitas | GitHub Actions di ROS 2 Humble, colcon test, simulator software-in-the-loop |
+
+## Peran saya
+
+Saya merancang dan menulis stack robot, driver robot, aplikasi handheld, dan NETRA, serta menjalankan uji lapangan. Tim AI mengerjakan model inspeksi dan prompt-nya.

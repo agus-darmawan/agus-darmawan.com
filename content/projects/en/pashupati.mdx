@@ -1,0 +1,123 @@
+---
+title: "Pashupati & NETRA: Autonomous Mall Patrol"
+description: "A robot-agnostic ROS 2 patrol and inspection stack for a wheel-legged quadruped, and NETRA, the command center that schedules patrols, validates what the robot finds and sends the alerts."
+category: robotics
+featured: true
+order: 1
+emoji: "🦿"
+color: "#0d9488"
+tags: ["ROS 2", "Python", "FAST-LIO2", "Jetson", "Ollama", "Go", "Next.js", "Flutter"]
+repo: "DarmawanRobotics/Pashupati"
+---
+
+Pashupati drives a wheel-legged quadruped through a shopping mall on fixed routes, stops at checkpoints and looks for trash, spills, floor damage or a person who has fallen. NETRA is the command center behind it: operators schedule patrols, watch the robot on the mall's floor plan, confirm what it found and get the alerts in Telegram.
+
+## The problem
+
+Security and cleaning staff walk the same corridors every shift. The robot had to take over those rounds: report a problem with a photo and a place on the map, count crowds, and never become a hazard itself in a corridor full of shoppers. It also had to keep patrolling when the Wi-Fi drops, and be run by mall operators, not by roboticists.
+
+## What I built
+
+Corridors are patrolled on the same routes every shift, so Pashupati uses teach and repeat instead of a global planner:
+
+- **Teach**: drive the route once with the handheld while FAST-LIO2 tracks the robot, mark the inspection stops and record the AprilTags that anchor the map.
+- **Repeat**: the route is resampled and smoothed, then followed with a curvature-aware speed profile; at every stop the robot settles to within 5 cm and 3° and inspects.
+- **Inspect**: a local vision-language model (Moondream through Ollama) checks each stop, and NETRA runs a second check before a person confirms it.
+- **Count people**: people the camera sees are placed on the floor plan and aggregated into per-minute crowd heatmaps.
+- **Operate**: schedules and live control from NETRA, manual control from a Retroid handheld over UDP, and the whole robot stack as one supervised systemd service.
+
+```text
+Livox Mid-360 ---> FAST-LIO2 ---> localization <--- AprilTags
+      |                                |
+      +---> 360° sector scan           |
+                   |                   v
+                   +---------> path follower + avoidance
+                                       |
+          handheld (UDP) ---> control mux ---> robot driver
+                              e-stop, protective field
+
+RealSense ---> AprilTags, inspection (VLM), people
+state, findings, crowds ---> fleet uplink ---> NETRA
+                             (WebSocket)       Go API, PostgreSQL,
+                                               Next.js, Telegram
+```
+
+## Challenges and how I solved them
+
+### One connection to the robot, or it falls
+
+**Problem.** The robot's SDK accepts a single control connection. The first driver used separate nodes to send commands and read state, each with its own connection, and the robot lost control mid-move and fell. Later it streamed telemetry happily but ignored every motion command.
+
+**Solution.** One driver node owns the only SDK connection, and everything else talks to it through ROS. On connect it asks the robot for SDK control and retries until the robot grants it; commands wait for that mode, except the emergency stop. A stale driver still holding the UDP port had made old telemetry look alive, so the whole stack now runs as one supervised service that also stops the vendor's autostart.
+
+### A Jetson that was busy doing nothing
+
+**Problem.** On the Jetson Orin NX the LiDAR sector node ran at about 6 Hz on a full core, and the localization node used 200 % CPU. rclpy turns each of the roughly 20,000 points in a Livox scan into a Python object, and pip's NumPy ships OpenBLAS threads that busy-wait.
+
+**Solution.** The node now reads the serialized Livox message straight into NumPy as a strided view of the buffer, about 1 ms per scan, with a unit-tested parser. Every Python node runs with one BLAS thread, TF listeners share the node's own executor, and heavy topics such as the teleop camera are subscribed only while someone is watching.
+
+### The model that ate the RAM
+
+**Problem.** With inspection on, the robot used 15.1 of its 15.3 GB and started swapping. Ollama's runner keeps earlier prompts in RAM, up to 8 GiB per model, and an inspection never reuses one because every prompt carries a new image.
+
+**Solution.** The setup script turns that cache off for the Ollama service and checks it on every install, and the detector unloads its model whenever inspection is switched off.
+
+### Safe around people
+
+**Problem.** Reactive avoidance is not a safety function, and in a mall the robot shares corridors with children, trolleys and people looking at their phones.
+
+**Solution.** Every velocity command, autonomous or from the handheld, passes a control mux with two guards. A latched software e-stop lets only zero through until someone releases it. A 360° protective field allows a speed only if the robot can stop in time in the direction it is moving, v·t + v²/2a ≤ clearance − margin, and without a fresh 360° scan there is no autonomous motion at all. When the active command source goes silent, the output drops to zero.
+
+### Following the path without swaying
+
+**Problem.** The first follower drove like a car, forward plus yaw. The robot oscillated around the path and swung wide around obstacles, even though a wheel-legged quadruped can move sideways.
+
+**Solution.** A holonomic controller commands x, y and yaw together, so the robot slides back onto the path instead of turning toward it. Avoidance became a path shift: the robot sidesteps an obstacle within a bounded offset and keeps its heading. In the simulator, the mean cross-track error dropped from 0.070 m to 0.046 m.
+
+### Testing without the robot
+
+**Problem.** Time with the robot is limited, and a regression found in the field costs a day.
+
+**Solution.** A software-in-the-loop simulator stands in for the robot, its sensors and the corridors, and CI on ROS 2 Humble runs end-to-end scenarios on every change: slide around a person, stop for a crowd, refuse to let the handheld drive into someone. The same seam made the stack robot-agnostic. A robot package only has to provide velocity commands, battery state and a URDF with the LiDAR and camera frames, and the simulator is the reference implementation.
+
+### A command center the robot does not depend on
+
+**Problem.** Mall Wi-Fi drops, and a robot that stops with the connection is useless. Operators also do not want a Telegram message for every crumpled napkin.
+
+**Solution.** The robot is autonomous during a patrol; NETRA is where people plan, watch and decide. The uplink spools uploads while offline, and uploads are idempotent, so retries never create duplicates. Findings go through two stages, an early detection on the robot and a final check plus human validation in NETRA, and rules per category decide whether a Telegram group is alerted straight away or an operator confirms first.
+
+### Putting the robot on the floor plan
+
+**Problem.** Operators think in shops and corridors, the robot in metres in its own map frame.
+
+**Solution.** NETRA takes the mall's floor plan as SVG or PDF, and an operator calibrates the base point, scale and rotation against the first uploaded route with a live preview. From then on, robot poses, routes, findings and crowd heatmaps are drawn on the plan. Until a plan exists, the map falls back to a grid in the robot's frame.
+
+## Results
+
+- Teach-and-repeat navigation, handheld teleop and AprilTag localization run on the robot as one supervised service; inspection and people counting are switched on per site.
+- The holonomic controller cut the mean cross-track error in simulation from 0.070 m to 0.046 m, and the end-to-end scenarios run in CI on every change.
+- Reading a LiDAR scan went from a full Jetson core at 6 Hz to about 1 ms, and the prompt cache that pushed the robot into swap is off.
+- Operators have a user manual, a tuning guide and a field test plan, and the team has a technical reference with the controller math and an issue register rated by severity.
+
+## Lessons learned
+
+- Measure on the target. The 6 Hz LiDAR bottleneck and the busy-waiting BLAS threads never showed up on a laptop.
+- Vendor SDKs have rules that only show up as failures. I now read the protocol docs first and test the driver alone before anything depends on it.
+- Put safety where every command passes. A guard inside the path follower would not have stopped the handheld; the mux does.
+- Keep the robot autonomous and the command center optional. Designing for a dropped connection from day one kept the uplink simple: spool, retry, idempotent uploads.
+- A simulator in CI turns field days into confirmation instead of debugging.
+
+## Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Robot | ZSBot Genisom L1W wheel-legged quadruped, Livox Mid-360, Intel RealSense D435i, Jetson Orin NX |
+| Robot software | ROS 2 Humble, Python, C++ driver, FAST-LIO2, AprilTag |
+| Perception | Moondream through Ollama, YOLO11n (ONNX) for people |
+| Handheld | Flutter app on a Retroid Pocket 4, UDP |
+| NETRA | Go API, PostgreSQL, Next.js dashboard, Docker Compose, Caddy, Grafana, Telegram bot |
+| Quality | GitHub Actions on ROS 2 Humble, colcon test, software-in-the-loop simulator |
+
+## My role
+
+I designed and wrote the robot stack, the robot driver, the handheld app and NETRA, and I run the field tests. The AI team works on the inspection model and its prompts.

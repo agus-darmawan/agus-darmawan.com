@@ -1,0 +1,93 @@
+---
+title: "Receptionist Robot Kiosk & Block-Coding Platform"
+description: "Software for a Bali robotics label: one kiosk app for receptionist robots and a self-built kiosk, with voice, queues and Aksara Bali, plus a block-coding simulator for its education robots."
+category: web
+featured: false
+order: 7
+emoji: "🛎️"
+color: "#db2777"
+tags: ["Next.js", "TypeScript", "Turborepo", "Blockly", "Ollama", "Whisper", "Piper", "Docker"]
+---
+
+A robotics label in Bali sells two kinds of robots: receptionists for offices, hotels and public services, and education robots for schools. I built the software for both: the kiosk app that runs on the receptionist robots and on a static kiosk the label assembles itself, a block-coding simulator for the education robots, and the sites that demo both in a browser.
+
+## The problem
+
+Receptionist robots often end up as ornaments in a corner of the lobby: factory greetings in English or Mandarin, the same generic menu for every buyer, and silence the moment the cloud connection drops. Bali adds a rule of its own: Bali Governor Regulation 80/2018 puts Aksara Bali above the Latin script on the signs of offices, schools, hotels and public facilities, exactly where these robots stand, so their screens and printouts have to follow the same layout. Schools have a different problem: they want to try a robot kit before they buy a classroom set.
+
+## What I built
+
+- **Kiosk app**: one touchscreen app for both robots and the static kiosk, with a voice assistant, queue numbers, a guest book, directions on a floor plan and the venue's organisation chart, plus printed queue tickets, visitor passes and route slips. The layout fits a 13.3-inch landscape screen and a 24-inch portrait one.
+- **Aksara Bali and the Balinese calendar**: a transliteration library writes venue and visitor names in Aksara Bali, queue tickets use Balinese numerals, and the Pawukon calendar adds the right greeting on holy days.
+- **Studio**: a venue types its name, sees its sign in Aksara Bali and opens a custom kiosk to try.
+- **Block-coding simulator**: Blockly with a Scratch-style look, and an arena in the browser where the robot moves and reads its sensors like the real kit. Missions follow the curriculum, and the junior-high robot shows a C++ preview of the blocks.
+- **One monorepo**: Turborepo with the apps on top of shared packages for the design system, the content and the Aksara logic, in Indonesian and English.
+
+```text
+visitor --> kiosk app
+              |
+              +--> listen:  Whisper, then browser speech, then typing
+              +--> answer:  language model (2 at a time), then venue rules
+              +--> speak:   Piper, then the device voice, then a text bubble
+              +--> print:   queue tickets, visitor passes, route slips
+```
+
+## Challenges and how I solved them
+
+### A robot that goes quiet looks broken
+
+**Problem.** A visitor waits two or three seconds for an answer, then repeats the question, taps the screen or walks to the desk. Every stage of a spoken conversation can be slow or fail: speech to text, the answer, and text to speech.
+
+**Solution.** Every stage has a fallback. Speech recognition runs on Whisper on the venue's server, falls back to the browser's own recognizer, and the question box is always on screen. The language model runs through Ollama with at most two calls at once; a third visitor, a failed call or a missing model gets an answer from rules that read the venue data, such as a room they named, the queue or a thank-you, and a named room comes with an offer to walk them there. Piper speaks the answer, with the device voice and then a text bubble as fallbacks, and the robot's mouth moves with the sound.
+
+### Aksara Bali from any name
+
+**Problem.** Venue and visitor names change all the time, so the script cannot be prepared as images. And Latin spelling hides a sound the script needs: whether an e is a pepet, as in Ketut, or a taling, as in Madé.
+
+**Solution.** A rule-based transliteration library converts Latin text on the spot: consonant clusters get adeg-adeg so the font stacks them into gantungan, a final ng, r or h becomes cecek, surang or bisah, and digits become Balinese numerals. Typing é marks the taling sound, and a short list of common names is read correctly without it. The library has unit tests.
+
+### Knowing where automation stops
+
+**Problem.** Rules cannot know every spelling. Loanwords from Kawi or Sanskrit often have their own spelling in the script that cannot be derived from the Latin form.
+
+**Solution.** The kiosk says so every time it shows a transliteration, and official signs, plaques or anything printed to last are reviewed with a Balinese language adviser first.
+
+### Private, offline and affordable
+
+**Problem.** Visitors' questions include names, errands and phone numbers, and a cloud bill grows with every guest who asks something.
+
+**Solution.** The model and the speech services run on the venue's own server, so conversations never leave it and the cost does not grow per question. The price is maintenance, and the first question after a long quiet spell is slower while the model loads back into memory.
+
+### Requirements that kept moving
+
+**Problem.** Product lines, names and even the list of sites changed several times while I was building.
+
+**Solution.** The logic that matters, transliteration, the calendar, venue data and design tokens, lives in shared packages with tests, apart from any site. Each change rebuilt pages, not that logic, and when the monorepo was split into a main repository with submodules, `git filter-repo` kept the full history of every part.
+
+## Results
+
+- One kiosk app runs on both receptionist robots and the static kiosk, in Indonesian and English.
+- The kiosk demos, Studio and the simulator run in any browser with sample venue data, so a school or an office can try them without signing up.
+- Everything is self-hosted with Docker Compose behind Caddy and a Cloudflare Tunnel, with the language model and speech services on the same machine.
+
+## Lessons learned
+
+- Design for the failure the visitor sees. "Never silent" turned out to be a better requirement than "fast".
+- Local culture is a requirement, not decoration: the regulation, the sound of an e and the review step all shaped the design.
+- Say where your automation stops. The transliteration notice builds more trust than pretending the output is perfect.
+- Keep domain logic out of the pages. It is the part that survives a change of plan.
+
+## Stack
+
+| Part | Technology |
+|------|-----------|
+| Apps | Next.js 16, React 19, TypeScript, Tailwind CSS 4, next-intl |
+| Monorepo | Turborepo, pnpm, shared packages for UI, content and Aksara Bali |
+| Assistant | Ollama, rule-based fallback over venue data |
+| Voice | Whisper for speech to text, Piper for text to speech |
+| Block coding | Blockly with a Scratch-style renderer, browser simulator |
+| Deployment | Docker Compose, Caddy, Cloudflare Tunnel, GitHub Actions with images on GHCR |
+
+## My role
+
+I designed and built the software end to end: the kiosk app, Studio, the simulator, the sites, the shared packages and the deployment.

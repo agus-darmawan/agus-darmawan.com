@@ -1,0 +1,87 @@
+---
+title: "Kios Robot Resepsionis & Platform Coding Blok"
+description: "Software untuk sebuah label robotika di Bali: satu aplikasi kios untuk robot resepsionis dan kios rakitan sendiri, lengkap dengan suara, antrean, dan Aksara Bali, plus simulator coding blok untuk robot edukasinya."
+---
+
+Sebuah label robotika di Bali menjual dua jenis robot: robot resepsionis untuk kantor, hotel, dan layanan publik, serta robot edukasi untuk sekolah. Saya membangun software untuk keduanya: aplikasi kios yang berjalan di robot resepsionis dan di kios statis yang dirakit sendiri oleh label itu, simulator coding blok untuk robot edukasi, dan situs yang mendemokan keduanya langsung di browser.
+
+## Masalahnya
+
+Robot resepsionis sering berakhir jadi pajangan di sudut lobi: sapaan bawaan pabrik dalam bahasa Inggris atau Mandarin, menu umum yang sama untuk semua pembeli, dan langsung diam begitu koneksi cloud putus. Bali juga punya aturan sendiri: Pergub Bali 80/2018 menempatkan Aksara Bali di atas huruf Latin pada papan nama kantor, sekolah, hotel, dan fasilitas umum, persis di tempat robot-robot ini berdiri, jadi layar dan cetakannya harus mengikuti tata letak yang sama. Sekolah punya masalah lain: mereka ingin mencoba kit robot sebelum membeli satu set untuk kelas.
+
+## Yang saya bangun
+
+- **Aplikasi kios**: satu aplikasi layar sentuh untuk kedua robot dan kios statis, dengan asisten suara, nomor antrean, buku tamu, petunjuk arah di denah, dan struktur organisasi tempat itu, plus cetakan tiket antrean, kartu tamu, dan slip rute. Tata letaknya menyesuaikan layar 13,3 inci mendatar maupun 24 inci tegak.
+- **Aksara Bali dan kalender Bali**: library transliterasi menulis nama tempat dan nama tamu dalam Aksara Bali, tiket antrean memakai angka Bali, dan kalender Pawukon menambahkan salam yang tepat di hari raya.
+- **Studio**: sebuah tempat mengetik namanya, melihat papan namanya dalam Aksara Bali, lalu membuka kios khusus untuk dicoba.
+- **Simulator coding blok**: Blockly bergaya Scratch dan arena di browser tempat robot bergerak dan membaca sensornya seperti kit aslinya. Misinya mengikuti kurikulum, dan robot SMP menampilkan pratinjau kode C++ dari blok yang disusun.
+- **Satu monorepo**: Turborepo dengan aplikasi di atas package bersama untuk design system, konten, dan logika Aksara, dalam bahasa Indonesia dan Inggris.
+
+```text
+tamu --> aplikasi kios
+            |
+            +--> mendengar: Whisper, lalu speech browser, lalu mengetik
+            +--> menjawab:  language model (2 sekaligus), lalu aturan tempat
+            +--> berbicara: Piper, lalu suara perangkat, lalu balon teks
+            +--> mencetak:  tiket antrean, kartu tamu, slip rute
+```
+
+## Tantangan dan solusinya
+
+### Robot yang diam terlihat rusak
+
+**Masalah.** Tamu menunggu jawaban dua atau tiga detik, lalu mengulang pertanyaan, mengetuk layar, atau pergi ke meja petugas. Setiap tahap percakapan suara bisa lambat atau gagal: suara ke teks, jawaban, dan teks ke suara.
+
+**Solusi.** Setiap tahap punya cadangan. Pengenalan suara memakai Whisper di server tempat itu, beralih ke pengenal suara bawaan browser, dan kolom pertanyaan selalu ada di layar. Language model berjalan lewat Ollama dengan paling banyak dua panggilan sekaligus; tamu ketiga, panggilan yang gagal, atau model yang belum terpasang mendapat jawaban dari aturan yang membaca data tempat, seperti ruangan yang disebut, antrean, atau ucapan terima kasih, dan ruangan yang disebut langsung disertai tawaran untuk diantar. Piper mengucapkan jawabannya, dengan suara perangkat lalu balon teks sebagai cadangan, dan mulut robot bergerak mengikuti suaranya.
+
+### Aksara Bali dari nama apa pun
+
+**Masalah.** Nama tempat dan nama tamu selalu berganti, jadi aksaranya tidak bisa disiapkan sebagai gambar. Ejaan Latin juga menyembunyikan satu bunyi yang dibutuhkan aksara: apakah sebuah e itu pepet, seperti pada Ketut, atau taling, seperti pada Madé.
+
+**Solusi.** Library transliterasi berbasis aturan mengubah teks Latin saat itu juga: gugus konsonan diberi adeg-adeg supaya font menumpuknya menjadi gantungan, ng, r, atau h di akhir suku kata menjadi cecek, surang, atau bisah, dan angka menjadi angka Bali. Mengetik é menandai bunyi taling, dan daftar pendek nama yang umum terbaca benar tanpa tanda itu. Library ini punya unit test.
+
+### Tahu di mana otomatisasi berhenti
+
+**Masalah.** Aturan tidak mungkin tahu semua ejaan. Kata serapan dari Kawi atau Sanskerta sering punya ejaan aksara sendiri yang tidak bisa diturunkan dari bentuk Latinnya.
+
+**Solusi.** Kios menyampaikan hal itu setiap kali menampilkan hasil transliterasi, dan papan nama resmi, prasasti, atau apa pun yang dicetak untuk jangka panjang ditinjau dulu bersama penyuluh Bahasa Bali.
+
+### Privat, offline, dan terjangkau
+
+**Masalah.** Pertanyaan tamu sering menyebut nama, keperluan, dan nomor telepon, dan tagihan cloud naik setiap kali ada tamu yang bertanya.
+
+**Solusi.** Model dan layanan suara berjalan di server milik tempat itu sendiri, jadi percakapan tidak pernah keluar dan biayanya tidak naik per pertanyaan. Harganya adalah perawatan, dan pertanyaan pertama setelah lama sepi sedikit lebih lambat karena model dimuat ulang ke memori.
+
+### Kebutuhan yang terus bergeser
+
+**Masalah.** Lini produk, nama, bahkan daftar situsnya berubah beberapa kali selama saya membangunnya.
+
+**Solusi.** Logika yang penting, yaitu transliterasi, kalender, data tempat, dan design token, ada di package bersama yang punya test, terpisah dari situs mana pun. Setiap perubahan cukup membangun ulang halaman, bukan logikanya, dan saat monorepo dipecah menjadi repo utama dengan submodule, `git filter-repo` menjaga seluruh history setiap bagian.
+
+## Hasil
+
+- Satu aplikasi kios berjalan di kedua robot resepsionis dan kios statis, dalam bahasa Indonesia dan Inggris.
+- Demo kios, Studio, dan simulator berjalan di browser apa pun dengan data tempat contoh, jadi sekolah atau kantor bisa mencobanya tanpa mendaftar.
+- Semuanya self-hosted dengan Docker Compose di belakang Caddy dan Cloudflare Tunnel, dengan language model dan layanan suara di mesin yang sama.
+
+## Pelajaran
+
+- Rancang untuk kegagalan yang dilihat tamu. "Tidak pernah diam" ternyata kebutuhan yang lebih baik daripada "cepat".
+- Budaya setempat adalah kebutuhan, bukan hiasan: aturannya, bunyi sebuah e, dan langkah peninjauan semuanya membentuk desainnya.
+- Sampaikan di mana otomatisasimu berhenti. Catatan transliterasi membangun lebih banyak kepercayaan daripada berpura-pura hasilnya sempurna.
+- Jauhkan logika domain dari halaman. Bagian itulah yang bertahan saat rencana berubah.
+
+## Stack
+
+| Bagian | Teknologi |
+|--------|-----------|
+| Aplikasi | Next.js 16, React 19, TypeScript, Tailwind CSS 4, next-intl |
+| Monorepo | Turborepo, pnpm, package bersama untuk UI, konten, dan Aksara Bali |
+| Asisten | Ollama, cadangan berbasis aturan dari data tempat |
+| Suara | Whisper untuk suara ke teks, Piper untuk teks ke suara |
+| Coding blok | Blockly dengan renderer gaya Scratch, simulator di browser |
+| Deployment | Docker Compose, Caddy, Cloudflare Tunnel, GitHub Actions dengan image di GHCR |
+
+## Peran saya
+
+Saya merancang dan membangun software-nya end to end: aplikasi kios, Studio, simulator, situs, package bersama, dan deployment.

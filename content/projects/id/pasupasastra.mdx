@@ -1,0 +1,100 @@
+---
+title: "PASUPASASTRA: Pusat Komando Multi-Drone"
+description: "Satu konsol untuk armada drone campuran: telemetri dan video live dari drone DJI, Autel, dan MAVLink, deteksi AI di setiap feed, dan peta 3D yang tetap jalan tanpa internet."
+---
+
+PASUPASASTRA adalah command center untuk tim yang menerbangkan beberapa merek drone sekaligus. Semua drone, videonya, dan apa yang dilihat AI di video itu tampil di satu peta 3D, dan semuanya berjalan di perangkat milik operator sendiri, dengan atau tanpa internet. Namanya plesetan dari Pasupatastra, panah Arjuna dalam Kakawin Arjunawiwaha.
+
+## Masalahnya
+
+Armada campuran itu hal biasa: satu operasi bisa menerbangkan drone enterprise DJI, Autel, dan autopilot MAVLink berdampingan. Masing-masing datang dengan ground station sendiri, jadi operator berpindah-pindah layar dan tidak ada satu gambaran utuh tentang posisi semuanya. Sistem terintegrasi yang menyelesaikan masalah ini adalah produk asing yang tertutup, sehingga data dan arah pengembangannya ada di tangan pihak lain, dan sebagian besar mengandalkan koneksi cloud yang tidak dimiliki tim lapangan.
+
+## Yang saya bangun
+
+- **Bridge**: aplikasi Android di remote controller drone memakai SDK vendor (DJI MSDK v5, Autel SDK) dan bicara dengan satu protokol WebSocket ke server. Autopilot MAVLink terhubung langsung.
+- **API**: service FastAPI memegang status armada, menyimpan telemetri di TimescaleDB, dan mengalirkan status live ke setiap konsol yang terbuka.
+- **Video**: MediaMTX menerima RTMP dan RTSP dari drone dan kamera CCTV, lalu menyajikannya lewat WebRTC untuk latensi rendah, dengan HLS sebagai cadangan.
+- **AI worker**: worker GPU membaca stream dan menjalankan beberapa model YOLO sekaligus, ditambah vision-language model lewat Ollama: model yang lebih besar menjawab pertanyaan operator tentang stream yang sedang difokuskan, model kecil membuat caption feed secara otomatis.
+- **Konsol**: Next.js dengan CesiumJS untuk peta 3D, berbahasa Indonesia, sebagai web app atau aplikasi desktop Tauri. Mode demo menyimulasikan seluruh backend di browser untuk presentasi.
+
+```text
+Telemetri dan perintah
+
+  aplikasi bridge DJI / Autel --+
+  autopilot MAVLink ------------+--> gcs-api (FastAPI) --> konsol (Next.js, Cesium)
+                                         |
+                                         +--> PostgreSQL + TimescaleDB
+
+Video dan AI
+
+  video drone dan CCTV --> MediaMTX --> WebRTC / HLS --> konsol
+                              |
+                              +--> gcs-worker (GPU): YOLO, VLM lewat Ollama
+                                       |
+                                       +--> deteksi, caption --> gcs-api
+```
+
+## Tantangan dan solusinya
+
+### Peta yang hilang di production
+
+**Masalah.** Peta 3D jalan normal di development, tetapi kosong di setiap build production, baik web maupun desktop. Minifier Turbopack menulis ulang sebagian kode Cesium menjadi template string berisi escape oktal yang ditolak browser, sehingga dynamic import-nya gagal tanpa pesan apa pun.
+
+**Solusi.** Cesium tidak lagi di-bundle. Aplikasi memuat build UMD resmi milik Cesium lewat tag script dari folder yang sudah menyajikan worker dan aset-nya, dan menampilkan pesan error alih-alih kanvas kosong kalau gagal. Bonusnya, JavaScript aplikasi turun dari sekitar 7 MB ke 1,2 MB.
+
+### Tidak ada internet di lapangan
+
+**Masalah.** Tim lapangan sering tidak punya koneksi, dan peta yang butuh tile online justru kosong saat paling dibutuhkan.
+
+**Solusi.** Citra Natural Earth bawaan Cesium selalu tampil sebagai layer dasar, dan layer offline menyajikan tile XYZ dari disk lokal lewat Caddy. Vision-language model berjalan lokal lewat Ollama, dan seluruh stack berjalan di satu laptop.
+
+### "Link lost" padahal drone terbang normal
+
+**Masalah.** Konsol menandai drone DJI terputus padahal telemetrinya terus masuk. Jam di remote controller tertinggal beberapa menit dari server, jadi setiap pesan terlihat basi begitu tiba.
+
+**Solusi.** Server memberi cap waktu pada telemetri dengan waktu terimanya sendiri dan menilai kesehatan link dari situ, tidak pernah dari jam perangkat.
+
+### Crash saat dua model dimuat bersamaan
+
+**Masalah.** Menyalakan beberapa detector sekaligus membuat worker Python crash total: dua thread memuat model YOLO saat backend GPU masih diinisialisasi.
+
+**Solusi.** Pemuatan model lewat lock di model registry, jadi model dimuat satu per satu.
+
+### Ponsel sebagai router
+
+**Masalah.** Saat pengujian, laptop server terhubung ke hotspot ponsel. Alamatnya berubah di setiap sesi, dan sebagian hotspot mengisolasi kliennya, sehingga bridge dan laptop lain tidak bisa menjangkau server maupun videonya.
+
+**Solusi.** Sebuah script menulis ulang alamat server di file environment setiap kali alamatnya berubah, dan WebRTC mendapat fallback TCP untuk jaringan yang memblokir UDP. Untuk pemakaian di lapangan, travel router khusus dengan reservasi DHCP tetap, atau laptop itu sendiri sebagai hotspot, menghindari kedua masalah itu.
+
+### Jebakan konfigurasi
+
+**Masalah.** Beberapa crash saat startup ternyata dari konfigurasi, bukan kode: origin CORS ditulis sebagai daftar dipisah koma padahal library settings mengharapkan JSON, drone demo di-seed dua kali setelah operator mengeditnya, dan static export Next.js 16 di Windows menulis file segmen route sebagai folder bertingkat, bukan nama bertitik.
+
+**Solusi.** Parser settings menerima kedua format daftar, seed mengecek apakah ID drone sudah ada alih-alih memercayai sebuah flag, dan script post-build mengganti nama file segmen di Windows.
+
+## Status
+
+Telemetri live dari drone enterprise DJI sudah berjalan end to end di konsol, berdampingan dengan video yang dialirkan lewat MediaMTX. Perintah terbang dan misi waypoint sudah diimplementasikan di bridge; uji terbang penuh adalah langkah berikutnya. Stack ini berjalan di laptop macOS dan Windows, dengan worker GPU native di Apple silicon dan di Docker pada mesin NVIDIA.
+
+## Pelajaran
+
+- Build production adalah program yang berbeda. Uji artefak hasil build, bukan dev server, apalagi dengan library sebesar Cesium.
+- Jangan pernah memercayai jam perangkat untuk menilai koneksi. Beri cap waktu saat pesan tiba.
+- Offline adalah fitur yang harus dirancang sejak awal: citra dasar, tile lokal, dan model lokal.
+- Jaringan lapangan adalah bagian dari sistem. Rencanakan router-nya seperti merencanakan server.
+- Taruh SDK vendor di pinggir. Setiap bridge menerjemahkan SDK-nya ke satu protokol, jadi server dan konsol tidak perlu tahu merek drone-nya.
+
+## Stack
+
+| Layer | Teknologi |
+|-------|-----------|
+| Konsol | Next.js 16 (static export), TypeScript, Zustand, CesiumJS, Tauri 2 |
+| API | Python, FastAPI, PostgreSQL dengan TimescaleDB, NATS |
+| AI | Beberapa model YOLO sekaligus, vision-language model lewat Ollama |
+| Video | MediaMTX: masuk RTMP dan RTSP, keluar WebRTC dan HLS |
+| Bridge | Aplikasi Flutter dengan kode native untuk DJI MSDK v5 dan Autel SDK |
+| Deployment | Docker Compose, Caddy, PM2 untuk service native |
+
+## Peran saya
+
+Saya merancang sistemnya dan membangunnya end to end: konsol, API, AI worker, bridge drone, infrastruktur, dan user manual.

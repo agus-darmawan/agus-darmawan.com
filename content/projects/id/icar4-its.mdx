@@ -1,0 +1,82 @@
+---
+title: "iCar 4: Porting Stack Mobil Otonom"
+description: "Menjalankan workspace self-driving iCar ITS di iCar 4 yang baru: satu format paket untuk board STM32 barunya, dua LiDAR Velodyne, dan workspace yang lebih rapi, hasil refactor dari base program Pandu Surya Tantra."
+---
+
+iCar adalah mobil listrik otonom yang dikembangkan di ITS. iCar 4 adalah kendaraan baru dengan board kontroler low-level dan LiDAR yang baru, dan software self-driving yang sudah ada harus bisa jalan di atasnya. Base program dan arsitekturnya dibuat oleh Pandu Surya Tantra; bagian saya adalah porting dan refactor untuk mobil baru ini.
+
+## Masalahnya
+
+Software-nya sudah jalan di mobil sebelumnya, tetapi iCar 4 mengganti dua hal yang paling sering diajak bicara: board STM32 yang menggerakkan throttle, setir, dan rem, serta LiDAR-nya. Kode lama menyusun paket UDP secara manual di offset byte yang cocok dengan firmware lama, dan workspace-nya membawa salinan driver untuk LiDAR yang sudah tidak ada di mobil baru.
+
+## Cara kerja stack-nya
+
+Workspace-nya ROS Noetic dengan C++, dibagi per tanggung jawab:
+
+- `icar_interface` bicara dengan hardware: STM32 lewat UDP, GPS (siap untuk koreksi NTRIP), LiDAR, dan antarmuka web lewat rosbridge.
+- `icar_middleware` mengubah data mentah menjadi state: odometri roda, pose estimator dengan complementary filter, segmentasi LiDAR dan rintangan, minimap, dan TF tree.
+- `icar_routine` menyetir: merekam rute, memuatnya, lalu mengikutinya dengan pure pursuit dan PID kecepatan, dengan zona rintangan dari LiDAR.
+- `icar_ui` adalah layar sentuh di dalam mobil, dibuat dengan LVGL.
+
+## Yang saya ubah
+
+### Satu format paket, didefinisikan sekali
+
+**Masalah.** PC dan firmware STM32 yang baru tidak sepakat soal layout paket. Kode lama menyalin setiap field ke buffer di offset yang dihitung manual, jadi setiap perubahan firmware berarti menghitung ulang byte di kedua sisi, dan ketidakcocokan gagal tanpa suara.
+
+**Solusi.** Kedua arah sekarang berupa struct biasa dengan field berukuran tetap. Dari mobil: timestamp, status, 16 kanal remote control, posisi setir, dua hitungan encoder, dan yaw gyro. Ke mobil: timestamp, transmisi, throttle, setpoint setir, rem, dan status I/O. Seluruh struct dikirim dan diterima dengan `sendto` dan `recvfrom` non-blocking, jadi loop 50 Hz tidak pernah tertahan oleh paket yang hilang, dan throttle negatif sekarang menggerakkan rem.
+
+```cpp
+struct {
+  uint32_t timestamp;
+  uint32_t status;
+  uint16_t remote_data[16];
+  uint32_t steer_pos;
+  uint16_t odom_enc_val[2];
+  float gyro_yaw_data;
+} data_to_pc;
+```
+
+### LiDAR baru tanpa kode driver baru
+
+**Masalah.** iCar 4 mengganti dua LiDAR Leishen dengan dua Velodyne VLP-16, satu di depan dan satu di belakang kanan.
+
+**Solusi.** Driver ROS Velodyne resmi masuk sebagai git submodule, dan setiap sensor berjalan di namespace-nya sendiri dengan nodelet manager, alamat IP, port, dan frame masing-masing. Antarmuka LiDAR yang sudah ada, yang menggabungkan kedua cloud ke base frame mobil dan memisahkan lantai, cukup di-remap input-nya, jadi segmentasi dan deteksi rintangan di hilirnya tidak berubah.
+
+### Workspace yang bisa di-diff
+
+**Masalah.** Kode tim tercampur dengan salinan library pihak ketiga, sehingga sulit melihat mana kode iCar dan mana yang saya ubah.
+
+**Solusi.** Commit pertama adalah base program persis seperti yang saya terima, tanpa salinan driver LiDAR, library helper, dan NTRIP client. Library helper milik Pandu, `ps_ros_lib`, dan driver Velodyne menjadi submodule, dan kode pihak ketiga lainnya (LVGL, lwgps, lwpkt, lwrb) dipindah ke `xtras/`. Setiap perubahan sesudahnya menjadi diff yang mudah dibaca terhadap aslinya.
+
+### Bring-up dulu, baru ketat
+
+**Masalah.** Link check mengharapkan penghitung paket dari mobil naik tepat satu setiap siklus. Penghitung di firmware baru tidak begitu, jadi semua paket ditolak dan mobil tidak pernah bergerak.
+
+**Solusi.** Selama bring-up saya menonaktifkan pengecekan itu dan mencatat ukuran paket di kedua sisi untuk memastikan layout-nya, dan mobil pun bisa jalan dengan board baru. Pengecekannya harus dikembalikan setelah perilaku penghitungnya disepakati dengan tim firmware, karena hanya itu yang memberi tahu mobil bahwa kontrolernya berhenti mendengarkan.
+
+## Hasil
+
+- Base program iCar berjalan di board dan LiDAR baru iCar 4, dengan routine dan middleware yang tidak berubah.
+- Workspace ini menjadi dasar pekerjaan berikutnya di peran yang sama: LiDAR-inertial odometry yang difusikan dengan GPS, tuning obstacle avoidance, dan dashboard web untuk memantau mobil.
+
+## Pelajaran
+
+- Definisikan format paket sekali, sebagai tipe yang dipakai kedua sisi. Offset byte yang disimpan di dua codebase pasti melenceng.
+- Saat me-refactor kode orang lain, jadikan kode aslinya commit pertama. Kredit dan review sama-sama jadi mudah.
+- Menonaktifkan pengecekan keselamatan kadang jalan tercepat melewati bring-up, tetapi hanya dengan alasan tertulis dan rencana untuk mengembalikannya.
+- Pakai driver upstream sebagai submodule, bukan salinan.
+
+## Stack
+
+| Bagian | Teknologi |
+|--------|-----------|
+| Middleware | ROS Noetic, C++, catkin |
+| Sensor | Dua Velodyne VLP-16, GPS, encoder roda, gyro |
+| Low level | Board STM32 lewat UDP |
+| UI di mobil | Layar sentuh LVGL |
+| Library | rosbridge, GeographicLib, libserialport |
+
+## Kredit
+
+Base program iCar, arsitekturnya, dan library helper `ps_ros_lib` dibuat oleh Pandu Surya Tantra. Bagian saya adalah porting ke iCar 4: protokol baru, integrasi Velodyne, dukungan rem, file launch, dan perapian workspace.
