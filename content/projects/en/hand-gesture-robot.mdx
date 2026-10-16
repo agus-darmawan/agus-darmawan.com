@@ -1,92 +1,89 @@
 ---
-title: "Hand Gesture Recognition for Collaborative Robots"
-description: "Lightweight deep learning system for real-time hand gesture recognition enabling collaborative robot control."
+title: "Hand Gesture Control for a UR5 Cobot"
+description: "Pointing instead of a teach pendant: a ROS prototype that drives a UR5 from MediaPipe hand tracking, and a co-authored paper on a 7 KB model that recognizes eight hand gestures."
 category: research
 featured: true
-order: 6
+order: 5
 emoji: "✋"
 color: "#ec4899"
-tags: ["Python", "TensorFlow Lite", "MediaPipe", "ROS2", "OpenCV", "NVIDIA Jetson"]
-repo: "agus-darmawan/hand-gesture-cobot"
+tags: ["ROS Noetic", "ROS 2", "Python", "MediaPipe", "OpenCV", "TensorFlow Lite", "UR5"]
+repo: "agus-darmawan/ros-ur5-controller-mediapipe"
 ---
 
-**Published Research** — A lightweight deep learning system enabling real-time hand gesture recognition for collaborative robot (cobot) control, without physical interfaces or wearables.
+Telling a cobot what to do usually means a teach pendant, a joystick or a laptop next to the arm. This work lets an operator use a hand instead. The prototype maps a fingertip seen by a camera to commands for a Universal Robots UR5, and the paper I co-authored at ITS covers a gesture model small enough for edge hardware.
 
-## Publication
+## The problem
 
-> *"Hand Gesture Recognition for Collaborative Robots Using Lightweight Deep Learning in Real-Time Robotic Systems"*
+In a shared workspace the operator's hands are busy, and walking to a pendant to tell the arm where a part goes breaks the flow. The interface should need no extra device to hold or wear, no training to use, and it must not fire a command by accident.
 
-Published as part of robotics research at Institut Teknologi Sepuluh Nopember (ITS).
+## The prototype
 
-## Motivation
+Four ROS Noetic packages:
 
-Traditional human-robot collaboration requires physical controllers, teach pendants, or complex setup. This research explores using natural hand gestures as an intuitive, zero-hardware-cost interface for controlling cobots in shared workspaces.
+- `ur_perception` runs MediaPipe Hands on the camera feed, maps the index fingertip to a cell of a grid drawn over the image and publishes only the cell number. A second node reads a distance sensor over serial.
+- `ur_controller` decides what a cell means in the current mode and switches the grid between modes.
+- `ur_interface` sends joint trajectories to the UR5 through the trajectory controller of the Universal Robots ROS driver.
+- `ur_srvs` holds the services to start, stop and change mode.
 
-## System Design
-
-### Gesture Recognition Pipeline
-
-```
-Camera Input (RGB)
-      ↓
-  MediaPipe Hands (landmark detection)
-      ↓
-  Feature Extraction (21 keypoints × 3D)
-      ↓
-  Lightweight CNN Classifier
-      ↓
-  Gesture Label (8 classes)
-      ↓
-  ROS Command Publisher
-      ↓
-  Cobot Motion Executor
+```text
+camera --> MediaPipe Hands --> index fingertip --> grid cell
+distance sensor (serial) --> part closer than 15 cm
+                              |
+                              v
+                        ur_controller
+               +--------------+--------------+
+               |                             |
+      control panel mode            pick-and-place mode
+      relay on an ESP (HTTP)        UR5 joint trajectory
 ```
 
-### Why Lightweight?
+It has two modes. As a **touchless control panel**, a 4 × 2 grid gives eight cells, each switching a relay on an ESP board over HTTP. For **pick and place**, a part arriving within 15 cm of the distance sensor makes the arm pick it up, the grid switches to two cells, and the operator points to the side where the arm should place it before it returns to its idle pose.
 
-Industrial cobots have strict real-time requirements. The model was designed to run at >30 FPS on edge hardware (NVIDIA Jetson) with <50ms end-to-end latency:
+## Challenges and how I solved them
 
-| Metric | Value |
-|--------|-------|
-| Inference latency | <20ms |
-| Full pipeline latency | <50ms |
-| Model size | ~2.3MB |
-| Accuracy (test set) | 97.4% |
-| FPS on Jetson Nano | 34 FPS |
+### A fingertip is never still
 
-### Gesture Classes
+**Problem.** The first version published raw fingertip coordinates at 1280 × 720. A hand always shakes a little, so mapping pixels straight to commands would make the relays chatter and the arm hesitate.
 
-8 control gestures mapped to robot commands:
+**Solution.** The image is split into a grid and only the cell under the fingertip counts. A command fires only when the cell changes: the controller switches the previous cell off and the new one on. The camera now runs at 848 × 480, plenty for one landmark, and a detection confidence of 0.9 keeps false hands out.
 
-1. ✊ Fist — Stop / Emergency halt
-2. ✋ Open palm — Pause current motion
-3. 👆 Point up — Move up
-4. 👇 Point down — Move down
-5. 👈 Point left — Move left
-6. 👉 Point right — Move right
-7. 👍 Thumbs up — Confirm/Execute
-8. 🤙 Hang loose — Return to home
+### An interface nobody has to learn
 
-### ROS Integration
+**Problem.** Every gesture vocabulary has to be taught to every operator, and people forget which shape means what.
 
-```python
-class GestureController(Node):
-    def __init__(self):
-        super().__init__('gesture_controller')
-        self.cmd_pub = self.create_publisher(
-            JointTrajectory, '/cobot/joint_trajectory', 10
-        )
-    
-    def on_gesture(self, gesture: str):
-        cmd = self.gesture_to_trajectory(gesture)
-        self.cmd_pub.publish(cmd)
-```
+**Solution.** The prototype only asks where the fingertip is, not what shape the hand makes, and it draws the grid with each cell's number on the camera view. Operators see what pointing will do before they do it.
 
-## 🛠 Tech Stack
+### A model small enough for the edge
 
-- **Python** — model training and inference pipeline
-- **MediaPipe** — real-time hand landmark detection
-- **TensorFlow Lite** — lightweight model deployment
-- **ROS2** — robot communication middleware
-- **OpenCV** — camera capture and preprocessing
-- **NVIDIA Jetson** — edge inference hardware
+**Problem.** Pointing chooses a place, but it cannot say stop or confirm, and a gesture model next to a cobot has to run in real time on modest hardware.
+
+**Solution.** That is the subject of the paper: a lightweight model that recognizes eight hand gestures with 1,103 parameters in 22 KB, at 93.5 % accuracy. Quantization and pruning with TensorFlow Lite bring it down to 7 KB, and it was tested controlling a UR5 in a real-time ROS 2 system.
+
+## Results
+
+- The prototype switches eight relays by pointing and runs a sensor-triggered pick-and-place on a UR5, with the drop side chosen by hand.
+- The paper's gesture model reaches 93.5 % accuracy on eight gestures in 7 KB after optimization.
+
+## Status
+
+The prototype was built in about a week in July 2024. The gripper calls are still stubs, and the pick and place poses are fixed joint positions recorded on the arm.
+
+## Lessons learned
+
+- Quantize a noisy input before you interpret it. A grid turned a shaking fingertip into a stable command.
+- Fire on change, not on every frame.
+- Show the operator the interface. Drawing the grid on the camera view made the system usable without instructions.
+- A small model is a design choice. 1,103 parameters were enough for eight gestures.
+
+## Stack
+
+| Part | Technology |
+|------|-----------|
+| Prototype | ROS Noetic, Python, MediaPipe Hands, OpenCV |
+| Robot | Universal Robots UR5 with the UR ROS driver |
+| I/O | Distance sensor over serial, relays on an ESP board over HTTP |
+| Research | TensorFlow Lite with quantization and pruning, ROS 2 |
+
+## Paper
+
+Muhtadin, I Wayan Agus Darmawan, Muhammad Hilmi Rusydiansyah, I Ketut Eddy Purnama, Chastine Fatichah and Mauridhi Hery Purnomo, [Hand Gesture Recognition for Collaborative Robots Using Lightweight Deep Learning in Real-Time Robotic Systems](https://arxiv.org/abs/2507.10055), arXiv, 2025.

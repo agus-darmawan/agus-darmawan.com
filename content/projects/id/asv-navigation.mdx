@@ -1,66 +1,99 @@
 ---
-title: "Sistem Navigasi Otonom ASV"
-description: "Sistem navigasi otonom berbasis ROS untuk Autonomous Surface Vehicle dengan multi-sensor fusion, meraih Grand Champion di IRC 2023."
+title: "Proteus V2: Sistem Otonom ASV Barunastra"
+description: "Workspace ROS yang saya pimpin untuk kapal permukaan otonom Barunastra ITS: misi, kontrol, dan koneksi hardware di balik gelar Grand Champion International Roboboat Competition 2023."
 ---
 
-Stack navigasi otonom lengkap untuk Barunastra ITS Roboboat, yang meraih **Grand Champion** di International Roboboat Competition 2023 (IRC 2023) dan Juara 1 di KKI 2022 & 2023.
+Proteus V2 adalah workspace ROS Noetic yang menjalankan kapal permukaan otonom (ASV) Barunastra ITS. Saya memimpin software-nya sebagai software lead tim, dan dengan sistem ini tim meraih **Grand Champion** di International Roboboat Competition (IRC) 2023, plus juara 2 dokumentasi desain.
 
-## 🏆 Hasil Kompetisi
+## Masalahnya
+
+Satu run roboboat adalah rangkaian tugas berwaktu di perairan terbuka: melewati kanal gerbang pelampung, mengikuti jalur, menyemprot target, docking, speed gate, mengantar dan mengambil objek, lalu pulang. Poin didapat dari tugas yang selesai di dalam slot waktu, tanpa ada yang menyentuh kontrol, di danau dengan angin, ombak, dan pantulan matahari ke kamera.
+
+## Yang saya bangun
+
+Workspace ini terdiri dari tujuh package ROS:
+
+- `nala_autonomy`: mission manager yang menjalankan lintasan sebagai urutan misi, masing-masing berupa state machine: mendekat lewat waypoint GPS, mencari, berjalan dengan deteksi kamera, selesai.
+- `nala_controller`: mengubah target kecepatan dan heading menjadi perintah thruster dan servo untuk tiga mode gerak, differential, azimuth (thruster yang bisa diarahkan), dan holonomic.
+- `nala_hardware`: link UDP ke board STM32 untuk empat thruster, dua servo kemudi, pompa, dan crane, ditambah servo Dynamixel.
+- `nala_localization`: GPS dan kompas dari MAVROS ke frame lokal, plus perekaman dan pemutaran ulang jalur.
+- `nala_perception` dan `nala_sensors`: deteksi kamera dan driver LiDAR.
+- `nala_interfaces`: message dan service yang dipakai bersama.
+
+```text
+deteksi kamera, GPS + kompas (MAVROS), LiDAR
+                      |
+                      v
+mission manager: satu state machine per tugas, masing-masing dengan jatah waktu
+                      |  target kecepatan dan heading, mode gerak
+                      v
+controller: differential, azimuth, atau holonomic
+                      |  perintah thruster dan servo
+                      v
+hardware node --UDP--> STM32: thruster, servo kemudi, pompa, crane
+              <------- mode, RC, tegangan baterai, status crane
+```
+
+## Tantangan dan solusinya
+
+### Satu tugas yang macet tidak boleh menghabiskan run
+
+**Masalah.** Dalam run berwaktu, kapal yang berputar-putar mencari gerbang yang tidak ketemu ikut menghabiskan waktu semua tugas sesudahnya.
+
+**Solusi.** Mission manager memberi setiap misi jatah waktu yang diatur per lintasan di YAML. Saat waktunya habis, handler timeout misi itu meninggalkan kapal dalam kondisi bersih (misalnya docking mundur selama empat detik) lalu manager pindah ke misi berikutnya. Start, stop, dan restart berupa service ROS, jadi tim bisa mengulang run dari pinggir dalam hitungan detik.
+
+### Menyetir dari gambar, bukan dari peta
+
+**Masalah.** GPS dan kompas cukup untuk membawa kapal mendekati tugas, tetapi tidak untuk menyelipkannya di antara dua pelampung.
+
+**Solusi.** Setiap misi dimulai dengan waypoint GPS pra-tugas untuk mencapai areanya, lalu kemudi diserahkan ke kamera. Kalau target belum terlihat, kapal berputar di tempat sambil menggeser kamera ke kiri dan kanan, dan kembali ke waypoint kalau tetap tidak ketemu. Deteksi difilter berdasarkan kelas dan posisinya terhadap garis "boat side" dan garis kritis yang digambar di citra, dan error heading diambil langsung dari posisi pelampung gerbang terhadap garis-garis itu. Tidak ada pelampung yang perlu dipetakan dulu, jadi heading yang noisy tidak pernah membuat kapal meleset dari gerbang.
+
+### Tuning di air, bukan di kode
+
+**Masalah.** Gain yang pas di danau latihan bisa salah di lintasan kompetisi yang berangin, dan build ulang di antara percobaan membuang slot.
+
+**Solusi.** Kecepatan, jatah waktu, kemiringan kamera, dan gain kontroler berupa service ROS yang bisa diubah langsung dari pinggir, dan setiap lintasan serta danau latihan punya set parameter YAML sendiri. Kontrol heading memakai PID dengan gain schedule: satu set gain untuk error kecil, satu set yang lebih agresif di atas π/8, dan keduanya di-clamp.
+
+### Mode gerak yang tepat di setiap momen
+
+**Masalah.** Melaju di kanal, berputar di tempat, dan merapat ke dock butuh perilaku thruster yang berbeda dari lambung yang sama.
+
+**Solusi.** Misi mengirim target bersama mode geraknya dan berganti mode sesuai kebutuhan: azimuth untuk melaju, differential untuk berputar di tempat saat mencari, holonomic untuk bergeser menyamping masuk ke dock sambil menjaga heading. Controller memetakan setiap mode ke thruster dan servo, dengan trim untuk setiap aktuator.
+
+### Link yang putus harus menghentikan kapal
+
+**Masalah.** Kalau sebuah node hang atau komputer onboard crash, perintah dorong terakhir tidak boleh terus membawa kapal ke tepi.
+
+**Solusi.** Hardware node memantau setiap aliran perintah: tidak ada perintah thruster, servo, atau pompa selama 0,5 detik, keluarannya kembali netral. Paket dari dan ke STM32 diawali header tetap, dan paket dengan header yang salah dibuang. Offset tiap thruster dan servo disimpan di config, jadi thruster yang dipasang ulang cukup diubah di config, bukan di kode.
+
+## Hasil
+
+Hasil tim selama saya mengerjakan software-nya:
 
 | Kompetisi | Tahun | Hasil |
 |-----------|-------|-------|
-| KKI (Kontes Kapal Tak Berawak) | 2022 | 🥇 Juara 1 |
-| IRC 2023 (International Roboboat) | 2023 | 🏆 Grand Champion |
-| IRC 2023 Design Documentation | 2023 | 🥈 Juara 2 |
-| KKI (Kontes Kapal Tak Berawak) | 2023 | 🥇 Juara 1 |
+| KKI (Kontes Kapal Indonesia), kapal tanpa awak | 2022 | Juara 1 |
+| International Roboboat Competition (IRC) | 2023 | Grand Champion |
+| Dokumentasi desain IRC | 2023 | Juara 2 |
+| KKI (Kontes Kapal Indonesia), kapal tanpa awak | 2023 | Juara 1 |
 
-## 🧠 Arsitektur Sistem
+## Pelajaran
 
-```
-Sensor (LiDAR + Kamera + GPS + IMU + Kompas)
-           ↓
-    Lapisan Fusi Sensor (ROS)
-           ↓
-  Lokalisasi & Pemetaan (RTK GPS + IMU)
-           ↓
-   Persepsi (Deteksi Objek - YOLO)
-           ↓
-   Perencanaan Jalur & Penghindaran Rintangan
-           ↓
-  Kontrol Thruster PID (Firmware level rendah)
-```
+- Rencanakan kegagalan di dalam run berwaktu. Jatah waktu dan restart yang bersih bernilai lebih banyak poin daripada satu perilaku yang cerdas.
+- Tutup loop dengan sensor yang paling jelas melihat. Di dekat tugas, kamera mengalahkan GPS, jadi menyetirlah dari gambar.
+- Buat setiap angka bisa di-tuning saat runtime. Di hari kompetisi tidak ada waktu untuk build ulang.
+- Keselamatan tempatnya di layer paling bawah. Pengecekan netral-saat-timeout di hardware node melindungi kapal dari semua bug di atasnya.
 
-## Kontribusi Teknis Utama
+## Stack
 
-### Fusi Multi-Sensor
-Mengintegrasikan 5 modalitas sensor menjadi estimasi state yang koheren:
-- **LiDAR** — deteksi rintangan dan pemetaan lingkungan
-- **Kamera** — klasifikasi warna pelampung dan deteksi tugas via YOLO
-- **GPS RTK** — posisi absolut tingkat sentimeter
-- **IMU** — estimasi attitude dan dead reckoning
-- **Kompas** — referensi heading
+| Layer | Teknologi |
+|-------|-----------|
+| Middleware | ROS Noetic, Python, catkin |
+| Lokalisasi | MAVROS (GPS dan kompas) |
+| Persepsi | Deteksi YOLO, point cloud LiDAR |
+| Hardware | STM32 lewat UDP, servo Dynamixel |
+| Monitoring | RViz, service ROS untuk tuning langsung |
 
-### Kontrol Thruster PID
-Merancang kontroler PID dual-thruster untuk:
-- Kontrol heading (sumbu yaw)
-- Kontrol kecepatan (sumbu surge)
-- Station-keeping di zona tanpa GPS
+## Peran saya
 
-### Otonomi Tugas
-Mengimplementasikan eksekusi misi otonom penuh untuk tugas IRC:
-1. Traversal kanal navigasi
-2. Timing speed gate
-3. Penghindaran pelampung
-4. Manuver docking
-
-## 🛠 Tech Stack
-
-- **ROS Noetic** — middleware dan integrasi sensor
-- **Python** — navigasi tingkat tinggi dan logika misi
-- **C++** — node pemrosesan sensor real-time
-- **OpenCV + YOLO** — pipeline persepsi visual
-- **GPS RTK** — lokalisasi presisi sentimeter
-
-## Peran dalam Tim
-
-Menjabat sebagai **Robotics Software Engineer** (Apr 2022 – Des 2023) dan **Ketua Divisi Elektro-Programming** (Des 2023 – Nov 2024), bertanggung jawab atas seluruh software stack dari driver sensor hingga eksekusi misi.
+Robotics software engineer sekaligus software lead workspace ini (2022 sampai 2023), lalu Ketua Divisi Elektro-Programming (2023 sampai 2024). Saya merancang workspace-nya dan memimpin pengembangannya, dari kerangka misi sampai link hardware. Arundaya Pratama Nurhasan mengerjakan navigasi, Taib Izzat Samawi UI dan sensor, dan Ikhwanul Abiyu computer vision.

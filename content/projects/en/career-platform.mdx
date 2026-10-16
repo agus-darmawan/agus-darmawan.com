@@ -1,82 +1,80 @@
 ---
-title: "Career Management Platform"
-description: "Internal HR platform with Easy Apply, automated CV standardization, and role-based access control built for PT Satkomindo."
+title: "Satkom Career: Recruitment Platform"
+description: "The hiring site of PT Satkomindo Mediyasa, built by a team of five during my internship. My part: the admin dashboard, auth, the standardized CV with a log of who read it, and the APIs behind them."
 category: web
 featured: false
-order: 5
+order: 8
 emoji: "💼"
 color: "#f59e0b"
-tags: ["React", "AdonisJS", "TypeScript", "PostgreSQL", "Docker", "JWT"]
-repo: "agus-darmawan/career-platform"
+tags: ["React", "TypeScript", "Ant Design", "Zustand", "AdonisJS", "MySQL", "Docker"]
+repo: "agus-darmawan/satkom-career-fe"
 ---
 
-Internal HR platform built for **PT Satkomindo Mediyasa**, featuring Easy Apply workflow, automated CV standardization, and comprehensive role-based access control across candidate, recruiter, and admin personas.
+Satkom Career is the recruitment site of PT Satkomindo Mediyasa. Candidates browse openings, fill in one profile and apply in a click; the HR team reviews every applicant through the same standardized CV. Five of us built it during my internship from February to June 2024. This page is about my part of it.
 
-## Business Problem
+## The problem
 
-PT Satkomindo's HR team (HCD division) needed to:
-1. Streamline the application process for hundreds of candidates
-2. Standardize CV formats submitted in inconsistent formats
-3. Give recruiters a unified dashboard to review, filter, and track candidates
-4. Provide admins full visibility over the hiring funnel
+Applications used to arrive as CVs in every layout and file format, so comparing two candidates meant reading two very different documents. Several recruiters screened the same pool, and none of them could tell who had already read which CV.
 
-## Features by Role
+## What the team built
 
-### Candidate Dashboard
-- Profile creation and document upload
-- **Easy Apply** — one-click application to open positions
-- Automated CV standardization to company template
-- Application status tracking
+- **Candidate site**: openings with search and filters, a multi-step profile with personal data, education, experience, certifications and documents, one-click applications and a "my applications" page.
+- **Admin dashboard**: statistics, job postings, applicants per job, the standardized CV, user management and master data.
+- **API**: AdonisJS 6 with Lucid on MySQL, VineJS validation and access tokens for candidates and admins.
 
-### Recruiter Dashboard
-- Candidate pipeline management (Kanban-style)
-- Application review with standardized CV preview
-- Interview scheduling integration
-- Candidate notes and tagging
+## My part
 
-### Admin Dashboard
-- Full user management (RBAC)
-- Job posting creation and management
-- Analytics: funnel metrics, time-to-hire, source tracking
-- Audit logs for all platform actions
+I wrote 177 of the frontend's 568 commits and 48 of the backend's 206, most of them in the admin side.
 
-## Technical Implementation
+- **Auth and routing**: login, register and logout, auth state moved from hand-rolled code into a Zustand store, protected layouts with separate candidate and admin logins, and the 403 and 404 pages.
+- **Admin dashboard**: summary cards, charts and applicant statistics, backed by aggregate queries I wrote in the API for applicants per job, totals and open positions.
+- **Jobs and master data**: the job table with filters, posting, editing, deleting and status, job details with description and qualifications, the applicant list for each job, and the screens for departments, job levels, education degrees and notice periods.
+- **Candidate profile**: profile sections, the multi-step edit form with validation and loading skeletons, and applying from a job's detail page.
+- **Standardized CV**: a page that lays out a candidate's profile in the company's CV format, previews uploaded certificates with react-pdf and prints a PDF named after the job and the candidate.
+- **Deployment**: the backend's Docker image, with nginx in front of the Node server.
 
-### Authentication & RBAC
+## Challenges and how I solved them
 
-```typescript
-// Role-based middleware
-export async function authorize(roles: Role[]) {
-  const session = await getServerSession();
-  if (!roles.includes(session.user.role)) {
-    throw new UnauthorizedError();
-  }
-}
-```
+### Two recruiters, one candidate
 
-### CV Standardization Pipeline
+**Problem.** Recruiters screened the same applicants, and nobody could tell whether a CV had already been read.
 
-1. Candidate uploads PDF/DOCX CV
-2. Parser extracts structured data (name, experience, education, skills)
-3. Template engine renders standardized company-format PDF
-4. Recruiter receives consistent, comparable documents
+**Solution.** Opening a CV logs the view once per recruiter. The applicant list shows who has read each CV and greys out the ones you have already opened, so every recruiter sees at a glance what is left to read.
 
-### Document Tracking System (AdonisJS)
+### Balinese names broke the file paths
 
-Separate service built for tracking HR documents through approval workflows:
-- Document upload → review → approval → archive pipeline
-- Email notifications at each stage
-- Role-based visibility (who can see/approve what)
-- Full audit trail with timestamp and user attribution
+**Problem.** Uploaded documents were stored in a folder named after the candidate's first name, and Balinese first names such as "I Wayan" contain spaces, which broke the paths for anyone with a space in their name. Certificates, which are PDFs, were also saved with a .jpg extension.
 
-## 🛠 Tech Stack
+**Solution.** Folder names strip whitespace on both the frontend and the API, and certificate files keep their real extension.
 
-| Component | Technology |
-|-----------|-----------|
-| Frontend | React, TypeScript, Tailwind CSS |
-| Backend API | AdonisJS (TypeScript) |
-| Database | PostgreSQL |
-| Auth | JWT + Role-based middleware |
-| File Storage | MinIO (S3-compatible) |
-| Deployment | Docker + Docker Compose |
-| CI/CD | Sprint-based with Git flow |
+### A full name found nobody
+
+**Problem.** First and last names live in separate columns, so a recruiter who typed a full name matched neither of them.
+
+**Solution.** The search splits the query into words and matches each one against the first name, the last name and the two joined together.
+
+### One CV for every candidate
+
+**Problem.** HR wanted every CV in the same layout and printable, built from what candidates had already entered instead of yet another upload.
+
+**Solution.** The CV is rendered in the browser from the profile data candidates already entered, with their certificates embedded, and printed with react-to-print. The file name is set from the job and the candidate's name, so downloaded CVs are easy to file.
+
+## Lessons learned
+
+- Test with real names. A space in a first name is normal in Bali, and it broke the file paths.
+- Search the way people type. Recruiters type full names, so the query has to span columns.
+- Small coordination features matter. One table and two endpoints told every recruiter which CVs were already read.
+- Generate documents from data instead of collecting them. Standardizing the input made the output consistent for free.
+
+## Stack
+
+| Part | Technology |
+|------|-----------|
+| Frontend | React 18, TypeScript, Vite, Tailwind CSS, Ant Design and its charts, Zustand |
+| Documents | react-pdf, react-to-print, react-quill |
+| Backend | AdonisJS 6, Lucid ORM, MySQL, VineJS, access tokens |
+| Deployment | Docker, nginx |
+
+## Team
+
+A team of five: Aisy Rozsidhy, Fadli, Haiqal, Gilang Suprobo and me.

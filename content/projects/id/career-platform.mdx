@@ -1,75 +1,73 @@
 ---
-title: "Platform Manajemen Karir"
-description: "Platform HR internal dengan Easy Apply, standarisasi CV otomatis, dan role-based access control untuk PT Satkomindo."
+title: "Satkom Career: Platform Rekrutmen"
+description: "Situs rekrutmen PT Satkomindo Mediyasa yang dibangun tim berlima selama saya magang. Bagian saya: dashboard admin, auth, CV terstandar dengan catatan siapa yang sudah membacanya, dan API di baliknya."
 ---
 
-Platform HR internal yang dibangun untuk **PT Satkomindo Mediyasa**, menampilkan alur Easy Apply, standarisasi CV otomatis, dan kontrol akses berbasis peran yang komprehensif untuk persona kandidat, rekruter, dan admin.
+Satkom Career adalah situs rekrutmen PT Satkomindo Mediyasa. Kandidat melihat lowongan, mengisi satu profil, dan melamar dengan sekali klik; tim HR meninjau setiap pelamar lewat CV terstandar yang sama. Kami berlima membangunnya selama saya magang, Februari sampai Juni 2024. Halaman ini membahas bagian saya.
 
-## Masalah Bisnis
+## Masalahnya
 
-Tim HR PT Satkomindo (divisi HCD) membutuhkan:
-1. Menyederhanakan proses lamaran untuk ratusan kandidat
-2. Menstandarisasi format CV yang diserahkan dalam format yang tidak konsisten
-3. Memberi rekruter dashboard terpadu untuk meninjau, memfilter, dan melacak kandidat
-4. Memberi admin visibilitas penuh atas funnel perekrutan
+Lamaran dulu datang dengan CV dalam berbagai layout dan format file, jadi membandingkan dua kandidat berarti membaca dua dokumen yang sangat berbeda. Beberapa rekruter menyaring kumpulan pelamar yang sama, dan tidak ada yang tahu siapa sudah membaca CV yang mana.
 
-## Fitur per Peran
+## Yang dibangun tim
 
-### Dashboard Kandidat
-- Pembuatan profil dan upload dokumen
-- **Easy Apply** — lamaran satu klik ke posisi yang terbuka
-- Standarisasi CV otomatis ke template perusahaan
-- Pelacakan status lamaran
+- **Situs kandidat**: lowongan dengan pencarian dan filter, profil bertahap berisi data pribadi, pendidikan, pengalaman, sertifikasi, dan berkas, lamaran sekali klik, serta halaman "lamaran saya".
+- **Dashboard admin**: statistik, lowongan, pelamar per lowongan, CV terstandar, manajemen user, dan master data.
+- **API**: AdonisJS 6 dengan Lucid di MySQL, validasi VineJS, dan access token untuk kandidat dan admin.
 
-### Dashboard Rekruter
-- Manajemen pipeline kandidat (gaya Kanban)
-- Tinjauan lamaran dengan preview CV terstandarisasi
-- Integrasi penjadwalan wawancara
-- Catatan dan penandaan kandidat
+## Bagian saya
 
-### Dashboard Admin
-- Manajemen pengguna penuh (RBAC)
-- Pembuatan dan manajemen posting pekerjaan
-- Analitik: metrik funnel, time-to-hire, pelacakan sumber
-- Log audit untuk semua aksi platform
+Saya menulis 177 dari 568 commit frontend dan 48 dari 206 commit backend, sebagian besar di sisi admin.
 
-## Implementasi Teknis
+- **Auth dan routing**: login, register, dan logout, state auth dipindah dari kode buatan sendiri ke store Zustand, layout terproteksi dengan login kandidat dan admin yang terpisah, serta halaman 403 dan 404.
+- **Dashboard admin**: kartu ringkasan, grafik, dan statistik pelamar, didukung query agregat yang saya tulis di API untuk pelamar per lowongan, total, dan posisi yang dibuka.
+- **Lowongan dan master data**: tabel lowongan dengan filter, tambah, edit, hapus, dan status, detail lowongan dengan deskripsi dan kualifikasi, daftar pelamar setiap lowongan, serta halaman untuk departemen, level jabatan, jenjang pendidikan, dan masa pemberitahuan.
+- **Profil kandidat**: bagian-bagian profil, form edit bertahap dengan validasi dan skeleton loading, serta melamar dari halaman detail lowongan.
+- **CV terstandar**: halaman yang menyusun profil kandidat dalam format CV perusahaan, menampilkan pratinjau sertifikat yang diunggah dengan react-pdf, dan mencetak PDF yang dinamai sesuai lowongan dan nama kandidat.
+- **Deployment**: Docker image untuk backend, dengan nginx di depan server Node.
 
-### Autentikasi & RBAC
+## Tantangan dan solusinya
 
-```typescript
-// Middleware berbasis peran
-export async function authorize(roles: Role[]) {
-  const session = await getServerSession();
-  if (!roles.includes(session.user.role)) {
-    throw new UnauthorizedError();
-  }
-}
-```
+### Dua rekruter, satu kandidat
 
-### Pipeline Standarisasi CV
+**Masalah.** Para rekruter menyaring pelamar yang sama, dan tidak ada yang tahu apakah sebuah CV sudah dibaca.
 
-1. Kandidat upload CV PDF/DOCX
-2. Parser mengekstrak data terstruktur (nama, pengalaman, pendidikan, keahlian)
-3. Template engine merender PDF format perusahaan yang terstandarisasi
-4. Rekruter menerima dokumen yang konsisten dan dapat dibandingkan
+**Solusi.** Membuka CV mencatat view satu kali per rekruter. Daftar pelamar menampilkan siapa saja yang sudah membaca setiap CV dan menyamarkan CV yang sudah kamu buka, jadi setiap rekruter langsung melihat apa yang belum dibaca.
 
-### Sistem Document Tracking (AdonisJS)
+### Nama Bali merusak path file
 
-Layanan terpisah yang dibangun untuk melacak dokumen HR melalui alur persetujuan:
-- Pipeline upload dokumen → tinjauan → persetujuan → arsip
-- Notifikasi email di setiap tahap
-- Visibilitas berbasis peran (siapa yang dapat melihat/menyetujui apa)
-- Jejak audit penuh dengan timestamp dan atribusi pengguna
+**Masalah.** Berkas yang diunggah disimpan di folder yang dinamai dari nama depan kandidat, dan nama depan Bali seperti "I Wayan" mengandung spasi, sehingga path rusak untuk siapa pun yang nama depannya berspasi. Sertifikat, yang berupa PDF, juga tersimpan dengan ekstensi .jpg.
 
-## 🛠 Tech Stack
+**Solusi.** Nama folder dibersihkan dari spasi di frontend maupun API, dan file sertifikat menyimpan ekstensi aslinya.
 
-| Komponen | Teknologi |
-|----------|-----------|
-| Frontend | React, TypeScript, Tailwind CSS |
-| Backend API | AdonisJS (TypeScript) |
-| Database | PostgreSQL |
-| Auth | JWT + Middleware berbasis peran |
-| Penyimpanan File | MinIO (kompatibel S3) |
-| Deployment | Docker + Docker Compose |
-| CI/CD | Sprint-based dengan Git flow |
+### Nama lengkap tidak menemukan siapa pun
+
+**Masalah.** Nama depan dan belakang ada di kolom terpisah, jadi rekruter yang mengetik nama lengkap tidak cocok dengan keduanya.
+
+**Solusi.** Pencarian memecah query menjadi kata-kata dan mencocokkan setiap kata dengan nama depan, nama belakang, dan gabungan keduanya.
+
+### Satu CV untuk setiap kandidat
+
+**Masalah.** HR ingin setiap CV punya layout yang sama dan bisa dicetak, disusun dari data yang sudah diisi kandidat, bukan dari upload tambahan.
+
+**Solusi.** CV di-render di browser dari data profil yang sudah diisi kandidat, lengkap dengan sertifikatnya, lalu dicetak dengan react-to-print. Nama file diambil dari lowongan dan nama kandidat, jadi CV yang diunduh mudah diarsipkan.
+
+## Pelajaran
+
+- Uji dengan nama sungguhan. Spasi di nama depan itu hal biasa di Bali, dan itu merusak path file.
+- Cari seperti orang mengetik. Rekruter mengetik nama lengkap, jadi query-nya harus melintasi kolom.
+- Fitur koordinasi kecil itu penting. Satu tabel dan dua endpoint memberi tahu setiap rekruter CV mana yang sudah dibaca.
+- Hasilkan dokumen dari data, jangan mengumpulkannya. Input yang terstandar membuat output konsisten dengan sendirinya.
+
+## Stack
+
+| Bagian | Teknologi |
+|--------|-----------|
+| Frontend | React 18, TypeScript, Vite, Tailwind CSS, Ant Design beserta chart-nya, Zustand |
+| Dokumen | react-pdf, react-to-print, react-quill |
+| Backend | AdonisJS 6, Lucid ORM, MySQL, VineJS, access token |
+| Deployment | Docker, nginx |
+
+## Tim
+
+Tim berlima: Aisy Rozsidhy, Fadli, Haiqal, Gilang Suprobo, dan saya.

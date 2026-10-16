@@ -1,73 +1,106 @@
 ---
-title: "ASV Autonomous Navigation System"
-description: "ROS-based autonomous navigation system for Autonomous Surface Vehicle with multi-sensor fusion, winning Grand Champion at IRC 2023."
+title: "Proteus V2: Autonomy for the Barunastra ASV"
+description: "The ROS workspace I led for Barunastra ITS's autonomous surface vessel: missions, control and hardware links behind the Grand Champion title at the International Roboboat Competition 2023."
 category: robotics
 featured: true
-order: 2
+order: 3
 emoji: "🚢"
 color: "#0ea5e9"
-tags: ["ROS Noetic", "Python", "C++", "OpenCV", "YOLO", "GPS RTK", "LiDAR"]
-repo: "agus-darmawan/barunastra-navigation"
+tags: ["ROS Noetic", "Python", "MAVROS", "YOLO", "LiDAR", "STM32", "Dynamixel"]
+repo: "agus-darmawan/ProteusV2"
 ---
 
-Full autonomous navigation stack for the Barunastra ITS Roboboat, which earned **Grand Champion** at the International Roboboat Competition 2023 (IRC 2023) and 1st Place at KKI 2022 & 2023.
+Proteus V2 is the ROS Noetic workspace that runs Barunastra ITS's autonomous surface vessel. I led the software as the team's software lead, and with it the team won **Grand Champion** at the International Roboboat Competition (IRC) 2023, plus 2nd place for design documentation.
 
-## 🏆 Competition Results
+## The problem
+
+A roboboat run is a timed sequence of tasks on open water: pass a channel of buoy gates, follow a path, spray a target, dock, run a speed gate, deliver and collect objects, then return home. Points come from finishing tasks inside the time slot, with nobody touching the controls, on a lake with wind, waves and sun glare on the camera.
+
+## What I built
+
+The workspace is seven ROS packages:
+
+- `nala_autonomy`: a mission manager that runs the course as a sequence of missions, each one a state machine: approach on GPS waypoints, search, run on camera detections, finish.
+- `nala_controller`: turns a speed and heading target into thruster and servo commands for three drive modes, differential, azimuth (steerable thrusters) and holonomic.
+- `nala_hardware`: a UDP link to the STM32 board for four thrusters, two steering servos, the pump and the crane, plus the Dynamixel servos.
+- `nala_localization`: GPS and compass from MAVROS in a local frame, plus path recording and replay.
+- `nala_perception` and `nala_sensors`: camera detections and the LiDAR driver.
+- `nala_interfaces`: the messages and services they share.
+
+```text
+camera detections, GPS + compass (MAVROS), LiDAR
+                      |
+                      v
+mission manager: one state machine per task, each with a time budget
+                      |  target speed and heading, drive mode
+                      v
+controller: differential, azimuth or holonomic
+                      |  thruster and servo commands
+                      v
+hardware node --UDP--> STM32: thrusters, steering servos, pump, crane
+              <------- mode, RC, battery voltages, crane status
+```
+
+## Challenges and how I solved them
+
+### One stuck task must not cost the run
+
+**Problem.** In a timed run, a boat circling a gate it cannot find burns the time of every task after it.
+
+**Solution.** The mission manager gives each mission a time budget, set per course in YAML. When a mission runs out of time, its timeout handler leaves the boat in a clean state (docking, for example, backs out for four seconds) and the manager moves on to the next one. Start, stop and restart are ROS services, so the team could reset a run from shore in seconds.
+
+### Steering from the image, not the map
+
+**Problem.** GPS and the compass are good enough to bring the boat close to a task, not to thread it between two buoys.
+
+**Solution.** Each mission starts on pre-task GPS waypoints to reach its area, then hands steering to the camera. If the target is not in view, the boat pivots on the spot and pans the camera left and right, and falls back to waypoints if it still finds nothing. Detections are filtered by class and by where they sit relative to "boat side" lines and a critical line drawn in the image, and the heading error comes straight from where the gate's buoys are relative to those lines. No buoy has to be placed on a map first, so a noisy heading never throws the boat off the gate.
+
+### Tuning on the water, not in the code
+
+**Problem.** Gains that work on the test lake are wrong on a windy competition course, and rebuilding between attempts wastes the slot.
+
+**Solution.** Speeds, time budgets, camera tilt and controller gains are ROS services, changed live from shore, and every course and test lake has its own YAML parameter set. Heading control uses gain-scheduled PID: one gain set for small errors, a more aggressive one beyond π/8, both clamped.
+
+### The right drive mode for each moment
+
+**Problem.** Cruising a channel, turning on the spot and lining up at a dock want different thruster behavior from the same hull.
+
+**Solution.** Missions publish a target together with a drive mode and switch modes as they go: azimuth to cruise, differential to pivot on the spot while searching, holonomic to slide sideways into a dock while holding the heading. The controller maps each mode to thrusters and servos, with a trim for every actuator.
+
+### A dropped link must stop the boat
+
+**Problem.** If a node hangs or the onboard computer crashes, the last thrust command must not keep the boat running toward the bank.
+
+**Solution.** The hardware node watches every command stream: no thruster, servo or pump command for 0.5 seconds, and the outputs return to neutral. Packets to and from the STM32 start with a fixed header, and packets with the wrong one are dropped. Offsets for each thruster and servo live in config, so a re-mounted thruster is a config change, not a code change.
+
+## Results
+
+Results of the team while I worked on its software:
 
 | Competition | Year | Result |
 |-------------|------|--------|
-| KKI (National Unmanned Water Vessel) | 2022 | 🥇 1st Place |
-| IRC 2023 (International Roboboat) | 2023 | 🏆 Grand Champion |
-| IRC 2023 Design Documentation | 2023 | 🥈 2nd Place |
-| KKI (National Unmanned Water Vessel) | 2023 | 🥇 1st Place |
+| KKI (Kontes Kapal Indonesia), unmanned water vessel | 2022 | 1st place |
+| International Roboboat Competition (IRC) | 2023 | Grand Champion |
+| IRC design documentation | 2023 | 2nd place |
+| KKI (Kontes Kapal Indonesia), unmanned water vessel | 2023 | 1st place |
 
-## 🧠 System Architecture
+## Lessons learned
 
-```
-Sensors (LiDAR + Camera + GPS + IMU + Compass)
-           ↓
-    Sensor Fusion Layer (ROS)
-           ↓
-  Localization & Mapping (RTK GPS + IMU)
-           ↓
-   Perception (Object Detection - YOLO)
-           ↓
-   Path Planning & Obstacle Avoidance
-           ↓
-  PID Thruster Control (Low-level firmware)
-```
+- Plan for failure inside a timed run. Time budgets and a clean restart were worth more points than any single clever behavior.
+- Close the loop on what you can see best. Near a task the camera beats GPS, so steer from the image.
+- Make every number tunable at runtime. On competition day there is no time to rebuild.
+- Safety belongs at the lowest layer. The neutral-on-timeout check in the hardware node protected the boat from every bug above it.
 
-## Key Technical Contributions
+## Stack
 
-### Multi-Sensor Fusion
-Integrated 5 sensor modalities into a coherent state estimate:
-- **LiDAR** — obstacle detection and environment mapping
-- **Camera** — buoy color classification and task detection via YOLO
-- **GPS RTK** — centimeter-level absolute positioning
-- **IMU** — attitude estimation and dead reckoning
-- **Compass** — heading reference
+| Layer | Technology |
+|-------|-----------|
+| Middleware | ROS Noetic, Python, catkin |
+| Localization | MAVROS (GPS and compass) |
+| Perception | YOLO detections, LiDAR point clouds |
+| Hardware | STM32 over UDP, Dynamixel servos |
+| Monitoring | RViz, ROS services for live tuning |
 
-### PID Thruster Control
-Designed dual-thruster PID controllers for:
-- Heading control (yaw axis)
-- Speed control (surge axis)
-- Station-keeping in GPS-denied zones
+## My role
 
-### Task Autonomy
-Implemented fully autonomous mission execution for IRC tasks:
-1. Navigation channel traversal
-2. Speed gate timing
-3. Buoy avoidance
-4. Docking maneuver
-
-## 🛠 Tech Stack
-
-- **ROS Noetic** — middleware and sensor integration
-- **Python** — high-level navigation and mission logic
-- **C++** — real-time sensor processing nodes
-- **OpenCV + YOLO** — visual perception pipeline
-- **GPS RTK** — centimeter-precision localization
-
-## Team Role
-
-Served as **Robotics Software Engineer** (Apr 2022 – Dec 2023) and **Electrical-Programming Division Leader** (Dec 2023 – Nov 2024), responsible for the entire software stack from sensor drivers to mission execution.
+Robotics software engineer and software lead of the workspace (2022 to 2023), then Electrical-Programming Division Leader (2023 to 2024). I designed the workspace and led its development, from the mission framework to the hardware link. Arundaya Pratama Nurhasan worked on navigation, Taib Izzat Samawi on the UI and sensors, and Ikhwanul Abiyu on computer vision.

@@ -1,71 +1,112 @@
 ---
-title: "Ubuntu Portfolio"
-description: "Interactive OS-themed developer portfolio with draggable windows, Spotify integration, i18n, and dark mode."
+title: "agus-darmawan.com: Website and Ubuntu Desktop"
+description: "This site: a fast, crawlable portfolio and an Ubuntu desktop you can actually use, built on one content layer in English and Indonesian, with tests, CI and dependency updates that merge themselves."
 category: web
 featured: true
-order: 1
+order: 4
 emoji: "🖥️"
 color: "#e95420"
-tags: ["Next.js", "TypeScript", "Tailwind CSS", "Zustand", "TanStack Query", "next-intl"]
+tags: ["Next.js", "TypeScript", "Tailwind CSS", "next-intl", "Zustand", "Vitest", "Playwright", "Sentry"]
 repo: "agus-darmawan/agus-darmawan.com"
-demo: "https://agus-darmawan.com"
+demo: "https://www.agus-darmawan.com"
 ---
 
-An interactive Ubuntu 22.04-themed developer portfolio that turns a boring resume into a living desktop environment. Every interaction is deliberate — from draggable windows to a real Spotify integration.
+This site has two views of the same content. The website is the default: fast, readable and easy to find. The desktop is an Ubuntu-style environment with windows, a terminal, a PDF viewer and a Spotify widget, for anyone who wants to explore. Both read from one content layer in English and Indonesian, and you can switch between them without losing your place.
 
-## ✨ Features
+## The problem
 
-- **Window Management** — Draggable, resizable windows with minimize/maximize/close controls, just like real GNOME Shell
-- **Spotify Integration** — Live "Now Playing" widget in the top bar with album art and progress tracking
-- **i18n Support** — Full English and Indonesian translations via next-intl
-- **Dark/Light Mode** — Theme toggling that preserves GNOME's always-dark top bar
-- **Terminal Emulator** — Functional bash-like terminal with vim mode, file system simulation, and command history
-- **PDF Resume Viewer** — In-window PDF rendering with zoom controls
+The first version was only the desktop. It was fun, and it was invisible: the home page's HTML had no words in it, because the desktop renders nothing before hydration and then plays a boot animation. Projects and posts existed only inside windows, the sitemap listed two URLs, and a search for my name had nothing to rank. Underneath, the desktop had grown bugs a portfolio cannot afford, from a contact form that never delivered to a terminal command that crashed the page.
 
-## 🛠 Tech Stack
+## What I built
 
-| Layer | Technology | Notes |
-|-------|-----------|-------|
-| Framework | Next.js 16 | App Router |
-| Language | TypeScript | Strict mode |
-| Styling | Tailwind CSS v4 | CSS variables |
-| State | Zustand + TanStack Query | Client + server |
-| i18n | next-intl | EN + ID |
-| PDF | pdfjs-dist | In-browser rendering |
+- **One content layer**: projects and posts are Markdown files with frontmatter validated by Zod at build time, and GitHub repos tagged `portfolio` are listed automatically with their README as the body.
+- **A real website**: server-rendered home, about, experience, projects, blog and contact pages in both languages, with canonical URLs, hreflang, structured data and a social card for every page.
+- **A desktop that keeps its state**: a store-driven window manager where windows stay mounted while minimized, each window subscribes only to its own state, and the stacking order is renumbered on focus.
+- **A hand-off between the views**: open a project on the website, switch to the desktop, and it opens in the Projects window; the bare domain reopens the view you used last.
+- **Quality gates**: Biome, knip, TypeScript, Vitest and a Playwright suite that runs against the production build in CI, and Dependabot updates that merge themselves once CI passes.
 
-## 🚀 Getting Started
-
-```bash
-git clone https://github.com/agus-darmawan/ubuntu-portfolio
-cd ubuntu-portfolio
-npm install
-cp .env.example .env.local
-# Add Spotify credentials to .env.local
-npm run dev
+```text
+content/projects/{en,id}/*.mdx --+
+content/blog/{en,id}/*.mdx ------+--> content layer --+--> website   /en, /id
+GitHub repos tagged "portfolio" -+                    |
+                                                      +--> desktop   /en/desktop
 ```
 
-## Architecture
+## Challenges and how I solved them
 
-> The portfolio is designed as a faithful recreation of GNOME Shell, where each "app" is an isolated React component mounted into a draggable window frame.
+### A home page with no words in it
 
-The window management system uses three cooperating hooks:
+**Problem.** Search engines saw an empty page, because the desktop is client-only and renders nothing before hydration.
 
-1. `useWindowZIndex` — monotonic z-index counter, ensures correct stacking order
-2. `useWindowLifecycle` — open/close/minimize/maximize state machine
-3. `useWindowDrag` — mouse drag with ref-based stale closure prevention
+**Solution.** First came statically generated routes for every project and post in both languages, structured data, canonical URLs with hreflang and a sitemap with every page. Then the website became the default home page, and the desktop moved to its own URL.
 
-### State Management
+### Windows that buried each other
 
-Window state lives in a single `useWindowManager` composite hook. The Spotify track and ping data are fetched server-side via Next.js API routes and polled every 10 seconds client-side using TanStack Query.
+**Problem.** A README window got a flat +500 z-index to stay above the Projects list, which also put it above every window opened later, so those could not be clicked. Dragging one window re-rendered all of them.
 
-## Environment Variables
+**Solution.** A store-driven window manager: the stacking order is renumbered within a bounded range on focus, the window area is its own stacking context so windows never cover the top bar or the dock, each window subscribes to its own slice of state, and an error boundary around each window keeps one crashing app from blanking the desktop.
 
-```env
-SPOTIFY_CLIENT_ID=your_client_id
-SPOTIFY_CLIENT_SECRET=your_client_secret
-SPOTIFY_REFRESH_TOKEN=your_refresh_token
-```
+### `cat __proto__` crashed the desktop
 
-## 🤝 Contributing
+**Problem.** The terminal's file system was a plain object, so a prototype key such as `__proto__` crashed the page. Line ids came from `crypto.randomUUID()`, which throws outside secure contexts, and vim's `:w` saved nothing.
 
-PRs welcome! Please read the contributing guide and follow the existing code style enforced by Biome.
+**Solution.** The terminal became a pure command engine that takes a command and the session state and returns output and effects, unit-tested without React. Every lookup goes through `Object.hasOwn`, line ids are a counter, and `:w` saves.
+
+### A contact form that said "sent"
+
+**Problem.** Three bugs stacked up. Without a Turnstile site key, the Send button did nothing. With a secret configured, every message was rejected because the server called the wrong verify endpoint. And production without SMTP answered "sent" and dropped the message.
+
+**Solution.** Turnstile is required only when it is configured, and then it fails closed; tokens reset after every try. The server validates input with Zod, limits each IP to five messages per ten minutes, and answers 503 when mail is not configured, so the form can send people to email instead.
+
+### Errors that never reached Sentry
+
+**Problem.** The i18n middleware caught Sentry's tunnel route and redirected every error report to `/en/monitoring`, which answered 404.
+
+**Solution.** The proxy's matcher now skips the tunnel.
+
+### Critical CVEs in the framework
+
+**Problem.** `pnpm audit` reported 62 vulnerabilities, 3 of them critical, including remote code execution in the Next.js image renderer that draws every social card on this site.
+
+**Solution.** I upgraded to the patched Next.js line, replaced axios with a small fetch helper and gray-matter with a tiny frontmatter parser, and overrode a vulnerable transitive Vite. The audit is at zero, and Dependabot keeps it there: weekly grouped updates with a cooldown so brand-new releases age for a few days first, merged automatically once lint, types, unit tests and the end-to-end suite pass.
+
+### Back stopped working after a deep link
+
+**Problem.** A link such as `/en/desktop?open=projects&item=…` tidied the URL with the History API before the Next.js router had hooked into history. After leaving for the website, Back changed the address bar but not the page.
+
+**Solution.** The URL is tidied one tick later, once the router owns history. A Playwright test reproduces the bug, and it failed before the fix.
+
+### Safari forgot the view
+
+**Problem.** Safari expires cookies written by JavaScript after seven days, so regular visitors lost the view they had chosen.
+
+**Solution.** The proxy re-issues the cookie from the server whenever it uses it.
+
+## Results
+
+- Every project and post is a crawlable page in two languages, with structured data and its own social card.
+- `pnpm audit` reports zero vulnerabilities, and the first Dependabot pull request merged itself the day the workflow landed.
+- Every push runs lint, a dead-code check, types and unit tests, then a production build with the Playwright suite against it.
+
+## Lessons learned
+
+- Build the plain version first. Recruiters and crawlers read a portfolio before anyone plays with it.
+- Test the artifact you ship. The Playwright suite runs against the standalone production build, not the dev server.
+- Silent success is the worst kind of failure. A form that says "sent" and drops the message is worse than one that shows an error.
+- Treat dependencies as a stream, not an event. Small weekly updates with a cooldown beat a 62-advisory upgrade.
+
+## Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 App Router, React 19, TypeScript |
+| Styling | Tailwind CSS v4 |
+| Content | Markdown with Zod-validated frontmatter, GitHub API |
+| State | Zustand, TanStack Query |
+| i18n | next-intl, English and Indonesian |
+| Quality | Biome, knip, Vitest, Playwright, GitHub Actions, Dependabot |
+| Operations | Vercel, Sentry, Cloudflare Turnstile, Cloudflare Web Analytics |
+
+## My role
+
+Solo project: design, code, content and operations.

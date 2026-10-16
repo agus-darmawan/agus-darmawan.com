@@ -1,63 +1,104 @@
 ---
-title: "Ubuntu Portfolio"
-description: "Portofolio developer bertema OS yang interaktif dengan jendela yang bisa di-drag, integrasi Spotify, i18n, dan dark mode."
+title: "agus-darmawan.com: Website dan Desktop Ubuntu"
+description: "Situs ini: portofolio yang cepat dan mudah ditemukan mesin pencari, plus desktop Ubuntu yang benar-benar bisa dipakai, dari satu content layer dalam bahasa Inggris dan Indonesia, lengkap dengan test, CI, dan update dependency yang merge sendiri."
 ---
 
-Portofolio developer bertema Ubuntu 22.04 yang interaktif — mengubah resume biasa menjadi lingkungan desktop yang hidup. Setiap interaksi dirancang dengan sengaja, dari jendela yang bisa diseret hingga integrasi Spotify yang real-time.
+Situs ini punya dua tampilan untuk konten yang sama. Website adalah tampilan utama: cepat, enak dibaca, dan mudah ditemukan. Desktop adalah lingkungan bergaya Ubuntu dengan jendela, terminal, PDF viewer, dan widget Spotify, untuk siapa pun yang ingin menjelajah. Keduanya membaca dari satu content layer dalam bahasa Inggris dan Indonesia, dan kamu bisa berpindah di antara keduanya tanpa kehilangan posisi.
 
-## ✨ Fitur
+## Masalahnya
 
-- **Manajemen Jendela** — Jendela yang bisa diseret dan diubah ukurannya dengan kontrol minimize/maximize/close, persis seperti GNOME Shell asli
-- **Integrasi Spotify** — Widget "Now Playing" langsung di top bar dengan album art dan pelacakan progres
-- **Dukungan i18n** — Terjemahan lengkap bahasa Inggris dan Indonesia via next-intl
-- **Mode Gelap/Terang** — Pergantian tema yang mempertahankan top bar yang selalu gelap ala GNOME
-- **Emulator Terminal** — Terminal fungsional seperti bash dengan mode vim, simulasi file system, dan riwayat perintah
-- **Viewer Resume PDF** — Rendering PDF dalam jendela dengan kontrol zoom
+Versi pertama hanya berupa desktop. Seru, tetapi tidak terlihat: HTML halaman utamanya tidak berisi satu kata pun, karena desktop tidak me-render apa pun sebelum hydration lalu memutar animasi boot. Proyek dan tulisan hanya ada di dalam jendela, sitemap cuma berisi dua URL, dan pencarian nama saya tidak menemukan apa pun untuk diperingkatkan. Di baliknya, desktop juga menumpuk bug yang tidak boleh ada di portofolio, mulai dari form kontak yang tidak pernah mengirim pesan sampai perintah terminal yang membuat halaman crash.
 
-## 🛠 Tech Stack
+## Yang saya bangun
 
-| Layer | Teknologi | Catatan |
-|-------|-----------|---------|
-| Framework | Next.js 16 | App Router |
-| Bahasa | TypeScript | Mode strict |
-| Styling | Tailwind CSS v4 | CSS variables |
-| State | Zustand + TanStack Query | Client + server |
-| i18n | next-intl | EN + ID |
-| PDF | pdfjs-dist | Rendering di browser |
+- **Satu content layer**: proyek dan tulisan berupa file Markdown dengan frontmatter yang divalidasi Zod saat build, dan repo GitHub dengan topic `portfolio` otomatis tampil dengan README sebagai isinya.
+- **Website sungguhan**: halaman home, about, experience, projects, blog, dan contact yang di-render di server dalam dua bahasa, lengkap dengan canonical URL, hreflang, structured data, dan social card untuk setiap halaman.
+- **Desktop yang menyimpan state-nya**: window manager berbasis store, jendela tetap ter-mount saat di-minimize, setiap jendela hanya subscribe ke state-nya sendiri, dan urutan tumpukan dinomori ulang saat fokus.
+- **Serah terima antar tampilan**: buka proyek di website, pindah ke desktop, dan proyek itu terbuka di jendela Projects; domain utama membuka tampilan yang terakhir kamu pakai.
+- **Quality gate**: Biome, knip, TypeScript, Vitest, dan suite Playwright yang berjalan terhadap build production di CI, plus update Dependabot yang merge sendiri setelah CI lolos.
 
-## 🚀 Memulai
-
-```bash
-git clone https://github.com/agus-darmawan/ubuntu-portfolio
-cd ubuntu-portfolio
-npm install
-cp .env.example .env.local
-# Tambahkan kredensial Spotify ke .env.local
-npm run dev
+```text
+content/projects/{en,id}/*.mdx --+
+content/blog/{en,id}/*.mdx ------+--> content layer --+--> website   /en, /id
+repo GitHub bertopic "portfolio" +                    |
+                                                      +--> desktop   /en/desktop
 ```
 
-## Arsitektur
+## Tantangan dan solusinya
 
-> Portofolio ini dirancang sebagai rekreasi setia GNOME Shell, di mana setiap "aplikasi" adalah komponen React terisolasi yang dimuat ke dalam frame jendela yang bisa diseret.
+### Halaman utama tanpa satu kata pun
 
-Sistem manajemen jendela menggunakan tiga hook yang bekerja bersama:
+**Masalah.** Mesin pencari melihat halaman kosong, karena desktop hanya berjalan di client dan tidak me-render apa pun sebelum hydration.
 
-1. `useWindowZIndex` — counter z-index yang monoton meningkat, memastikan urutan tumpukan yang benar
-2. `useWindowLifecycle` — state machine buka/tutup/minimize/maximize
-3. `useWindowDrag` — drag mouse dengan pencegahan stale closure berbasis ref
+**Solusi.** Pertama, route statis untuk setiap proyek dan tulisan dalam dua bahasa, structured data, canonical URL dengan hreflang, dan sitemap yang memuat semua halaman. Lalu website menjadi halaman utama, dan desktop pindah ke URL-nya sendiri.
 
-### Manajemen State
+### Jendela yang saling mengubur
 
-State jendela berada di satu hook komposit `useWindowManager`. Data track Spotify dan ping diambil server-side via API routes Next.js dan di-polling setiap 10 detik client-side menggunakan TanStack Query.
+**Masalah.** Jendela README mendapat z-index +500 supaya tetap di atas daftar Projects, yang juga membuatnya berada di atas setiap jendela yang dibuka sesudahnya, sehingga jendela-jendela itu tidak bisa diklik. Menyeret satu jendela membuat semua jendela ikut re-render.
 
-## Variabel Environment
+**Solusi.** Window manager berbasis store: urutan tumpukan dinomori ulang dalam rentang terbatas saat fokus, area jendela menjadi stacking context sendiri sehingga jendela tidak pernah menutupi top bar atau dock, setiap jendela subscribe ke potongan state-nya sendiri, dan error boundary di setiap jendela mencegah satu aplikasi yang crash mengosongkan seluruh desktop.
 
-```env
-SPOTIFY_CLIENT_ID=client_id_kamu
-SPOTIFY_CLIENT_SECRET=client_secret_kamu
-SPOTIFY_REFRESH_TOKEN=refresh_token_kamu
-```
+### `cat __proto__` membuat desktop crash
 
-## 🤝 Kontribusi
+**Masalah.** File system terminal berupa object biasa, jadi kunci prototype seperti `__proto__` membuat halaman crash. Id baris dibuat dengan `crypto.randomUUID()`, yang melempar error di luar secure context, dan `:w` di vim tidak menyimpan apa pun.
 
-PR sangat diterima! Silakan baca panduan kontribusi dan ikuti gaya kode yang ada yang diberlakukan oleh Biome.
+**Solusi.** Terminal menjadi command engine murni yang menerima perintah dan state sesi lalu mengembalikan output dan efek, dengan unit test tanpa React. Setiap pencarian lewat `Object.hasOwn`, id baris berupa counter, dan `:w` benar-benar menyimpan.
+
+### Form kontak yang bilang "terkirim"
+
+**Masalah.** Tiga bug bertumpuk. Tanpa site key Turnstile, tombol Kirim tidak melakukan apa-apa. Dengan secret terpasang, setiap pesan ditolak karena server memanggil endpoint verifikasi yang salah. Dan production tanpa SMTP menjawab "terkirim" lalu membuang pesannya.
+
+**Solusi.** Turnstile hanya diwajibkan saat dikonfigurasi, dan saat itu ia fail-closed; token di-reset setiap kali mencoba. Server memvalidasi input dengan Zod, membatasi setiap IP lima pesan per sepuluh menit, dan menjawab 503 saat email belum dikonfigurasi, sehingga form bisa mengarahkan orang ke email.
+
+### Error yang tidak pernah sampai ke Sentry
+
+**Masalah.** Middleware i18n menangkap route tunnel Sentry dan mengalihkan setiap laporan error ke `/en/monitoring`, yang menjawab 404.
+
+**Solusi.** Matcher di proxy sekarang melewati tunnel itu.
+
+### CVE kritis di framework
+
+**Masalah.** `pnpm audit` melaporkan 62 kerentanan, 3 di antaranya kritis, termasuk remote code execution di renderer gambar Next.js yang membuat setiap social card situs ini.
+
+**Solusi.** Saya upgrade ke versi Next.js yang sudah ditambal, mengganti axios dengan helper fetch kecil dan gray-matter dengan parser frontmatter mungil, serta meng-override Vite transitif yang rentan. Audit-nya sekarang nol, dan Dependabot menjaganya tetap begitu: update mingguan yang dikelompokkan dengan cooldown supaya rilis yang masih baru "matang" dulu beberapa hari, lalu merge otomatis setelah lint, type, unit test, dan suite end-to-end lolos.
+
+### Tombol Back rusak setelah deep link
+
+**Masalah.** Link seperti `/en/desktop?open=projects&item=…` merapikan URL dengan History API sebelum router Next.js terpasang ke history. Setelah pindah ke website, Back mengubah address bar tetapi tidak halamannya.
+
+**Solusi.** URL dirapikan satu tick kemudian, setelah router memegang history. Sebuah test Playwright mereproduksi bug ini, dan test itu gagal sebelum diperbaiki.
+
+### Safari lupa tampilan pilihanmu
+
+**Masalah.** Safari menghapus cookie yang ditulis JavaScript setelah tujuh hari, jadi pengunjung setia kehilangan tampilan yang sudah mereka pilih.
+
+**Solusi.** Proxy menerbitkan ulang cookie dari server setiap kali memakainya.
+
+## Hasil
+
+- Setiap proyek dan tulisan menjadi halaman yang bisa di-crawl dalam dua bahasa, dengan structured data dan social card masing-masing.
+- `pnpm audit` melaporkan nol kerentanan, dan pull request Dependabot pertama merge sendiri di hari workflow-nya masuk.
+- Setiap push menjalankan lint, pengecekan dead code, type, dan unit test, lalu build production dengan suite Playwright terhadapnya.
+
+## Pelajaran
+
+- Bangun versi sederhananya dulu. Recruiter dan crawler membaca portofolio sebelum ada yang memainkannya.
+- Uji artefak yang benar-benar dikirim. Suite Playwright berjalan terhadap build production standalone, bukan dev server.
+- Sukses yang diam adalah kegagalan terburuk. Form yang bilang "terkirim" lalu membuang pesan lebih buruk daripada form yang menampilkan error.
+- Perlakukan dependency sebagai aliran, bukan peristiwa. Update kecil mingguan dengan cooldown lebih baik daripada upgrade dengan 62 advisory.
+
+## Stack
+
+| Layer | Teknologi |
+|-------|-----------|
+| Framework | Next.js 16 App Router, React 19, TypeScript |
+| Styling | Tailwind CSS v4 |
+| Konten | Markdown dengan frontmatter tervalidasi Zod, GitHub API |
+| State | Zustand, TanStack Query |
+| i18n | next-intl, bahasa Inggris dan Indonesia |
+| Kualitas | Biome, knip, Vitest, Playwright, GitHub Actions, Dependabot |
+| Operasional | Vercel, Sentry, Cloudflare Turnstile, Cloudflare Web Analytics |
+
+## Peran saya
+
+Proyek solo: desain, kode, konten, dan operasional.

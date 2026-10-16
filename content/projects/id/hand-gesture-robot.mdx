@@ -1,85 +1,82 @@
 ---
-title: "Pengenalan Gestur Tangan untuk Robot Kolaboratif"
-description: "Sistem deep learning ringan untuk pengenalan gestur tangan real-time yang memungkinkan kontrol robot kolaboratif."
+title: "Kontrol Gestur Tangan untuk Cobot UR5"
+description: "Menunjuk sebagai pengganti teach pendant: prototipe ROS yang menggerakkan UR5 dari hand tracking MediaPipe, dan paper yang saya tulis bersama tentang model 7 KB pengenal delapan gestur tangan."
 ---
 
-**Penelitian Dipublikasikan** — Sistem deep learning ringan yang memungkinkan pengenalan gestur tangan real-time untuk kontrol robot kolaboratif (cobot), tanpa antarmuka fisik atau wearable.
+Memberi perintah ke cobot biasanya berarti teach pendant, joystick, atau laptop di samping lengan robot. Proyek ini membuat operator cukup memakai tangannya. Prototipenya memetakan ujung jari yang dilihat kamera menjadi perintah untuk Universal Robots UR5, dan paper yang saya tulis bersama rekan di ITS membahas model gestur yang cukup kecil untuk hardware edge.
 
-## Publikasi
+## Masalahnya
 
-> *"Hand Gesture Recognition for Collaborative Robots Using Lightweight Deep Learning in Real-Time Robotic Systems"*
+Di ruang kerja bersama, tangan operator sedang sibuk, dan berjalan ke teach pendant hanya untuk memberi tahu lengan robot ke mana sebuah part harus diletakkan memutus alur kerja. Antarmukanya tidak boleh butuh perangkat tambahan untuk dipegang atau dipakai, tidak perlu pelatihan, dan tidak boleh memicu perintah tanpa sengaja.
 
-Dipublikasikan sebagai bagian dari penelitian robotika di Institut Teknologi Sepuluh Nopember (ITS).
+## Prototipenya
 
-## Motivasi
+Empat package ROS Noetic:
 
-Kolaborasi manusia-robot tradisional memerlukan kontroler fisik, teach pendant, atau pengaturan yang kompleks. Penelitian ini mengeksplorasi penggunaan gestur tangan alami sebagai antarmuka intuitif tanpa biaya hardware untuk mengontrol cobot di ruang kerja bersama.
+- `ur_perception` menjalankan MediaPipe Hands pada feed kamera, memetakan ujung telunjuk ke salah satu sel grid yang digambar di atas citra, dan hanya mem-publish nomor selnya. Node kedua membaca sensor jarak lewat serial.
+- `ur_controller` menentukan arti sebuah sel di mode yang sedang aktif dan mengganti grid antar mode.
+- `ur_interface` mengirim joint trajectory ke UR5 lewat trajectory controller dari Universal Robots ROS driver.
+- `ur_srvs` berisi service untuk start, stop, dan ganti mode.
 
-## Desain Sistem
-
-### Pipeline Pengenalan Gestur
-
-```
-Input Kamera (RGB)
-      ↓
-  MediaPipe Hands (deteksi landmark)
-      ↓
-  Ekstraksi Fitur (21 keypoint × 3D)
-      ↓
-  Classifier CNN Ringan
-      ↓
-  Label Gestur (8 kelas)
-      ↓
-  Publisher Command ROS
-      ↓
-  Eksekutor Gerak Cobot
+```text
+kamera --> MediaPipe Hands --> ujung telunjuk --> sel grid
+sensor jarak (serial) --> part lebih dekat dari 15 cm
+                              |
+                              v
+                        ur_controller
+               +--------------+--------------+
+               |                             |
+      mode panel kontrol            mode pick and place
+      relay di ESP (HTTP)           joint trajectory UR5
 ```
 
-### Mengapa Ringan?
+Ada dua mode. Sebagai **panel kontrol tanpa sentuh**, grid 4 × 2 memberi delapan sel, masing-masing menyalakan relay di board ESP lewat HTTP. Untuk **pick and place**, part yang datang dalam jarak 15 cm dari sensor membuat lengan mengambilnya, grid berganti menjadi dua sel, dan operator menunjuk sisi tempat part harus diletakkan sebelum lengan kembali ke posisi idle.
 
-Cobot industri memiliki persyaratan real-time yang ketat. Model dirancang untuk berjalan di >30 FPS pada hardware edge (NVIDIA Jetson) dengan latensi end-to-end <50ms:
+## Tantangan dan solusinya
 
-| Metrik | Nilai |
-|--------|-------|
-| Latensi inferensi | <20ms |
-| Latensi pipeline penuh | <50ms |
-| Ukuran model | ~2.3MB |
-| Akurasi (test set) | 97.4% |
-| FPS di Jetson Nano | 34 FPS |
+### Ujung jari tidak pernah diam
 
-### Kelas Gestur
+**Masalah.** Versi pertama mem-publish koordinat mentah ujung jari di 1280 × 720. Tangan selalu sedikit bergetar, jadi memetakan piksel langsung ke perintah akan membuat relay berkedip dan lengan robot ragu-ragu.
 
-8 gestur kontrol yang dipetakan ke perintah robot:
+**Solusi.** Citra dibagi menjadi grid dan hanya sel di bawah ujung jari yang dihitung. Perintah hanya dikirim saat selnya berganti: controller mematikan sel sebelumnya lalu menyalakan sel yang baru. Kamera sekarang berjalan di 848 × 480, lebih dari cukup untuk satu landmark, dan confidence deteksi 0,9 mencegah tangan palsu.
 
-1. ✊ Kepalan — Stop / Henti darurat
-2. ✋ Telapak terbuka — Jeda gerak saat ini
-3. 👆 Tunjuk atas — Gerak ke atas
-4. 👇 Tunjuk bawah — Gerak ke bawah
-5. 👈 Tunjuk kiri — Gerak ke kiri
-6. 👉 Tunjuk kanan — Gerak ke kanan
-7. 👍 Jempol atas — Konfirmasi/Eksekusi
-8. 🤙 Hang loose — Kembali ke posisi awal
+### Antarmuka yang tidak perlu dipelajari
 
-### Integrasi ROS
+**Masalah.** Setiap kosakata gestur harus diajarkan ke setiap operator, dan orang lupa bentuk tangan mana artinya apa.
 
-```python
-class GestureController(Node):
-    def __init__(self):
-        super().__init__('gesture_controller')
-        self.cmd_pub = self.create_publisher(
-            JointTrajectory, '/cobot/joint_trajectory', 10
-        )
-    
-    def on_gesture(self, gesture: str):
-        cmd = self.gesture_to_trajectory(gesture)
-        self.cmd_pub.publish(cmd)
-```
+**Solusi.** Prototipe ini hanya bertanya di mana ujung jari berada, bukan bentuk tangannya, dan menggambar grid beserta nomor setiap sel di tampilan kamera. Operator bisa melihat akibat dari menunjuk sebelum melakukannya.
 
-## 🛠 Tech Stack
+### Model yang cukup kecil untuk edge
 
-- **Python** — pelatihan model dan pipeline inferensi
-- **MediaPipe** — deteksi landmark tangan real-time
-- **TensorFlow Lite** — deployment model ringan
-- **ROS2** — middleware komunikasi robot
-- **OpenCV** — pengambilan kamera dan preprocessing
-- **NVIDIA Jetson** — hardware inferensi edge
+**Masalah.** Menunjuk bisa memilih tempat, tetapi tidak bisa bilang berhenti atau konfirmasi, dan model gestur di samping cobot harus berjalan real-time di hardware sederhana.
+
+**Solusi.** Itulah topik paper-nya: model ringan yang mengenali delapan gestur tangan dengan 1.103 parameter dalam 22 KB, dengan akurasi 93,5 %. Quantization dan pruning dengan TensorFlow Lite mengecilkannya menjadi 7 KB, dan model ini diuji untuk mengendalikan UR5 dalam sistem ROS 2 real-time.
+
+## Hasil
+
+- Prototipenya menyalakan delapan relay hanya dengan menunjuk dan menjalankan pick and place berbasis sensor di UR5, dengan sisi peletakan dipilih lewat tangan.
+- Model gestur di paper mencapai akurasi 93,5 % untuk delapan gestur dalam 7 KB setelah optimasi.
+
+## Status
+
+Prototipenya dibuat dalam sekitar satu minggu pada Juli 2024. Fungsi gripper masih berupa stub, dan pose pick and place masih berupa posisi joint tetap yang direkam di lengan robot.
+
+## Pelajaran
+
+- Kuantisasi input yang noisy sebelum menafsirkannya. Grid mengubah ujung jari yang bergetar menjadi perintah yang stabil.
+- Kirim perintah saat ada perubahan, bukan di setiap frame.
+- Perlihatkan antarmukanya ke operator. Grid yang digambar di tampilan kamera membuat sistem ini bisa dipakai tanpa instruksi.
+- Model kecil adalah pilihan desain. 1.103 parameter sudah cukup untuk delapan gestur.
+
+## Stack
+
+| Bagian | Teknologi |
+|--------|-----------|
+| Prototipe | ROS Noetic, Python, MediaPipe Hands, OpenCV |
+| Robot | Universal Robots UR5 dengan UR ROS driver |
+| I/O | Sensor jarak lewat serial, relay di board ESP lewat HTTP |
+| Riset | TensorFlow Lite dengan quantization dan pruning, ROS 2 |
+
+## Paper
+
+Muhtadin, I Wayan Agus Darmawan, Muhammad Hilmi Rusydiansyah, I Ketut Eddy Purnama, Chastine Fatichah, dan Mauridhi Hery Purnomo, [Hand Gesture Recognition for Collaborative Robots Using Lightweight Deep Learning in Real-Time Robotic Systems](https://arxiv.org/abs/2507.10055), arXiv, 2025.
