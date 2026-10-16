@@ -1,14 +1,21 @@
 import { type RefObject, useCallback, useEffect, useState } from "react";
 import type { TocEntry } from "@/lib/markdown/types";
 
-// `#${id}` is an invalid selector for ids like "2-install" — always escape.
+// `#${id}` is an invalid selector for ids like "2-install": always escape.
 const byId = (root: ParentNode, id: string) =>
 	root.querySelector<HTMLElement>(`[id="${CSS.escape(id)}"]`);
 
+/** Where a heading counts as "reached": just below the page's sticky header. */
+const PAGE_OFFSET = 96;
+const WINDOW_OFFSET = 24;
+
+const smooth = (): ScrollBehavior =>
+	matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+
 /**
- * Tracks which heading is in view (TOC highlight).
- * Pass a scroll container ref (desktop windows) or `null` to follow the
- * page scroll (standalone /projects and /blog routes).
+ * The section being read (for the table of contents) and a way to jump to
+ * one. Pass the scroll container (desktop windows) or `null` to follow the
+ * page (website).
  */
 export function useHeadingScroll(
 	containerRef: RefObject<HTMLElement | null> | null,
@@ -26,20 +33,30 @@ export function useHeadingScroll(
 		let frame = 0;
 		const update = () => {
 			frame = 0;
-			const containerTop = container?.getBoundingClientRect().top ?? 80;
+			const line =
+				(container?.getBoundingClientRect().top ?? 0) +
+				(container ? WINDOW_OFFSET : PAGE_OFFSET);
+			// The last heading above the line is the section being read.
+			let current = toc[0].id;
 			for (const entry of toc) {
 				const el = byId(root, entry.id);
-				if (el && el.getBoundingClientRect().top - containerTop > -8) {
-					setActiveId(entry.id);
-					return;
-				}
+				if (!el) continue;
+				if (el.getBoundingClientRect().top - line > 1) break;
+				current = entry.id;
 			}
-			setActiveId(toc[toc.length - 1]?.id ?? null);
+			// A short last section never reaches the line: at the very end
+			// of the scroll, it is the one being read.
+			const end = container
+				? container.scrollTop + container.clientHeight >=
+					container.scrollHeight - 2
+				: false;
+			setActiveId(end ? (toc.at(-1)?.id ?? current) : current);
 		};
 		const onScroll = () => {
 			if (!frame) frame = requestAnimationFrame(update);
 		};
 
+		update();
 		target.addEventListener("scroll", onScroll, { passive: true });
 		return () => {
 			target.removeEventListener("scroll", onScroll);
@@ -52,14 +69,22 @@ export function useHeadingScroll(
 			const container = containerRef?.current ?? null;
 			const el = byId(container ?? document, id);
 			if (!el) return;
-			const offset = container
-				? container.getBoundingClientRect().top + 16
-				: 80;
-			(container ?? window).scrollBy({
-				top: el.getBoundingClientRect().top - offset,
-				behavior: "smooth",
-			});
-			if (!container) history.replaceState(null, "", `#${id}`);
+			if (container) {
+				// Scroll only the window body: scrollIntoView would also move
+				// the desktop around it.
+				container.scrollBy({
+					top:
+						el.getBoundingClientRect().top -
+						container.getBoundingClientRect().top -
+						WINDOW_OFFSET +
+						1,
+					behavior: smooth(),
+				});
+			} else {
+				// Headings carry a scroll-margin for the sticky header.
+				el.scrollIntoView({ behavior: smooth(), block: "start" });
+				history.replaceState(null, "", `#${id}`);
+			}
 			setActiveId(id);
 		},
 		[containerRef],

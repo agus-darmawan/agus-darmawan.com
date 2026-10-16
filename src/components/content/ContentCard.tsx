@@ -1,13 +1,15 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { MouseEvent } from "react";
 import { Link } from "@/i18n/navigation";
 import { contentPath } from "@/lib/content/paths";
 import type { ContentMeta } from "@/lib/content/types";
+import { itemKey } from "@/lib/meta/keys";
+import { Banner } from "./banner/Banner";
 import { ContentLinks, useMetaLabels } from "./ContentHeader";
-import { accentStyle, Chip, ContentIcon, MetaRow, TagList } from "./primitives";
+import { accentStyle, Chip, MetaRow, TagList } from "./primitives";
+import { ViewCount } from "./stats/ItemStats";
 
 interface ContentCardProps {
 	item: ContentMeta;
@@ -22,7 +24,10 @@ interface ContentCardProps {
 const isModified = (e: MouseEvent) =>
 	e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0;
 
-/** One card for projects AND posts — the differences are data-driven. */
+/**
+ * One card for projects AND posts in the desktop windows: the item's banner
+ * beside its title, summary, tags and facts (stacked in narrow windows).
+ */
 export function ContentCard({ item, onOpen }: ContentCardProps) {
 	const t = useTranslations("Content");
 	const labels = useMetaLabels(item);
@@ -31,82 +36,57 @@ export function ContentCard({ item, onOpen }: ContentCardProps) {
 	return (
 		<article
 			style={accentStyle(item.color)}
-			className="group relative w-full rounded-2xl overflow-hidden transition-all duration-200 bg-(--surface-secondary) border border-(--border) hover:border-(--accent)/40 hover:-translate-y-0.5 hover:shadow-[0_8px_32px_color-mix(in_srgb,var(--accent)_14%,transparent)] focus-within:border-(--accent)/60"
+			className="@container group relative rounded-xl border border-(--border) bg-(--surface-secondary) p-3 transition-colors hover:border-(--accent)/50 focus-within:border-(--accent)"
 		>
-			{/* Accent bar */}
-			<div
-				aria-hidden="true"
-				className={
-					!isProject || item.featured
-						? "h-0.5 w-full bg-linear-to-r from-(--accent) to-(--accent)/25"
-						: "h-0.5 w-full bg-(--accent)/25"
-				}
-			/>
-
-			<div className="relative p-4">
-				<div className="flex items-start justify-between gap-3 mb-3">
-					<div className="flex items-start gap-3 min-w-0">
-						<ContentIcon
-							emoji={item.emoji}
-							size={isProject ? "md" : "sm"}
-							className="transition-transform duration-200 group-hover:scale-110"
-						/>
-						<div className="min-w-0">
-							<div className="flex items-center gap-2 flex-wrap">
-								<h3 className="font-semibold text-sm leading-snug text-(--text-primary)">
-									{/* Stretched link: the whole card is clickable, inner
-									    links sit above it with `relative z-10`. */}
-									<Link
-										href={contentPath(item)}
-										onClick={(e) => {
-											if (!onOpen || isModified(e)) return;
-											e.preventDefault();
-											onOpen(item);
-										}}
-										className="outline-none after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-(--accent)"
-									>
-										{item.title}
-									</Link>
-								</h3>
-								{isProject && item.featured && <Chip>{t("featured")}</Chip>}
-							</div>
-							{isProject ? (
-								<span className="text-[10px] mt-0.5 inline-block text-(--text-muted)">
-									{t(`category.${item.category}`)}
-								</span>
-							) : (
-								<p className="text-[11px] mt-0.5 line-clamp-2 leading-relaxed text-(--text-secondary)">
-									{item.description}
-								</p>
-							)}
-						</div>
+			<div className="grid gap-3.5 @md:grid-cols-[9rem_minmax(0,1fr)]">
+				<Banner
+					item={item}
+					aspect={16 / 9}
+					sizes="9rem"
+					className="rounded-lg"
+				/>
+				<div className="min-w-0 py-0.5">
+					<div className="flex items-start justify-between gap-3">
+						<h3 className="text-sm font-semibold leading-snug text-(--text-primary)">
+							{/* Stretched link: the whole card is clickable, inner
+							    links sit above it with `relative z-10`. */}
+							<Link
+								href={contentPath(item)}
+								onClick={(e) => {
+									if (!onOpen || isModified(e)) return;
+									e.preventDefault();
+									onOpen(item);
+								}}
+								className="outline-none after:absolute after:inset-0 after:rounded-xl after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-(--accent)"
+							>
+								{item.title}
+							</Link>
+						</h3>
+						{isProject && item.featured && (
+							<Chip className="shrink-0">{t("featured")}</Chip>
+						)}
 					</div>
-
-					<span
-						aria-hidden="true"
-						className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 bg-(--accent)/10 text-(--accent)"
-					>
-						<ArrowUpRight size={14} />
-					</span>
-				</div>
-
-				{isProject && (
-					<p className="text-xs leading-relaxed mb-3 line-clamp-2 text-(--text-secondary)">
+					{isProject && (
+						<p className="mt-0.5 text-[11px] text-(--text-muted)">
+							{t(`category.${item.category}`)}
+						</p>
+					)}
+					<p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-(--text-secondary)">
 						{item.description}
 					</p>
-				)}
-
-				<TagList
-					className="mb-3"
-					tags={item.tags}
-					max={isProject ? 4 : undefined}
-					variant={isProject ? "muted" : "accent"}
-					moreLabel={(count) => t("moreTags", { count })}
-				/>
-
-				<div className="flex items-center justify-between gap-2">
-					<MetaRow dateIso={item.date} labels={labels} />
-					<ContentLinks item={item} size="sm" />
+					<TagList
+						className="mt-2.5"
+						tags={item.tags}
+						max={4}
+						variant="muted"
+						moreLabel={(count) => t("moreTags", { count })}
+					/>
+					<div className="mt-2.5 flex flex-wrap items-center justify-between gap-2">
+						<MetaRow dateIso={item.date} labels={labels}>
+							<ViewCount item={itemKey(item)} icon />
+						</MetaRow>
+						<ContentLinks item={item} size="sm" />
+					</div>
 				</div>
 			</div>
 		</article>

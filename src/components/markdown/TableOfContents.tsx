@@ -3,56 +3,58 @@
 import { useTranslations } from "next-intl";
 import type { TocEntry } from "@/lib/markdown/types";
 import { cn } from "@/lib/utils";
-import { MARKDOWN_STYLES, type MarkdownSize } from "./styles";
 
 interface TocProps {
 	entries: TocEntry[];
 	activeId: string | null;
 	onNavigate: (id: string) => void;
-	size?: MarkdownSize;
+	/** Hide the "Contents" heading (when something else already names it). */
+	hideTitle?: boolean;
+	className?: string;
 }
 
-const INDENT = { 1: "pl-0", 2: "pl-2", 3: "pl-4" } as const;
-
+/**
+ * The article's sections on a rule; the one being read is marked in the
+ * item's accent. Entries are real anchors: crawlable, shareable, and they
+ * still work before hydration.
+ */
 export function TableOfContents({
 	entries,
 	activeId,
 	onNavigate,
-	size = "compact",
+	hideTitle,
+	className,
 }: TocProps) {
 	const t = useTranslations("Content");
-	const styles = MARKDOWN_STYLES[size];
 	if (entries.length < 2) return null;
 
 	return (
-		<nav
-			className={cn(
-				"shrink-0 hidden lg:block sticky self-start pt-1",
-				styles.toc,
+		<nav aria-label={t("tableOfContents")} className={className}>
+			{!hideTitle && (
+				<p className="mb-3 font-medium text-(--text-primary)">
+					{t("tableOfContents")}
+				</p>
 			)}
-			aria-label={t("tableOfContents")}
-		>
-			<p className={styles.tocTitle}>{t("tableOfContents")}</p>
-			<ul className="space-y-0.5">
+			<ol className="border-l border-(--border)">
 				{entries.map((entry) => {
-					const isActive = activeId === entry.id;
+					const active = entry.id === activeId;
 					return (
 						<li key={entry.id}>
-							{/* Real anchors: crawlable, middle-clickable, shareable. */}
 							<a
 								href={`#${entry.id}`}
 								onClick={(e) => {
+									if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0)
+										return;
 									e.preventDefault();
 									onNavigate(entry.id);
 								}}
-								aria-current={isActive ? "location" : undefined}
+								aria-current={active ? "location" : undefined}
 								className={cn(
-									"block w-full text-left leading-snug truncate transition-colors",
-									styles.tocLink,
-									INDENT[entry.level],
-									isActive
-										? "text-(--accent) font-medium"
-										: "text-(--text-muted) hover:text-(--text-secondary)",
+									"-ml-px block border-l-2 py-[0.3em] pr-2 leading-snug transition-colors",
+									entry.level === 3 ? "pl-[1.75em]" : "pl-[0.9em]",
+									active
+										? "border-(--accent) text-(--text-primary)"
+										: "border-transparent text-(--text-muted) hover:text-(--text-primary)",
 								)}
 							>
 								{entry.text}
@@ -60,7 +62,7 @@ export function TableOfContents({
 						</li>
 					);
 				})}
-			</ul>
+			</ol>
 		</nav>
 	);
 }

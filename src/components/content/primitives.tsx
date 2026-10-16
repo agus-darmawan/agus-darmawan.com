@@ -11,31 +11,6 @@ import { cn } from "@/lib/utils";
 export const accentStyle = (color: string) =>
 	({ "--accent": color }) as CSSProperties;
 
-export function ContentIcon({
-	emoji,
-	size = "md",
-	className,
-}: {
-	emoji: string;
-	size?: "sm" | "md" | "lg";
-	className?: string;
-}) {
-	return (
-		<span
-			aria-hidden="true"
-			className={cn(
-				"rounded-xl flex items-center justify-center shrink-0 bg-(--accent)/10 border border-(--accent)/15",
-				size === "sm" && "w-9 h-9 text-lg",
-				size === "md" && "w-11 h-11 text-xl",
-				size === "lg" && "w-14 h-14 text-3xl",
-				className,
-			)}
-		>
-			{emoji}
-		</span>
-	);
-}
-
 export function Chip({
 	children,
 	variant = "accent",
@@ -110,10 +85,13 @@ export function MetaRow({
 	dateIso,
 	labels,
 	className,
+	children,
 }: {
 	dateIso?: string | null;
 	labels: MetaRowLabels;
 	className?: string;
+	/** More pairs after the built-in ones (views and likes). */
+	children?: ReactNode;
 }) {
 	const items = [
 		labels.date && dateIso && (
@@ -142,7 +120,7 @@ export function MetaRow({
 		),
 	].filter(Boolean);
 
-	if (items.length === 0) return null;
+	if (items.length === 0 && !children) return null;
 	return (
 		<div
 			className={cn(
@@ -151,6 +129,7 @@ export function MetaRow({
 			)}
 		>
 			{items}
+			{children}
 		</div>
 	);
 }

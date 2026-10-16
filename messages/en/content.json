@@ -4,7 +4,6 @@
 		"copied": "Copied!",
 		"copyCode": "Copy code",
 		"tableOfContents": "Contents",
-		"imageFailed": "Failed to load image: {alt}",
 		"code": "Code",
 		"demo": "Live demo",
 		"viewOnGithub": "View on GitHub",
@@ -33,8 +32,18 @@
 		"clearSearch": "Clear search",
 		"video": "YouTube video",
 		"playVideo": "Play video: {title}",
+		"footnotes": "Footnotes",
+		"backToReference": "Back to reference {n}",
+		"callout": {
+			"note": "Note",
+			"tip": "Tip",
+			"important": "Important",
+			"warning": "Warning",
+			"caution": "Caution"
+		},
 		"views": "{count, plural, one {# view} other {# views}}",
 		"likes": "{count, plural, one {# like} other {# likes}}",
-		"like": "Like"
+		"like": "Like",
+		"loading": "Loading"
 	}
 }

@@ -49,7 +49,10 @@
 		},
 		"writing": {
 			"title": "Writing",
-			"all": "All posts"
+			"all": "All posts",
+			"search": "Search posts",
+			"noMatch": "No posts match “{query}”.",
+			"filter": "Filter posts by tag"
 		},
 		"cta": {
 			"title": "Have a robot, a dashboard or an idea that needs building?",
@@ -68,7 +71,9 @@
 		"projects": {
 			"filter": "Filter projects by category",
 			"empty": "No projects in this category yet.",
-			"featured": "Featured"
+			"featured": "Featured",
+			"search": "Search projects",
+			"noMatch": "No projects match “{query}”."
 		},
 		"footer": {
 			"tagline": "Robotics engineer and full-stack developer in Denpasar, Bali.",

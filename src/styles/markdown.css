@@ -1,0 +1,498 @@
+/* ────────────────────────────────────────────────
+   Article typography (`.md`), shared by the website
+   pages and the desktop windows. Sizes are in em, so
+   `.md-compact` scales the whole article down.
+   Colours come from the shared tokens, which `.site`
+   re-maps to the website palette.
+──────────────────────────────────────────────── */
+
+:root {
+	--md-link: #c2421a;
+	--md-note: #0969da;
+	--md-tip: #1a7f37;
+	--md-important: #8250df;
+	--md-warning: #9a6700;
+	--md-caution: #cf222e;
+}
+
+.dark {
+	--md-link: #f47c4c;
+	--md-note: #4493f8;
+	--md-tip: #3fb950;
+	--md-important: #ab7df8;
+	--md-warning: #d29922;
+	--md-caution: #f85149;
+}
+
+@layer components {
+	.md {
+		--md-text: var(--text-secondary);
+		--md-ink: var(--text-primary);
+		/* Captions and quotes: quieter, still readable. */
+		--md-quiet: var(--text-secondary);
+		/* Line numbers and list markers: decoration only. */
+		--md-faint: var(--text-muted);
+		--md-line: var(--border);
+		--md-raised: var(--surface-secondary);
+
+		color: var(--md-text);
+		font-size: 1rem;
+		line-height: 1.75;
+		overflow-wrap: break-word;
+	}
+
+	.site .md {
+		--md-quiet: var(--site-muted);
+		--md-link: var(--site-link);
+	}
+
+	.md-compact {
+		font-size: 0.8125rem;
+		line-height: 1.7;
+	}
+
+	.md > :first-child {
+		margin-top: 0;
+	}
+
+	.md > :last-child {
+		margin-bottom: 0;
+	}
+
+	/* ── Text ─────────────────────────────────────── */
+
+	.md :is(p, ul, ol, dl) {
+		margin-block: 1.15em;
+	}
+
+	.md :is(h2, h3, h4, h5, h6) {
+		color: var(--md-ink);
+		font-weight: 500;
+		line-height: 1.3;
+		text-wrap: balance;
+	}
+
+	.md h2 {
+		margin: 2.3em 0 0.7em;
+		font-size: 1.375em;
+		letter-spacing: -0.01em;
+	}
+
+	.md h3 {
+		margin: 1.9em 0 0.55em;
+		font-size: 1.125em;
+	}
+
+	.md :is(h4, h5, h6) {
+		margin: 1.6em 0 0.45em;
+		font-size: 1em;
+	}
+
+	/* Headings link to themselves; a "#" shows in the margin on hover. */
+	.md .md-anchor {
+		position: relative;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.md .md-anchor::before {
+		/* The hash is decoration: empty alt text keeps it out of the name. */
+		content: "#" / "";
+		position: absolute;
+		right: 100%;
+		padding-right: 0.3em;
+		color: var(--md-faint);
+		font-weight: 400;
+		opacity: 0;
+		transition: opacity 0.15s;
+	}
+
+	.md :is(h2, h3, h4):hover .md-anchor::before,
+	.md .md-anchor:focus-visible::before {
+		opacity: 1;
+	}
+
+	.md strong {
+		color: var(--md-ink);
+		font-weight: 500;
+	}
+
+	.md a:not(.md-anchor) {
+		color: var(--md-link);
+		text-decoration-line: underline;
+		text-decoration-thickness: 1px;
+		text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+		text-underline-offset: 0.22em;
+		transition: text-decoration-color 0.15s;
+	}
+
+	.md a:not(.md-anchor):hover {
+		text-decoration-color: currentColor;
+	}
+
+	.md :not(pre) > code {
+		padding: 0.1em 0.35em;
+		border: 1px solid var(--md-line);
+		border-radius: 0.3em;
+		background: var(--md-raised);
+		color: var(--md-ink);
+		font-family: var(--font-mono);
+		/* Ubuntu Mono sets small: this matches the body's x-height. */
+		font-size: 0.95em;
+	}
+
+	.md kbd {
+		padding: 0.05em 0.4em;
+		border: 1px solid var(--md-line);
+		border-bottom-width: 2px;
+		border-radius: 0.3em;
+		background: var(--md-raised);
+		color: var(--md-ink);
+		font-family: var(--font-mono);
+		font-size: 0.9em;
+	}
+
+	.md :is(sub, sup) {
+		line-height: 0;
+	}
+
+	.md hr {
+		margin: 2.5em 0;
+		border: 0;
+		border-top: 1px solid var(--md-line);
+	}
+
+	.md blockquote {
+		margin: 1.5em 0;
+		padding-left: 1.1em;
+		border-left: 2px solid var(--md-line);
+		color: var(--md-quiet);
+	}
+
+	.md blockquote > :is(:first-child) {
+		margin-top: 0;
+	}
+
+	.md blockquote > :is(:last-child) {
+		margin-bottom: 0;
+	}
+
+	/* ── Lists ────────────────────────────────────── */
+
+	.md :is(ul, ol) {
+		padding-left: 1.35em;
+	}
+
+	.md ul {
+		list-style: disc;
+	}
+
+	.md ol {
+		list-style: decimal;
+	}
+
+	.md li {
+		margin-block: 0.45em;
+		padding-left: 0.25em;
+	}
+
+	.md li::marker {
+		color: var(--md-faint);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.md li > :is(ul, ol) {
+		margin-block: 0.45em;
+	}
+
+	.md li > p {
+		margin-block: 0.6em;
+	}
+
+	.md .contains-task-list {
+		padding-left: 0.1em;
+		list-style: none;
+	}
+
+	.md .task-list-item input {
+		margin: 0 0.55em 0 0;
+		vertical-align: -0.1em;
+		accent-color: var(--accent, var(--md-link));
+	}
+
+	.md dt {
+		color: var(--md-ink);
+		font-weight: 500;
+	}
+
+	.md dd {
+		margin: 0.25em 0 0.75em 1.25em;
+	}
+
+	/* ── Tables ───────────────────────────────────── */
+
+	.md .md-table {
+		margin: 1.75em 0;
+		overflow-x: auto;
+	}
+
+	.md table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.9375em;
+		line-height: 1.55;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.md th {
+		padding: 0 1.5em 0.6em 0;
+		border-bottom: 1px solid color-mix(in srgb, var(--md-ink) 30%, transparent);
+		color: var(--md-ink);
+		font-weight: 500;
+		text-align: left;
+		vertical-align: bottom;
+	}
+
+	.md td {
+		padding: 0.7em 1.5em 0.7em 0;
+		border-bottom: 1px solid var(--md-line);
+		vertical-align: top;
+	}
+
+	.md :is(th, td):last-child {
+		padding-right: 0;
+	}
+
+	.md td:first-child {
+		color: var(--md-ink);
+	}
+
+	/* ── Images and figures ───────────────────────── */
+
+	.md img {
+		display: inline;
+		max-width: 100%;
+		height: auto;
+		vertical-align: middle;
+	}
+
+	.md figure {
+		margin: 2em 0;
+	}
+
+	.md figure img {
+		display: block;
+		border-radius: 0.5rem;
+		background: var(--md-raised);
+	}
+
+	.md figcaption {
+		margin-top: 0.75em;
+		color: var(--md-quiet);
+		font-size: 0.875em;
+		line-height: 1.5;
+	}
+
+	.md details {
+		margin: 1.25em 0;
+		padding: 0.6em 1em;
+		border: 1px solid var(--md-line);
+		border-radius: 0.5rem;
+	}
+
+	.md summary {
+		color: var(--md-ink);
+		font-weight: 500;
+		cursor: pointer;
+	}
+
+	.md details[open] > summary {
+		margin-bottom: 0.5em;
+	}
+
+	/* ── Code blocks ──────────────────────────────── */
+
+	.md .md-code {
+		margin: 1.6em 0;
+		overflow: hidden;
+		border: 1px solid var(--md-line);
+		border-radius: 0.625rem;
+		background: var(--md-raised);
+	}
+
+	.md .md-code-bar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1em;
+		min-height: 2.6em;
+		padding: 0 0.4em 0 1.1em;
+		border-bottom: 1px solid var(--md-line);
+		color: var(--md-quiet);
+		font-size: 0.8125em;
+		line-height: 1.3;
+	}
+
+	.md .md-code-title {
+		color: var(--md-ink);
+		font-family: var(--font-mono);
+		font-size: 1.05em;
+	}
+
+	.md .md-code-copy {
+		display: inline-flex;
+		flex-shrink: 0;
+		align-items: center;
+		gap: 0.4em;
+		height: 2em;
+		padding: 0 0.6em;
+		border-radius: 0.375rem;
+		color: var(--md-quiet);
+		transition:
+			background-color 0.15s,
+			color 0.15s;
+	}
+
+	.md .md-code-copy:hover {
+		background: color-mix(in srgb, var(--md-ink) 7%, transparent);
+		color: var(--md-ink);
+	}
+
+	.md .md-code-copy svg {
+		width: 1.1em;
+		height: 1.1em;
+	}
+
+	.md pre {
+		margin: 0;
+		padding: 0.95em 0;
+		overflow-x: auto;
+		color: var(--md-ink);
+		font-family: var(--font-mono);
+		font-size: 0.9375em;
+		line-height: 1.65;
+		tab-size: 2;
+	}
+
+	.md pre code {
+		display: block;
+		/* Highlighted lines span the full scroll width. */
+		min-width: max-content;
+	}
+
+	.md pre .line {
+		display: block;
+		min-height: 1lh;
+		padding: 0 1.2em;
+	}
+
+	.md pre .line.highlighted {
+		background: color-mix(
+			in srgb,
+			var(--accent, var(--md-link)) 13%,
+			transparent
+		);
+		box-shadow: inset 2px 0 var(--accent, var(--md-link));
+	}
+
+	.md pre code[data-line-numbers] {
+		counter-reset: line;
+	}
+
+	.md pre code[data-line-numbers] .line::before {
+		content: counter(line);
+		counter-increment: line;
+		display: inline-block;
+		width: 2.5ch;
+		margin-right: 1.5ch;
+		color: var(--md-faint);
+		text-align: right;
+		user-select: none;
+	}
+
+	.md .shiki span[style] {
+		color: var(--shiki-light);
+	}
+
+	.dark .md .shiki span[style] {
+		color: var(--shiki-dark);
+	}
+
+	/* ── Callouts ─────────────────────────────────── */
+
+	.md .md-callout {
+		--md-callout: var(--md-note);
+		margin: 1.6em 0;
+		padding: 0.8em 1.1em;
+		border-left: 2px solid var(--md-callout);
+		border-radius: 0 0.5rem 0.5rem 0;
+		background: color-mix(in srgb, var(--md-callout) 7%, transparent);
+	}
+
+	.md .md-callout[data-kind="tip"] {
+		--md-callout: var(--md-tip);
+	}
+
+	.md .md-callout[data-kind="important"] {
+		--md-callout: var(--md-important);
+	}
+
+	.md .md-callout[data-kind="warning"] {
+		--md-callout: var(--md-warning);
+	}
+
+	.md .md-callout[data-kind="caution"] {
+		--md-callout: var(--md-caution);
+	}
+
+	.md .md-callout-title {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		margin: 0 0 0.3em;
+		color: var(--md-callout);
+		font-weight: 500;
+	}
+
+	.md .md-callout-title svg {
+		width: 1.05em;
+		height: 1.05em;
+		flex-shrink: 0;
+	}
+
+	.md .md-callout > :nth-child(2) {
+		margin-top: 0;
+	}
+
+	.md .md-callout > :last-child {
+		margin-bottom: 0;
+	}
+
+	/* ── Video ────────────────────────────────────── */
+
+	.md .md-video {
+		margin: 2em 0;
+	}
+
+	.md .md-video-frame {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+		border-radius: 0.625rem;
+		background: #000;
+	}
+
+	/* ── Footnotes ────────────────────────────────── */
+
+	.md .footnotes {
+		margin-top: 3em;
+		padding-top: 1.25em;
+		border-top: 1px solid var(--md-line);
+		color: var(--md-quiet);
+		font-size: 0.875em;
+	}
+
+	.md .footnotes ol {
+		margin: 0;
+	}
+}

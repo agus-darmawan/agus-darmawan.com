@@ -15,10 +15,12 @@ import {
 } from "@/components/window/WindowHero";
 import type { AppId } from "@/config/apps";
 import type { ContentMeta } from "@/lib/content/types";
+import { itemKey } from "@/lib/meta/keys";
 import { cn } from "@/lib/utils";
 import { useContentSelection } from "@/store/useContentSelection";
 import { ContentCard } from "./ContentCard";
 import { ContentDetail } from "./ContentDetail";
+import { StatsScope } from "./stats/ItemStats";
 
 interface ContentFilterOption {
 	value: string;
@@ -72,6 +74,7 @@ export function ContentWindow<T extends ContentMeta>({
 	const backRef = useRef<HTMLButtonElement>(null);
 
 	const selected = items.find((i) => i.slug === selectedSlug) ?? null;
+	const keys = useMemo(() => items.map(itemKey), [items]);
 
 	// A deep link (/desktop?open=projects&item=…) picks the item to show.
 	const requested = useContentSelection((s) =>
@@ -176,7 +179,7 @@ export function ContentWindow<T extends ContentMeta>({
 					{pills.length > 0 && filter && (
 						<>
 							<div className="flex items-center gap-2 mb-2.5">
-								<span className="text-[9px] font-semibold uppercase tracking-widest shrink-0 text-(--text-muted)">
+								<span className="text-[11px] font-medium shrink-0 text-(--text-muted)">
 									{filter.label}
 								</span>
 								<div className="flex-1 h-px bg-linear-to-r from-(--border) to-transparent" />
@@ -260,7 +263,7 @@ export function ContentWindow<T extends ContentMeta>({
 
 				<div className="flex-1 overflow-auto px-5 py-4">
 					<div className="flex items-center gap-2 mb-3">
-						<span className="text-[10px] font-semibold uppercase tracking-widest text-(--text-muted)">
+						<span className="text-[11px] font-medium text-(--text-muted)">
 							{labels.list}
 						</span>
 						<div className="flex-1 h-px bg-(--border)" />
@@ -277,16 +280,18 @@ export function ContentWindow<T extends ContentMeta>({
 							<p className="text-sm text-(--text-muted)">{labels.empty}</p>
 						</div>
 					) : (
-						<ul className="grid grid-cols-1 gap-3">
-							{visible.map((item) => (
-								<li key={item.slug}>
-									<ContentCard
-										item={item}
-										onOpen={(i) => setSelectedSlug(i.slug)}
-									/>
-								</li>
-							))}
-						</ul>
+						<StatsScope items={keys}>
+							<ul className="grid grid-cols-1 gap-3">
+								{visible.map((item) => (
+									<li key={item.slug}>
+										<ContentCard
+											item={item}
+											onOpen={(i) => setSelectedSlug(i.slug)}
+										/>
+									</li>
+								))}
+							</ul>
+						</StatsScope>
 					)}
 				</div>
 			</div>
