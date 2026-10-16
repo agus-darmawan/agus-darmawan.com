@@ -34,7 +34,10 @@ export interface GitHubRepo {
 	pushed_at: string;
 }
 
-/** `missing` = GitHub answered 404 (private/renamed/deleted), so don't link it. */
+/**
+ * `missing` = don't link it: GitHub answered 404 (renamed, deleted, or
+ * private to an anonymous request), or the repo is private.
+ */
 type RepoLookup =
 	| { status: "ok"; repo: GitHubRepo }
 	| { status: "missing" }
@@ -67,7 +70,9 @@ export async function getRepo(fullName: string): Promise<RepoLookup> {
 	if (!res) return { status: "unknown" };
 	if (res.status === 404) return { status: "missing" };
 	if (!res.ok) return { status: "unknown" };
-	return { status: "ok", repo: (await res.json()) as GitHubRepo };
+	const repo = (await res.json()) as GitHubRepo;
+	// GITHUB_TOKEN can see private repos, visitors can't: a link would 404.
+	return repo.private ? { status: "missing" } : { status: "ok", repo };
 }
 
 /** Public, non-fork, non-archived repos tagged with the portfolio topic. */

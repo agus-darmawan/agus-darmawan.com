@@ -83,6 +83,26 @@ describe("content loader (real /content files)", () => {
 		expect(id?.body).not.toBe(en?.body);
 	});
 
+	it("drops the repo link when GitHub says the repo is missing or private", async () => {
+		vi.mocked(getRepo).mockImplementation(async (name) =>
+			name === "agus-darmawan/ProteusV2"
+				? { status: "missing" }
+				: { status: "unknown" },
+		);
+		try {
+			const boat = await getProject("en", "asv-navigation");
+			const site = await getProject("en", "ubuntu-portfolio");
+			expect(boat?.repoUrl).toBeNull();
+			expect(site?.repoUrl).toBe(
+				"https://github.com/agus-darmawan/agus-darmawan.com",
+			);
+		} finally {
+			vi.mocked(getRepo).mockImplementation(async () => ({
+				status: "unknown",
+			}));
+		}
+	});
+
 	it("puts featured projects first", async () => {
 		const projects = await getProjects("en");
 		const firstNonFeatured = projects.findIndex((p) => !p.featured);
