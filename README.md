@@ -32,6 +32,9 @@ Both read from one content layer, in English and Indonesian. Open a project on t
 ## Highlights
 
 - **One content layer**: projects and posts are Markdown files with Zod-validated frontmatter, enriched with live GitHub data. Public repos tagged `portfolio` show up on their own, with their README as the write-up.
+- **Articles that read well**: Markdown is rendered once, on the server: GitHub-flavoured, sanitized, highlighted with Shiki (VS Code's grammars, light and dark), with GitHub alerts, heading anchors and a sticky table of contents. The website and the desktop windows render the same tree.
+- **A banner for everything**: each project and post gets a drawing of a robot's route, seeded by its slug, unless its frontmatter names a photo.
+- **Views and likes**: counted once per visitor in Upstash Redis. Without Redis configured, the counts simply don't show.
 - **A desktop that behaves**: a store-driven window manager with snapping, minimize without losing state, an error boundary per window, a command palette (`Ctrl+K`) and a terminal with Tab completion, `man agus` and a working vim.
 - **Easy to find**: a static page per project and post in both languages, canonical URLs with hreflang, JSON-LD (`Person`, `ProfilePage`, `BlogPosting`, `SoftwareSourceCode`), a social card per page and a sitemap with alternates.
 - **The small things**: dark mode, Spotify now playing, a contact form behind Turnstile, a resume viewer, Sentry, Cloudflare Web Analytics.
@@ -41,7 +44,7 @@ Both read from one content layer, in English and Indonesian. Open a project on t
 
 Every curated project page has the same shape: the problem, what was built, the challenges and how they were solved, results, lessons learned, the stack and my role. They are written in both languages and read well on a phone.
 
-<img src="docs/images/content.webp" alt="A project write-up with its table of contents, and the home page on a phone in dark mode" width="100%">
+<img src="docs/images/content.webp" alt="A project page with its drawn banner, and another project on a phone in Indonesian" width="100%">
 
 ## How it fits together
 
@@ -106,12 +109,25 @@ color: "#0d9488"
 tags: ["ROS 2", "Python", "FAST-LIO2"]
 repo: "DarmawanRobotics/Pashupati"   # optional: live stars, hidden if private
 demo: "https://example.com"          # optional
+# banner: "/images/projects/pashupati.jpg"   # optional photo from /public;
+# bannerAlt: "Pashupati in a mall corridor"  # a route is drawn without one
 ---
 
 The body in Markdown. Don't repeat the title as an H1; the page renders it.
 ```
 
-`content/projects/id/<slug>.mdx` needs only `title`, `description` and the body; everything else comes from `en`, and a missing translation falls back to English. Posts work the same way under `content/blog/`, with a required `date`. Add `draft: true` to hide either. A typo in the frontmatter fails the build and names the file.
+`content/projects/id/<slug>.mdx` needs only `title`, `description` and the body (and `bannerAlt`, if there is a photo); everything else comes from `en`, and a missing translation falls back to English. Posts work the same way under `content/blog/`, with a required `date`. Add `draft: true` to hide either. A typo in the frontmatter fails the build and names the file.
+
+### What the Markdown can do
+
+Everything GitHub renders (tables, task lists, footnotes, raw HTML, which is sanitized), plus:
+
+| Write | Get |
+|---|---|
+| ```` ```ts title="store.ts" {2,4-6} showLineNumbers ```` | A file name, highlighted lines, line numbers |
+| `> [!NOTE]` (or `TIP`, `IMPORTANT`, `WARNING`, `CAUTION`) | A callout |
+| `![Demo](https://youtu.be/<id>)` or `::youtube[Title](<id>)` | A video that loads when clicked |
+| `![Alt](/images/x.png "Caption")` on a line of its own | A figure with a caption |
 
 ## Environment variables
 
@@ -129,13 +145,16 @@ See [`.env.example`](.env.example). Nothing is required; a missing integration s
 | `NEXT_PUBLIC_CONTENT_URL` | R2 CDN for the resume PDFs |
 | `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN` | Error tracking |
 | `CF_ACCOUNT_ID`, `CF_SITE_TAG`, `CF_API_TOKEN` | Visitor counter in the terminal |
+| `UPSTASH_REDIS_REST_URL` / `TOKEN` (or Vercel's `KV_REST_API_URL` / `TOKEN`) | Views and likes |
+| `META_SALT` | Secret for hashing visitor ids (defaults to the Redis token) |
+| `META_STORE=memory` | Views and likes in memory, for development and the e2e tests |
 
 ## Scripts
 
 ```bash
 pnpm dev          # development server
 pnpm build        # production build (standalone output)
-pnpm test:run     # unit tests: parser, highlighter, content loader, GitHub client, terminal
+pnpm test:run     # unit tests: Markdown pipeline, banners, content loader, GitHub client, views and likes, terminal
 pnpm test:e2e     # Playwright against the standalone build (run pnpm build first)
 pnpm type-check   # tsc --noEmit
 pnpm lint         # Biome
@@ -145,7 +164,7 @@ pnpm analyze      # bundle analyzer
 
 ## CI and dependency updates
 
-Every push runs two jobs: **Lint, types, unit tests**, then **Build + end-to-end**, which builds the standalone server and runs the Playwright suite against it (window manager, terminal, SEO, the website and a phone layout).
+Every push runs two jobs: **Lint, types, unit tests**, then **Build + end-to-end**, which builds the standalone server and runs the Playwright suite against it (window manager, terminal, SEO, articles, the website and a phone layout).
 
 Dependabot ([`.github/dependabot.yml`](.github/dependabot.yml)) opens pull requests every Monday, with a cooldown so brand-new releases age for a few days first. Patch and minor updates, and GitHub Actions updates, merge themselves once both jobs pass ([`dependabot-auto-merge.yml`](.github/workflows/dependabot-auto-merge.yml)); major updates wait for a review. One-time repository setup:
 
@@ -172,17 +191,18 @@ docs/images/                README images
 src/
   app/[locale]/             the website: home, about, experience, projects, blog, contact
   app/[locale]/desktop/     the desktop (noindex: same content as the website)
-  app/api/                  contact, Spotify, visitors, content bodies
+  app/api/                  contact, Spotify, visitors, content bodies, views and likes
   components/
-    content/                one list + detail implementation behind Projects and Blog
-    markdown/               Markdown renderer, code highlighting, table of contents
+    content/                cards, banners, views and likes, the desktop's Projects and Blog
+    markdown/               renders the prepared tree: code blocks, callouts, table of contents
     seo/                    JSON-LD and route helpers for projects and posts
   config/site.ts            identity, URLs and socials in one place
   features/                 desktop apps: about, blog, projects, terminal, ...
   features/site/            the website: shell, header, footer, pages, home preview
   lib/
     content/                loader, GitHub client, Zod schema, types
-    markdown/               parser and highlighter (pure, tested)
+    markdown/               remark/rehype pipeline, Shiki, sanitizing (server only, tested)
+    meta/                   views and likes: Upstash REST or memory
     seo/                    metadata and structured data builders
   store/                    Zustand window manager and content selection
   proxy.ts                  locale routing; the bare domain reopens the view used last
