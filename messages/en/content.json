@@ -32,6 +32,9 @@
 		"moreProjects": "More projects",
 		"clearSearch": "Clear search",
 		"video": "YouTube video",
-		"playVideo": "Play video: {title}"
+		"playVideo": "Play video: {title}",
+		"views": "{count, plural, one {# view} other {# views}}",
+		"likes": "{count, plural, one {# like} other {# likes}}",
+		"like": "Like"
 	}
 }

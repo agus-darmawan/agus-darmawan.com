@@ -235,6 +235,17 @@ body {
 	animation: float-particle ease-in-out infinite;
 }
 
+/* The heart of the like button, once, when you like something. */
+@keyframes like-pop {
+	40% {
+		transform: scale(1.35);
+	}
+}
+
+.animate-like-pop {
+	animation: like-pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
 /* Block cursor of the demo terminal on the home page. */
 @keyframes caret-blink {
 	50% {

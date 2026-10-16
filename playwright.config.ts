@@ -35,8 +35,9 @@ export default defineConfig({
 	webServer: process.env.E2E_BASE_URL
 		? undefined
 		: {
-				// The app builds with `output: "standalone"`, so serve that bundle.
-				command: `PORT=${PORT} HOSTNAME=127.0.0.1 pnpm start:standalone`,
+				// The app builds with `output: "standalone"`, so serve that bundle,
+				// with views and likes kept in memory instead of Redis.
+				command: `META_STORE=memory PORT=${PORT} HOSTNAME=127.0.0.1 pnpm start:standalone`,
 				url: `${baseURL}/en`,
 				reuseExistingServer: !process.env.CI,
 				timeout: 120_000,

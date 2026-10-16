@@ -32,6 +32,9 @@
 		"moreProjects": "Proyek lainnya",
 		"clearSearch": "Hapus pencarian",
 		"video": "Video YouTube",
-		"playVideo": "Putar video: {title}"
+		"playVideo": "Putar video: {title}",
+		"views": "{count, plural, other {# kali dilihat}}",
+		"likes": "{count, plural, other {# suka}}",
+		"like": "Suka"
 	}
 }
