@@ -19,7 +19,7 @@ Bagian paling rumit adalah window manager. Setiap window butuh manajemen z-index
 
 Solusinya adalah satu **Zustand store** untuk semua state window:
 
-```ts
+```ts title="useWindowStore.ts" {6-7}
 const useWindowStore = create<WindowStore>((set, get) => ({
   windows: [],
   activeWindowId: null,
@@ -36,13 +36,15 @@ Fungsi `getEffectiveZ` adalah yang menarik — window README selalu harus berada
 
 Terminal mendispatch custom event yang diterjemahkan halaman menjadi operasi window:
 
-```ts
-// Di command processor terminal
+::::code-group
+```ts title="Command processor terminal"
 window.dispatchEvent(new CustomEvent("openApp", { detail: { appId } }));
+```
 
-// Di page.tsx
+```ts title="page.tsx"
 window.addEventListener("openApp", (e) => openWindow(e.detail.appId));
 ```
+::::
 
 Ini membuat terminal sepenuhnya terpisah dari window manager. Terminal tidak mengimpor apapun dari sistem window — hanya dispatch event dan selesai.
 

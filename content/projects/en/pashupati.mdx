@@ -66,7 +66,13 @@ state, findings, crowds ---> fleet uplink ---> NETRA
 
 **Problem.** Reactive avoidance is not a safety function, and in a mall the robot shares corridors with children, trolleys and people looking at their phones.
 
-**Solution.** Every velocity command, autonomous or from the handheld, passes a control mux with two guards. A latched software e-stop lets only zero through until someone releases it. A 360° protective field allows a speed only if the robot can stop in time in the direction it is moving, v·t + v²/2a ≤ clearance − margin, and without a fresh 360° scan there is no autonomous motion at all. When the active command source goes silent, the output drops to zero.
+**Solution.** Every velocity command, autonomous or from the handheld, passes a control mux with two guards. A latched software e-stop lets only zero through until someone releases it. A 360° protective field allows a speed only if the robot can stop in time in the direction it is moving, reaction distance plus braking distance within the clearance:
+
+$$
+v\,t + \frac{v^2}{2a} \le d_\text{clearance} - d_\text{margin}
+$$
+
+Without a fresh 360° scan there is no autonomous motion at all. When the active command source goes silent, the output drops to zero.
 
 ### Following the path without swaying
 

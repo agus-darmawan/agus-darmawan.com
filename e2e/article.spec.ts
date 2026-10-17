@@ -74,7 +74,9 @@ test("the desktop window renders the same article", async ({ page }) => {
 	const win = windowNamed(page, "Blog");
 	await win.getByRole("link").first().click();
 
-	await expect(win.locator(".md-code").first()).toContainText("TypeScript");
+	await expect(win.locator(".md-code").first()).toContainText(
+		"useWindowStore.ts",
+	);
 	await expect(win.getByRole("button", { name: /^Like/ })).toBeVisible();
 	// In-page links scroll the window and leave the address alone.
 	await win
@@ -87,4 +89,22 @@ test("the desktop window renders the same article", async ({ page }) => {
 	await heading.getByRole("link").click();
 	await expect(page).toHaveURL(/\/en\/desktop$/);
 	await expect(heading).toBeInViewport();
+});
+
+test("tabs switch code blocks and math is typeset", async ({ page }) => {
+	await page.goto("/en/blog/building-ubuntu-portfolio");
+	const tabs = page.getByRole("tablist");
+	const second = tabs.getByRole("tab", { name: "page.tsx" });
+	await expect(second).toHaveAttribute("aria-selected", "false");
+	await expect(page.getByText("addEventListener")).toBeHidden();
+	await second.click();
+	await expect(second).toHaveAttribute("aria-selected", "true");
+	await expect(page.getByText("addEventListener")).toBeVisible();
+	await second.press("ArrowLeft");
+	await expect(
+		tabs.getByRole("tab", { name: "Terminal command processor" }),
+	).toBeFocused();
+
+	await page.goto("/en/projects/pashupati");
+	await expect(page.locator(".katex-display").first()).toBeVisible();
 });

@@ -144,15 +144,19 @@ describe("renderMarkdown: code", () => {
 	});
 
 	it("parses fence meta", () => {
-		expect(parseCodeMeta(`title='a b.ts' {2, 4-6} showLineNumbers`)).toEqual({
-			title: "a b.ts",
+		expect(
+			parseCodeMeta(`title='src/a b.ts' {2, 4-6} showLineNumbers /x/`),
+		).toEqual({
+			title: "src/a b.ts",
 			highlight: new Set([2, 4, 5, 6]),
 			lineNumbers: true,
+			rest: "{2, 4-6} showLineNumbers /x/",
 		});
 		expect(parseCodeMeta(undefined)).toEqual({
 			title: undefined,
 			highlight: new Set(),
 			lineNumbers: false,
+			rest: "",
 		});
 	});
 });
@@ -201,11 +205,16 @@ describe("renderMarkdown: callouts and media", () => {
 		expect(youtubeId("https://example.com/watch?v=nope")).toBeNull();
 	});
 
-	it("makes a lone image a figure, captioned by its title", async () => {
+	it("makes a lone image a zoomable figure, captioned by its title", async () => {
 		const out = await html('![Arch](/a.png "The architecture")');
 		expect(out).toBe(
-			'<figure><img src="/a.png" alt="Arch" title="The architecture" loading="lazy" decoding="async"><figcaption>The architecture</figcaption></figure>',
+			'<figure data-zoom="" data-src="/a.png" data-alt="Arch"><img src="/a.png" alt="Arch" title="The architecture" loading="lazy" decoding="async"><figcaption>The architecture</figcaption></figure>',
 		);
+	});
+
+	it("keeps a linked image's link instead of zooming it", async () => {
+		const out = await html("[![Shot](/a.png)](https://example.com)");
+		expect(out).toMatch(/^<figure><a href="https:\/\/example.com"/);
 	});
 
 	it("leaves images inside text, and README layout paragraphs, as they are", async () => {

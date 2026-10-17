@@ -59,7 +59,13 @@ status, temuan, keramaian ---> fleet uplink ---> NETRA
 
 **Masalah.** Avoidance yang reaktif bukan fungsi keselamatan, dan di mal robot berbagi koridor dengan anak-anak, troli, dan orang yang sibuk dengan ponselnya.
 
-**Solusi.** Setiap perintah kecepatan, baik dari mode otonom maupun dari handheld, melewati control mux dengan dua penjaga. Software e-stop yang terkunci hanya meloloskan nol sampai ada yang melepasnya. Protective field 360° hanya mengizinkan kecepatan yang masih memungkinkan robot berhenti tepat waktu ke arah geraknya, v·t + v²/2a ≤ clearance − margin, dan tanpa scan 360° yang segar tidak ada gerakan otonom sama sekali. Saat sumber perintah yang aktif diam, keluarannya turun ke nol.
+**Solusi.** Setiap perintah kecepatan, baik dari mode otonom maupun dari handheld, melewati control mux dengan dua penjaga. Software e-stop yang terkunci hanya meloloskan nol sampai ada yang melepasnya. Protective field 360° hanya mengizinkan kecepatan yang masih memungkinkan robot berhenti tepat waktu ke arah geraknya, yaitu jarak reaksi ditambah jarak pengereman masih di dalam clearance:
+
+$$
+v\,t + \frac{v^2}{2a} \le d_\text{clearance} - d_\text{margin}
+$$
+
+Tanpa scan 360° yang segar tidak ada gerakan otonom sama sekali. Saat sumber perintah yang aktif diam, keluarannya turun ke nol.
 
 ### Mengikuti jalur tanpa bergoyang
 

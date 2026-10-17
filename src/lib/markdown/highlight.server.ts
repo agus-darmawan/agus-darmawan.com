@@ -1,4 +1,11 @@
 import "server-only";
+import {
+	transformerMetaWordHighlight,
+	transformerNotationDiff,
+	transformerNotationFocus,
+	transformerNotationHighlight,
+	transformerNotationWordHighlight,
+} from "@shikijs/transformers";
 import type { Element, ElementContent } from "hast";
 import {
 	createHighlighterCore,
@@ -117,12 +124,19 @@ export interface CodeMeta {
 	/** 1-based line numbers to emphasize, from `{1,3-5}`. */
 	highlight: Set<number>;
 	lineNumbers: boolean;
+	/** The rest of the info string, for Shiki (`/word/` highlights). */
+	rest: string;
 }
 
-/** Parses the info string after the language: `title="a.ts" {1,3-5} showLineNumbers`. */
+const TITLE = /title=(?:"([^"]*)"|'([^']*)')/;
+
+/**
+ * Parses the info string after the language:
+ * `title="a.ts" {1,3-5} showLineNumbers /useState/`.
+ */
 export function parseCodeMeta(meta: string | undefined): CodeMeta {
 	const text = meta ?? "";
-	const title = text.match(/title=(?:"([^"]*)"|'([^']*)')/);
+	const title = text.match(TITLE);
 	const highlight = new Set<number>();
 	for (const range of text.match(/\{([\d,\s-]+)\}/)?.[1].split(",") ?? []) {
 		const [from, to = from] = range.trim().split("-").map(Number);
@@ -133,8 +147,23 @@ export function parseCodeMeta(meta: string | undefined): CodeMeta {
 		title: title?.[1] ?? title?.[2] ?? undefined,
 		highlight,
 		lineNumbers: /\bshowLineNumbers\b/.test(text),
+		// A title is a path: its slashes must not read as `/word/` patterns.
+		rest: text.replace(TITLE, "").trim(),
 	};
 }
+
+/**
+ * Comment notations in the code itself (the comment is removed):
+ * `// [!code ++]` and `// [!code --]` mark a diff, `// [!code highlight]`
+ * a line, `// [!code focus]` dims the rest, `// [!code word:name]` a word.
+ */
+const NOTATIONS = [
+	transformerNotationDiff(),
+	transformerNotationHighlight(),
+	transformerNotationFocus(),
+	transformerNotationWordHighlight(),
+	transformerMetaWordHighlight(),
+];
 
 export interface HighlightedCode {
 	/** The `<pre>` Shiki produced, ready to drop into a hast tree. */
@@ -169,9 +198,11 @@ export async function highlight(
 
 	const root = shiki.codeToHast(code.replace(/\n$/, ""), {
 		lang,
+		meta: { __raw: meta.rest },
 		themes: { light: "github-light", dark: "github-dark" },
 		defaultColor: false,
-		transformers: [lines],
+		// Ours last: it drops the newlines the notations still expect.
+		transformers: [...NOTATIONS, lines],
 	});
 	const pre = root.children.find(
 		(child): child is Element =>

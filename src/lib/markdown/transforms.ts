@@ -53,6 +53,21 @@ export function headings(tree: Root): TocEntry[] {
 	const slugger = new GithubSlugger();
 	// The page's own ids: a "Content" heading must not steal the skip link.
 	for (const id of RESERVED_IDS) slugger.slug(id);
+	// Headings inside a component (a step, a tab, a callout, a collapsed
+	// block) get anchors but aren't sections of the article.
+	const nested = new Set<Element>();
+	visit(tree, "element", (node) => {
+		const boxed =
+			node.properties.dataComponent !== undefined ||
+			node.tagName === "details" ||
+			node.tagName === "blockquote";
+		if (!boxed) return;
+		visit(node, "element", (child) => {
+			if (child !== node && LEVEL[child.tagName]) nested.add(child);
+		});
+		return SKIP;
+	});
+
 	const toc: TocEntry[] = [];
 	visit(tree, "element", (node) => {
 		// GFM's footnote label is a visually hidden h2; it isn't a section.
@@ -66,7 +81,9 @@ export function headings(tree: Root): TocEntry[] {
 		const id = slugger.slug(text) || slugger.slug("section");
 		node.tagName = `h${level}`;
 		node.properties = { ...node.properties, id };
-		if (level === 2 || level === 3) toc.push({ id, text, level });
+		if ((level === 2 || level === 3) && !nested.has(node)) {
+			toc.push({ id, text, level });
+		}
 
 		let linked = false;
 		visit(node, "element", (child) => {
@@ -170,9 +187,28 @@ function videoOf(p: Element): { id: string; title?: string } | null {
 	return id ? { id, title: title || undefined } : null;
 }
 
+/** A figure whose image opens full size when clicked. */
+export function zoomable(image: Element, caption?: string): Element {
+	return element(
+		"figure",
+		{
+			dataZoom: "",
+			dataSrc: prop(image, "src"),
+			dataAlt: prop(image, "alt") ?? "",
+		},
+		[
+			image,
+			...(caption
+				? [element("figcaption", {}, [{ type: "text", value: caption }])]
+				: []),
+		],
+	);
+}
+
 /**
  * A paragraph that only holds an image becomes a figure (its title is the
- * caption); one that only holds a YouTube link becomes a click-to-load embed.
+ * caption; a linked image keeps its link instead of zooming); one that only
+ * holds a YouTube link becomes a click-to-load embed.
  */
 export function media(tree: Root) {
 	visit(tree, "element", (node, index, parent) => {
@@ -193,12 +229,15 @@ export function media(tree: Root) {
 		const image = soleImage(node);
 		if (!image) return;
 		const caption = prop(image, "title");
-		parent.children[index] = element("figure", {}, [
-			...meaningful(node.children),
-			...(caption
-				? [element("figcaption", {}, [{ type: "text", value: caption }])]
-				: []),
-		]);
+		const [only] = meaningful(node.children);
+		parent.children[index] = isElement(only, "img")
+			? zoomable(image, caption)
+			: element("figure", {}, [
+					only,
+					...(caption
+						? [element("figcaption", {}, [{ type: "text", value: caption }])]
+						: []),
+				]);
 		return SKIP;
 	});
 }

@@ -44,6 +44,10 @@
 		"views": "{count, plural, other {# kali dilihat}}",
 		"likes": "{count, plural, other {# suka}}",
 		"like": "Suka",
-		"loading": "Memuat"
+		"loading": "Memuat",
+		"details": "Detail",
+		"openImage": "Buka ukuran penuh: {alt}",
+		"image": "Gambar",
+		"close": "Tutup"
 	}
 }
