@@ -23,7 +23,7 @@ The trickiest part was the window manager. Each window needs z-index management,
 
 The fix was a single **Zustand store** for all window state:
 
-```ts
+```ts title="useWindowStore.ts" {6-7}
 const useWindowStore = create<WindowStore>((set, get) => ({
   windows: [],
   activeWindowId: null,
@@ -40,13 +40,15 @@ The `getEffectiveZ` function was a fun one — README windows always need to sit
 
 The terminal dispatches custom events that the page translates into window operations:
 
-```ts
-// In terminal command processor
+::::code-group
+```ts title="Terminal command processor"
 window.dispatchEvent(new CustomEvent("openApp", { detail: { appId } }));
+```
 
-// In page.tsx
+```ts title="page.tsx"
 window.addEventListener("openApp", (e) => openWindow(e.detail.appId));
 ```
+::::
 
 This keeps the terminal completely decoupled from the window manager. The terminal doesn't import anything from the window system — it just dispatches events and forgets.
 
