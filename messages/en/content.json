@@ -44,6 +44,10 @@
 		"views": "{count, plural, one {# view} other {# views}}",
 		"likes": "{count, plural, one {# like} other {# likes}}",
 		"like": "Like",
-		"loading": "Loading"
+		"loading": "Loading",
+		"details": "Details",
+		"openImage": "Open full size: {alt}",
+		"image": "Image",
+		"close": "Close"
 	}
 }

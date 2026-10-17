@@ -1,18 +1,29 @@
 import "server-only";
+import { randomUUID } from "node:crypto";
 import type { Element, Root } from "hast";
 import { toString as textOf } from "hast-util-to-string";
 import type { Root as MdastRoot } from "mdast";
+import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize, {
 	defaultSchema,
 	type Options as Schema,
 } from "rehype-sanitize";
+import remarkDirective from "remark-directive";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { SKIP, visit } from "unist-util-visit";
 import { SITE } from "@/config/site";
+import {
+	components,
+	type RepoResolver,
+	repos,
+	trustComponents,
+} from "./components";
+import { COMPONENT_PROPS, remarkComponents } from "./directives";
 import { highlight, languageLabel, parseCodeMeta } from "./highlight.server";
 import {
 	attributes,
@@ -28,8 +39,9 @@ import type { MarkdownDoc } from "./types";
 /**
  * Markdown → a sanitized, highlighted hast tree plus its outline.
  *
- *   remark (GFM)  →  rehype, raw HTML parsed  →  sanitized (GitHub's rules)
- *   →  trusted passes: Shiki, heading anchors, callouts, embeds, figures
+ *   remark (GFM, $$math$$, directives)  →  rehype, raw HTML parsed
+ *   →  sanitized (GitHub's rules)  →  trusted passes: components, KaTeX,
+ *   Shiki, heading anchors, callouts, embeds, figures, repo cards
  *
  * Bodies come from our own MDX files and from GitHub READMEs, so raw HTML is
  * allowed (READMEs are full of it) but always sanitized before anything we
@@ -40,8 +52,13 @@ const schema: Schema = {
 	...defaultSchema,
 	attributes: {
 		...defaultSchema.attributes,
-		// The fence info after the language, read by the highlighter.
-		code: [...(defaultSchema.attributes?.code ?? []), "dataMeta"],
+		// Language and math classes, and the fence info for the highlighter.
+		code: [
+			["className", /^language-./, "math-inline", "math-display"],
+			"dataMeta",
+		],
+		// Directive markers; `trustComponents` drops forged ones.
+		div: [...(defaultSchema.attributes?.div ?? []), ...COMPONENT_PROPS],
 	},
 };
 
@@ -104,16 +121,31 @@ export interface RenderOptions {
 	footnoteLabel?: string;
 	/** Accessible name of a footnote's way back, given its number. */
 	footnoteBackLabel?: (reference: string) => string;
+	/** Summary of a `:::details` written without one. */
+	detailsLabel?: string;
+	/** Looks up `::github` repos; without it, cards are plain links. */
+	resolveRepo?: RepoResolver;
 }
 
 export async function renderMarkdown(
 	markdown: string,
-	{ footnoteLabel, footnoteBackLabel }: RenderOptions = {},
+	{
+		footnoteLabel,
+		footnoteBackLabel,
+		detailsLabel = "Details",
+		resolveRepo,
+	}: RenderOptions = {},
 ): Promise<MarkdownDoc> {
+	// Marks this render's components; raw HTML can't guess it.
+	const nonce = randomUUID();
 	const processor = unified()
 		.use(remarkParse)
 		// `~250 lines` is not strikethrough; `~~text~~` still is.
 		.use(remarkGfm, { singleTilde: false })
+		// Math is `$$…$$` only: a single `$` is a price.
+		.use(remarkMath, { singleDollarTextMath: false })
+		.use(remarkDirective)
+		.use(remarkComponents, { nonce, source: markdown, detailsLabel })
 		.use(remarkCodeMeta)
 		.use(remarkRehype, {
 			allowDangerousHtml: true,
@@ -127,13 +159,18 @@ export async function renderMarkdown(
 		})
 		.use(rehypeRaw)
 		.use(rehypeSanitize, schema)
+		.use(() => (tree: Root) => trustComponents(tree, nonce))
+		// Before Shiki, which would take display math for a code block.
+		.use(rehypeKatex)
 		.use(rehypeCode);
 
 	const tree = await processor.run(processor.parse(markdown));
 	const toc = headings(tree);
 	footnotes(tree);
 	callouts(tree);
+	components(tree);
 	media(tree);
+	await repos(tree, resolveRepo);
 	tables(tree);
 	attributes(tree, SITE.url);
 	compact(tree);
