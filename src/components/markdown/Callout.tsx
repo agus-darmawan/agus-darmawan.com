@@ -20,12 +20,17 @@ const ICONS = {
 const isKind = (kind: string | undefined): kind is CalloutKind =>
 	kind !== undefined && kind in ICONS;
 
-/** GitHub-style alert (`> [!NOTE]`), titled in the reader's language. */
+/**
+ * GitHub-style alert (`> [!NOTE]`, or `:::note[Title]`), titled in the
+ * reader's language unless the author gave it a title.
+ */
 export function Callout({
 	kind: requested,
+	title,
 	children,
 }: {
 	kind?: string;
+	title?: string;
 	children: ReactNode;
 }) {
 	const t = useTranslations("Content.callout");
@@ -36,7 +41,7 @@ export function Callout({
 		<div className="md-callout" data-kind={kind}>
 			<p className="md-callout-title">
 				<Icon aria-hidden />
-				{t(kind)}
+				{title ?? t(kind)}
 			</p>
 			{children}
 		</div>
