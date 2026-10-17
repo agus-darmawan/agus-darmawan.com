@@ -124,10 +124,22 @@ Everything GitHub renders (tables, task lists, footnotes, raw HTML, which is san
 
 | Write | Get |
 |---|---|
-| ```` ```ts title="store.ts" {2,4-6} showLineNumbers ```` | A file name, highlighted lines, line numbers |
-| `> [!NOTE]` (or `TIP`, `IMPORTANT`, `WARNING`, `CAUTION`) | A callout |
-| `![Demo](https://youtu.be/<id>)` or `::youtube[Title](<id>)` | A video that loads when clicked |
-| `![Alt](/images/x.png "Caption")` on a line of its own | A figure with a caption |
+| ```` ```ts title="store.ts" {2,4-6} showLineNumbers /useState/ ```` | A file name, highlighted lines, line numbers, highlighted words |
+| `// [!code ++]`, `// [!code --]`, `// [!code highlight]`, `// [!code focus]` at the end of a code line | Diff lines, a highlighted line, focus (the comment is removed) |
+| `> [!NOTE]`, or `:::note[Title]` … `:::` (also `tip`, `important`, `warning`, `caution`) | A callout, with your own title if you give one |
+| `:::details[Summary]` … `:::` | A collapsed block |
+| `:::steps` with a `###` heading per step | Numbered steps on a line (kept out of the table of contents) |
+| `:::code-group` around code blocks | One tab per block, named by its `title` or language |
+| `::::tabs` with `:::tab[Label]` blocks inside | Tabs holding anything |
+| `:::files` around a nested list (`src/` is a folder, `**name**` marks one, text after the name is a note) | A file tree |
+| `$$…$$` inline, or `$$` on lines of their own | Math, typeset with KaTeX on the server (a single `$` stays a dollar) |
+| `![Alt](/images/x.png "Caption")` on a line of its own | A figure with a caption that opens full size |
+| `:::gallery{cols=3}` around images | A grid of figures that open full size |
+| `![Demo](https://youtu.be/<id>)` or `::youtube[Title]{id="<id or URL>"}` | A video that loads when clicked |
+| `::video[Caption]{src="/videos/x.mp4" poster="/images/x.jpg"}` | A video file with controls |
+| `::github{repo="owner/name"}` | A card with the repo's description, language and stars (hidden if the repo is private) |
+
+Anything else that looks like a directive (`10:30`, `key:value`, `::unknown`) stays the text it was written as.
 
 ## Environment variables
 
